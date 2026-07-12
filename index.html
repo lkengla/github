@@ -62,7 +62,7 @@
 
   main {
     min-height: 100vh;
-    padding-top: 90px;
+    padding-top: 84px;
     display: flex;
     flex-direction: column;
   }
@@ -71,7 +71,7 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-end;
     padding: 0 0 24px;
   }
 
@@ -358,9 +358,36 @@
       return track.scrollLeft + (elRect.left - trackRect.left) - (track.clientWidth - elRect.width) / 2;
     }
 
+    let animRaf = null;
+
+    function animateScrollTo(target, duration) {
+      if (animRaf) cancelAnimationFrame(animRaf);
+      track.style.scrollSnapType = 'none';
+      const start = track.scrollLeft;
+      const change = target - start;
+      const startTime = performance.now();
+      function step(now) {
+        const t = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - t, 3);
+        track.scrollLeft = start + change * eased;
+        if (t < 1) {
+          animRaf = requestAnimationFrame(step);
+        } else {
+          animRaf = null;
+          track.style.scrollSnapType = '';
+        }
+      }
+      animRaf = requestAnimationFrame(step);
+    }
+
     function goTo(i, smooth) {
       index = i;
-      track.scrollTo({ left: centerScrollLeft(cards[i]), behavior: smooth ? 'smooth' : 'auto' });
+      const target = centerScrollLeft(cards[i]);
+      if (smooth) {
+        animateScrollTo(target, 380);
+      } else {
+        track.scrollLeft = target;
+      }
     }
 
     goTo(1, false);
