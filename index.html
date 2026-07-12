@@ -61,11 +61,18 @@
   }
 
   main {
+    min-height: 100vh;
     padding-top: 90px;
+    display: flex;
+    flex-direction: column;
   }
 
   .work {
-    padding: 0 0 80px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 0 24px;
   }
 
   .work-heading {
@@ -115,12 +122,11 @@
 
   .card {
     flex: 0 0 auto;
-    width: min(58vw, 620px);
     scroll-snap-align: center;
   }
 
   .thumb {
-    width: 100%;
+    width: min(80vw, 99vh);
     aspect-ratio: 16 / 10;
     background: linear-gradient(135deg, var(--c1), var(--c2));
     position: relative;
@@ -216,7 +222,7 @@
       padding-right: 24px;
     }
 
-    .card {
+    .thumb {
       width: 88vw;
     }
   }
