@@ -49,15 +49,15 @@
   }
 
   header nav a {
-    color: var(--muted);
+    color: var(--ink);
     text-decoration: none;
     font-size: 13px;
     margin-left: 28px;
-    transition: color 0.2s ease;
+    transition: opacity 0.2s ease;
   }
 
   header nav a:hover {
-    color: var(--ink);
+    opacity: 0.6;
   }
 
   main {
@@ -91,23 +91,22 @@
   }
 
   .controls button {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    border: 1px solid var(--hairline);
-    background: var(--bg);
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: none;
     color: var(--ink);
+    font-size: 20px;
+    font-weight: 700;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s ease, border-color 0.2s ease;
+    transition: opacity 0.2s ease;
   }
 
   .controls button:hover {
-    background: var(--ink);
-    color: var(--bg);
-    border-color: var(--ink);
+    opacity: 0.6;
   }
 
   .carousel {
@@ -132,7 +131,6 @@
   .thumb {
     width: 100%;
     aspect-ratio: 16 / 10;
-    border-radius: 12px;
     background: linear-gradient(135deg, var(--c1), var(--c2));
     position: relative;
     overflow: hidden;
@@ -166,7 +164,9 @@
   }
 
   .card span {
-    font-size: 13px;
+    display: block;
+    font-size: 16px;
+    font-weight: 300;
     color: var(--muted);
   }
 
@@ -207,8 +207,8 @@
         <div class="thumb is-photo" data-index="01">
           <img src="portfolio projects/ArtDivision/artdivison-freeway_signage-mockup.jpg" alt="Art Division &mdash; freeway signage mockup">
         </div>
-        <h3>Art Division</h3>
-        <span>Freeway Signage</span>
+        <h3>ArtDivision</h3>
+        <span>Branding, Website, Etc.</span>
       </div>
       <div class="card">
         <div class="thumb" data-index="02" style="--c1:#e4ddd3; --c2:#b9ac97;"></div>
@@ -264,30 +264,36 @@
     document.getElementById('next').addEventListener('click', () => goTo(index + 1, true));
     document.getElementById('prev').addEventListener('click', () => goTo(index - 1, true));
 
-    let settleTimer;
-    track.addEventListener('scroll', () => {
-      clearTimeout(settleTimer);
-      settleTimer = setTimeout(() => {
-        const trackRect = track.getBoundingClientRect();
-        const center = trackRect.left + track.clientWidth / 2;
-        let closest = index;
-        let minDist = Infinity;
-        cards.forEach((c, i) => {
-          const r = c.getBoundingClientRect();
-          const dist = Math.abs((r.left + r.width / 2) - center);
-          if (dist < minDist) {
-            minDist = dist;
-            closest = i;
-          }
-        });
-        index = closest;
-        if (index === 0) {
-          goTo(count, false);
-        } else if (index === cards.length - 1) {
-          goTo(1, false);
+    function settle() {
+      const trackRect = track.getBoundingClientRect();
+      const center = trackRect.left + track.clientWidth / 2;
+      let closest = index;
+      let minDist = Infinity;
+      cards.forEach((c, i) => {
+        const r = c.getBoundingClientRect();
+        const dist = Math.abs((r.left + r.width / 2) - center);
+        if (dist < minDist) {
+          minDist = dist;
+          closest = i;
         }
-      }, 120);
-    });
+      });
+      index = closest;
+      if (index === 0) {
+        goTo(count, false);
+      } else if (index === cards.length - 1) {
+        goTo(1, false);
+      }
+    }
+
+    if ('onscrollend' in window) {
+      track.addEventListener('scrollend', settle);
+    } else {
+      let settleTimer;
+      track.addEventListener('scroll', () => {
+        clearTimeout(settleTimer);
+        settleTimer = setTimeout(settle, 60);
+      });
+    }
 
     window.addEventListener('resize', () => goTo(index, false));
   })();
