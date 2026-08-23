@@ -5,6 +5,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Liam</title>
 <style>
+  @font-face {
+    font-family: "Basier Square Mono";
+    src: url("fonts/BasierSquareMono-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Basier Square Mono";
+    src: url("fonts/BasierSquareMono-Medium.woff2") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Basier Square Mono";
+    src: url("fonts/BasierSquareMono-SemiBold.woff2") format("woff2");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: "Basier Square Mono";
+    src: url("fonts/BasierSquareMono-Bold.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+
   :root {
     --ink: #111111;
     --muted: #6b6b6b;
@@ -19,12 +51,13 @@
   html, body {
     margin: 0;
     padding: 0;
+    overflow-x: hidden;
   }
 
   body {
     background: var(--bg);
     color: var(--ink);
-    font-family: "Aktiv Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-family: "Basier Square Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -71,21 +104,17 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: center;
     padding: 0 0 24px;
   }
 
-  .work-heading {
-    display: flex;
-    align-items: baseline;
-    justify-content: flex-end;
-    padding: 0 40px;
-    margin-bottom: 20px;
-  }
-
   .controls {
+    position: fixed;
+    bottom: 32px;
+    right: 40px;
     display: flex;
     gap: 10px;
+    z-index: 2000;
   }
 
   .controls button {
@@ -95,7 +124,7 @@
     background: none;
     color: var(--ink);
     font-size: 20px;
-    font-weight: 700;
+    font-weight: 400;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -108,47 +137,37 @@
   }
 
   .carousel {
-    display: flex;
-    gap: 28px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding: 0 8vw 12px;
-    scrollbar-width: none;
-  }
-
-  .carousel::-webkit-scrollbar {
-    display: none;
+    position: relative;
+    perspective: 2000px;
+    height: calc(min(92vw, 122vh) * 0.625 + 92px);
   }
 
   .card {
-    flex: 0 0 auto;
-    scroll-snap-align: center;
-    transition: transform 0.3s ease;
-  }
-
-  .card:hover + .card {
-    transform: translateX(14px);
-  }
-
-  .card:has(+ .card:hover) {
-    transform: translateX(-14px);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform-style: preserve-3d;
+    will-change: transform;
   }
 
   .thumb {
-    width: min(92vw, 122vh);
+    width: min(92vw, 122vh); /* fallback before JS pins an explicit px box */
     aspect-ratio: 16 / 10;
     background: linear-gradient(135deg, var(--c1), var(--c2));
     position: relative;
     overflow: hidden;
     transform-origin: center center;
     transition: transform 0.3s ease, filter 0.3s ease;
+    will-change: transform;
   }
 
-  .card:hover .thumb {
+  .card:hover .thumb,
+  .card.is-hovered .thumb {
     transform: scale(1.035);
   }
 
-  .carousel:has(.card:hover) .card:not(:hover) .thumb {
+  .carousel:has(.card:hover) .card:not(:hover) .thumb,
+  .carousel:has(.card.is-hovered) .card:not(.is-hovered) .thumb {
     filter: brightness(0.9);
   }
 
@@ -163,26 +182,23 @@
     display: block;
   }
 
-  .thumb::after {
-    content: attr(data-index);
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.85);
-    letter-spacing: 0.05em;
+  /* For projects mixing horizontal and square photos — shows the whole
+     image instead of cropping the square ones to fill the wide frame. */
+  .thumb.fit-contain img {
+    object-fit: contain;
   }
 
   .card h3 {
     font-size: 16px;
     font-weight: 500;
-    margin: 18px 0 4px;
+    line-height: 1.2;
+    margin: 18px 0 0;
   }
 
   .card span {
     display: block;
     font-size: 16px;
-    font-weight: 300;
+    font-weight: 400;
     color: var(--muted);
   }
 
@@ -205,39 +221,819 @@
 
   .raffle {
     display: flex;
-    gap: 12px;
+    gap: 0;
+    /* Scales with viewport so a longer phrase (17 reels) still fits on one
+       line at any screen size; 96px is the same size the 4-letter version
+       used on desktop. */
+    font-size: clamp(22px, 8vw, 96px);
   }
 
   .reel {
-    width: 46px;
-    height: 68px;
+    /* Basier Square Mono's fixed character advance is exactly 0.619em, so
+       the reel is sized to that (not an arbitrary box + gap) — letters sit
+       exactly as they would in real monospaced text, no gap needed. Em-based
+       so it scales with .raffle's responsive font-size. */
+    width: 0.619em;
+    height: 1.479em;
     overflow: hidden;
     position: relative;
-    border-bottom: 2px solid var(--ink);
   }
 
   .reel-strip {
     display: flex;
     flex-direction: column;
     align-items: center;
+    will-change: transform;
   }
 
   .reel-strip span {
-    height: 68px;
-    line-height: 68px;
-    font-size: 46px;
-    font-weight: 700;
+    height: 1.479em;
+    line-height: 1.479em;
+    font-size: 1em;
+    font-weight: 400;
     text-align: center;
   }
 
+  /* Book viewer */
+  .book-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    opacity: 0;
+    visibility: hidden;
+    background: rgba(246, 245, 241, 0.6);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    transition: opacity 0.35s ease, visibility 0.35s ease;
+  }
+
+  .book-modal.open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  /* The modal opens onto a scrollable spread gallery (matching the print
+     look of highlighted spreads), with the interactive flip-through book
+     embedded inline partway down instead of being the whole experience.
+     No background of its own — it sits on top of .book-modal's own
+     blurred/whited-out backdrop, which shows through as the page color. */
+  .gallery-scroll {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .gallery-rows {
+    padding: 0 5% 32px;
+  }
+
+  .gallery-row {
+    display: flex;
+    gap: 32px;
+    margin-top: 32px;
+  }
+
+  /* Extra breathing room after the hero photo specifically, separating it
+     from the rest of the gallery rather than reading as part of the same
+     tight row-to-row rhythm. */
+  #galleryRowsBefore .gallery-row:first-child {
+    margin-bottom: 100px;
+  }
+
+  /* Every gallery pick is a genuine two-page spread (see the curated
+     lists below), so the wrapper can carry a fixed spread aspect-ratio —
+     that gives both the image and its crease-shadow overlay (img.shadow,
+     added below) a stable, identical box to line up in via object-fit,
+     regardless of whether max-height ends up clamping it. */
+  .gallery-img-wrap {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    aspect-ratio: 1200 / 970;
+  }
+
+  /* The hero photo (front cover/spine/back cover) isn't a spread — it's
+     wider, so it needs its own real aspect-ratio rather than the spread
+     default above. Same max-height:78vh as the player (via the
+     :only-child rule below) is what actually makes the two match in
+     height, since both clamp to the same viewport-relative cap. */
+  .gallery-img-wrap.hero {
+    aspect-ratio: 2000 / 1203;
+  }
+
+  /* A real event poster mixed into Old New Mens Club's gallery — tall and
+     narrow rather than a spread's landscape shape, so it needs its own
+     aspect-ratio the same way .hero does above. Same :only-child rule
+     below gives it the room a portrait piece needs (capped by viewport
+     height, not squeezed to fit a landscape row) rather than being forced
+     small alongside spreads that don't share its proportions. */
+  .gallery-img-wrap.poster {
+    aspect-ratio: 2 / 3;
+  }
+
+  .gallery-row img {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  /* A single image spanning the full row width otherwise renders taller
+     than the screen — cap the height so it never overflows top and
+     bottom. contain (not cover) so nothing is ever cropped; any leftover
+     space in the box just shows the page behind it. */
+  .gallery-row .gallery-img-wrap:only-child {
+    max-height: 78vh;
+    margin: 0 auto;
+  }
+
+  /* Faint center crease, simulating the gutter of a real book — a
+     provided PNG (mostly white at low alpha, darkening toward the very
+     center) laid on top of every full-spread image. Never on the two
+     half-page images (the half-title/half-final), which aren't spreads
+     and have no gutter to show. mix-blend-mode:multiply is what makes
+     this read as "faint shadow" rather than "gray-and-white stripe" —
+     plain alpha-over compositing keeps the white parts of the PNG
+     visible as a wash; multiply makes white a no-op and only the darker
+     core actually darkens the image underneath. */
+  img.shadow {
+    mix-blend-mode: multiply;
+    pointer-events: none;
+  }
+
+  .book-description {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 14vh 24px 16px;
+    color: #1a1a1a;
+  }
+
+  .book-description h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .book-description p {
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0 0 32px;
+  }
+
+  .book-description dl {
+    display: flex;
+    gap: 40px;
+    margin: 0;
+  }
+
+  .dl-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .book-description dt {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  .book-description dd {
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+    opacity: 0.85;
+  }
+
+  /* Organico Bello's product page — one white-bg product photo per item,
+     hover-spinning through its own angle shots (see the JS below). Plain
+     white backdrop instead of the book modals' blur, for now. */
+  #productModal {
+    background: #fff;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 48px 32px;
+    padding: 0 5% 100px;
+  }
+
+  /* Forces the card back to column 1 — since column 1 of the row it'd
+     otherwise land in is already taken, the grid bumps it down to a new
+     row instead, without leaving a gap behind it. */
+  .product-card--row-start {
+    grid-column-start: 1;
+  }
+
+  .product-photo {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  .product-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .product-card h4 {
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.2;
+    margin: 14px 0 0;
+  }
+
+  .book-embed-section {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Same horizontal inset as .gallery-rows so the player matches the
+       large single-image gallery rows in width — vertical padding is
+       unchanged, deliberately more generous than the tighter gaps between
+       ordinary gallery rows. */
+    padding: 60px 5% 96px;
+  }
+
+  .book-contact {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    padding: 40px 24px 64px;
+    color: #1a1a1a;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    opacity: 0.7;
+  }
+
+  /* San Diego Football Club's gallery — reuses the book modals' chrome
+     (.book-modal/.gallery-scroll/.book-description/.book-embed-section/
+     .book-contact above) but not their gallery-row system, which assumes
+     every image shares one fixed aspect ratio the way book spreads do.
+     Branding mockups don't: a business card, a bus wrap, and a jersey are
+     all wildly different shapes. So rows here size by a fixed HEIGHT
+     instead (three tiers below — bigger tier for the mockups that matter
+     more), and each item just takes whatever width its own aspect ratio
+     produces at that height, rather than forcing equal widths. */
+  .brand-gallery-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 32px;
+    margin: 0 auto 32px;
+    padding: 0 5%;
+  }
+
+  .brand-gallery-row.size-lg {
+    --row-h: 56vh;
+  }
+
+  .brand-gallery-row.size-md {
+    --row-h: 38vh;
+  }
+
+  .brand-gallery-row.size-sm {
+    --row-h: 28vh;
+  }
+
+  /* Jersey/longsleeve/hoodie share this one height so the three pairs
+     read as one consistent set. A fixed-box grid (tried earlier) kept
+     the boxes even but let each garment's own aspect ratio decide how
+     much of the box it actually filled — the wide longsleeve shots
+     ended up looking smaller than the more upright jersey/hoodie ones
+     even though their boxes matched. Height-locking, like the rest of
+     this gallery, fixes that directly. The wider gap (vs. the default
+     32px) spreads the jersey/hoodie pair further apart, since their
+     narrower images sit closer together at the default gap than the
+     wider longsleeve pair does — that made the whole set feel off
+     center optically even though every row is mathematically centered. */
+  .brand-gallery-row.size-clothing {
+    --row-h: 46vh;
+    gap: 64px;
+  }
+
+  /* Longsleeve sits at size-md (shorter than the jersey/hoodie rows around
+     it) — extra margin above and below keeps it from crowding them, so the
+     shorter row reads as intentional breathing room rather than a gap. */
+  .brand-gallery-row.row-longsleeve {
+    margin-top: 32px;
+    margin-bottom: 64px;
+  }
+
+  /* A bit of breathing room before the video embed below it, since the
+     video already carries its own top padding (.book-embed-section) that
+     reads as too tight coming straight off a gallery row. */
+  .brand-gallery-row.before-video {
+    margin-bottom: 64px;
+  }
+
+  .brand-item {
+    position: relative;
+    height: var(--row-h);
+    max-width: 100%;
+  }
+
+  .brand-item img {
+    display: block;
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+  }
+
+  /* The click-to-play brand video, sitting in .book-embed-section exactly
+     where the other projects' page-flip player does. A fixed 16:9 box
+     (the video's own shape) rather than a book trim size, with a poster
+     frame + centered pill-shaped hint standing in for the player-hint text
+     the book players use — that text is styled to tuck into the empty half
+     of a closed cover, which this full-bleed poster doesn't have. */
+  .video-player {
+    position: relative;
+    width: min(100%, calc(78vh * 16 / 9));
+    aspect-ratio: 16 / 9;
+    cursor: pointer;
+    background: #111;
+    overflow: hidden;
+  }
+
+  .video-player img,
+  .video-player video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .video-player video {
+    display: none;
+  }
+
+  .video-player.playing img,
+  .video-player.playing .video-hint {
+    display: none;
+  }
+
+  .video-player.playing video {
+    display: block;
+  }
+
+  .video-player.playing {
+    cursor: default;
+  }
+
+  .video-hint {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  .video-hint span {
+    padding: 10px 22px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    color: #fff;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
   @media (max-width: 640px) {
-    header, .work-heading, .carousel {
+    .brand-gallery-row.size-lg {
+      --row-h: 38vh;
+    }
+
+    .brand-gallery-row.size-md {
+      --row-h: 28vh;
+    }
+
+    .brand-gallery-row.size-clothing {
+      --row-h: 34vh;
+    }
+
+    .brand-gallery-row.size-sm {
+      --row-h: 22vh;
+    }
+  }
+
+  .book-close {
+    position: fixed;
+    top: 32px;
+    right: 40px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: none;
+    color: #1a1a1a;
+    font-size: 32px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s ease;
+    z-index: 3010;
+  }
+
+  .book-close:hover {
+    opacity: 0.6;
+  }
+
+  /* A page-by-page flip was too slow to load through for an 800-page
+     book, and paging through that many spreads by hand isn't realistic
+     anyway — this plays the interior as a rapid slideshow instead,
+     pausing on hover (see the JS below). No frame/background of its own —
+     sized and displayed exactly like the large single-image gallery rows
+     (100% of the 5%-inset container, capped at 78vh, letterboxed by
+     object-fit:contain with nothing behind it) so the two read as the
+     same thing, not a distinct "player" widget. aspect-ratio + max-height
+     on the wrapper (rather than sizing rules on the img directly) gives
+     the crease-shadow overlay a stable box to line up with, below.
+
+     width is deliberately computed via min(), not left as width:100% with
+     a separate max-height:78vh — Safari doesn't reconcile aspect-ratio
+     against width:100%+max-height together correctly: when max-height is
+     what actually binds (a short/wide window), it clamps the height but
+     leaves the width at the full 100%, so the box ends up the wrong shape
+     entirely (visibly wider-than-tall relative to 1200/970) rather than a
+     smaller box of the same shape. Precomputing "the width a 78vh-tall box
+     of this aspect-ratio would have" and taking whichever of that or 100%
+     is smaller sidesteps the ambiguity — aspect-ratio then only ever has
+     one value (the winning width) to reconcile height against. */
+  .spread-player {
+    position: relative;
+    width: min(100%, calc(78vh * 1200 / 970));
+    aspect-ratio: 1200 / 970;
+    cursor: pointer;
+    perspective: 2400px;
+    /* Clicking to page forward/back (see the JS below) is rapid enough
+       that, left to the browser's defaults, it reads as a click-drag —
+       highlighting the image and/or the hint text next to it instead of
+       just turning the page. */
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* A single page (the half-title/half-final, or either cover) is close to
+     exactly half this box's width — the box's own aspect-ratio (1200/970,
+     a two-page spread) is almost exactly double a single page's (1000/1616)
+     — so right/left-aligning a page's object-position, rather than the
+     centering default, tucks it flush against the box's shared vertical
+     centerline with no leftover gap. That centerline is the book's spine:
+     the half-title sits flush right of it, the half-final flush left of
+     it, matching wherever their respective cover hinges open onto. Full
+     two-page spreads fill the whole box regardless, so they're unaffected
+     by (and don't need) any object-position override. */
+  .spread-player img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    -webkit-user-drag: none;
+    user-drag: none;
+  }
+
+  /* Overrides the generic rule above with explicit positioning instead of
+     object-position — full spreads fill the box outright (their aspect
+     ratio already matches closely enough that no fitting is needed), while
+     the half-title/half-final sit flush against the box's shared
+     centerline exactly like the covers above. This also makes the
+     element's own box match its visible content exactly, not just the
+     pixels drawn inside it — which matters for the hover-to-pause listener
+     bound to this element in the JS below: hovering the empty letterboxed
+     half of a single-page frame no longer counts as hovering "the page." */
+  #spreadPlayerImg {
+    top: 0;
+    bottom: auto;
+    left: 0;
+    right: auto;
+    width: 100%;
+  }
+
+  #spreadPlayerImg.align-right {
+    width: auto;
+    right: 0;
+    left: auto;
+  }
+
+  #spreadPlayerImg.align-left {
+    width: auto;
+    left: 0;
+    right: auto;
+  }
+
+  /* Same three rules, duplicated for #bookModal2's player — IDs can't be
+     shared between the two books' images the way the class-based rules
+     elsewhere on this page are. */
+  #spreadPlayerImg2 {
+    top: 0;
+    bottom: auto;
+    left: 0;
+    right: auto;
+    width: 100%;
+  }
+
+  #spreadPlayerImg2.align-right {
+    width: auto;
+    right: 0;
+    left: auto;
+  }
+
+  #spreadPlayerImg2.align-left {
+    width: auto;
+    left: 0;
+    right: auto;
+  }
+
+  /* Same three rules again, duplicated for #bookModal3's player. */
+  #spreadPlayerImg3 {
+    top: 0;
+    bottom: auto;
+    left: 0;
+    right: auto;
+    width: 100%;
+  }
+
+  #spreadPlayerImg3.align-right {
+    width: auto;
+    right: 0;
+    left: auto;
+  }
+
+  #spreadPlayerImg3.align-left {
+    width: auto;
+    left: 0;
+    right: auto;
+  }
+
+  /* The real front-cover scan sits on top of the (already-loaded) half-title
+     page and swings open like a real cover; the real back-cover scan
+     mirrors it, and swings shut over the half-final page once the
+     slideshow reaches the end. Both are one-time flourishes (open on
+     click, close at the end of the loop), not a repeated interaction, so a
+     real 3D rotation is worth the cost here even though it wasn't for
+     paging through 400 interior spreads.
+
+     Each panel is sized to exactly the cover scan's own cropped aspect
+     ratio (1275/2063, flush height, auto width) rather than the full
+     spread-player box — so the panel's own left/right edge *is* the
+     image's edge, with nothing approximated. transform-origin sits on
+     that same edge (left for the front cover, right for the back), so the
+     hinge is pinned to a literal, fixed point on the element itself and
+     can't drift over the course of the rotation the way a percentage
+     computed against a much wider ambient box could. */
+  .cover-flip {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    z-index: 20;
+    transform-style: preserve-3d;
+    transition: transform 0.9s cubic-bezier(0.45, 0.05, 0.15, 1);
+    pointer-events: none;
+  }
+
+  /* No object-fit here at all, even though the panel and image now share
+     the same aspect ratio and object-fit would be a no-op — Safari doesn't
+     reliably apply object-fit to a replaced element that also has
+     backface-visibility:hidden inside a preserve-3d/perspective stack like
+     this one, and silently falls back to painting it at its raw intrinsic
+     pixel size instead. Plain replaced-element sizing (height:100%,
+     width:auto, no object-fit involved) sidesteps that entirely. */
+  .cover-flip img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: auto;
+    right: auto;
+    height: 100%;
+    width: auto;
+    display: block;
+    backface-visibility: hidden;
+  }
+
+  /* Swapping in the .open/.shut transform (or the .settled display) instantly
+     — no transition — is how the player is silently reset between viewings:
+     behind the shut back cover, or when the modal is reopened. */
+  .cover-flip.no-transition {
+    transition: none;
+  }
+
+  .cover-flip-front {
+    right: 0;
+    left: auto;
+    aspect-ratio: 1275 / 2063;
+    transform-origin: left center;
+    transform: rotateY(0deg);
+  }
+
+  /* A full 180deg turn (rather than stopping just past perpendicular) is
+     what makes this read as a page settling open flat instead of flying
+     off — see .cover-face-back below, the flip card's "back of the sheet"
+     that comes into view for exactly that resting half of the turn. Once a
+     real full spread is about to appear and fill the whole box, .settled
+     (set in JS) hides the whole flap — cover art and blank back-face both
+     — since it's no longer needed and would otherwise sit on top of the
+     spread's left half forever. */
+  .cover-flip-front.open {
+    transform: rotateY(-180deg);
+  }
+
+  .cover-flip-front.settled {
+    display: none;
+  }
+
+  /* Each flip card's other face — plain, since a blank page has nothing to
+     mirror — filling the same panel (so the two read as one rigid sheet)
+     but pre-rotated 180deg, so it's invisible while its cover art is
+     flush/showing and only faces the viewer for the resting half of the
+     turn, once the art has rotated past perpendicular and out of view.
+     Used on both covers so the closing swing mirrors the opening one
+     instead of just snapping into view partway through: the back cover's
+     blank face is what's visible in its parked, off-page resting state, so
+     closing shows it swinging in from there before the art itself
+     resolves into view, the same shape the opening swing has in reverse.
+     A faint gradient near each one's spine edge (the shared hinge — left
+     for the front cover's face, right for the back cover's, since that's
+     where each panel's own hinge is) stands in for the crease-shadow the
+     interior spreads get from shadow2.png. */
+  .cover-face-back {
+    position: absolute;
+    inset: 0;
+    background-color: #f6f5f1;
+    transform: rotateY(180deg);
+    backface-visibility: hidden;
+  }
+
+  .cover-flip-front .cover-face-back {
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0) 14%);
+  }
+
+  .cover-flip-back .cover-face-back {
+    background-image: linear-gradient(to left, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0) 14%);
+  }
+
+  /* Parked at rotateY(180deg) — the same angle the front cover rests at
+     once open — means its own blank face (not the art) is what faces the
+     viewer by default, unlike the front cover, which parks on its art.
+     That's deliberate for the mirrored closing swing (see the big comment
+     above .cover-face-back), but it means this element can't just sit
+     there passively the way the old art-only version could: a blank face
+     facing the viewer for the entire slideshow would permanently cover the
+     left half of every full spread. display:none by default, switched to
+     .active only for the brief closing bookend (see JS playEnding), keeps
+     it out of the way the rest of the time. Swings in to rotateY(0) — flush
+     over the half-final page, art showing — once the slideshow reaches the
+     end, then fades to transparent instead of swinging back open once the
+     bookend is done (see .fade-out) — its own opacity transition, layered
+     alongside the shared transform one. */
+  .cover-flip-back {
+    left: 0;
+    right: auto;
+    aspect-ratio: 1275 / 2063;
+    transform-origin: right center;
+    transform: rotateY(180deg);
+    transition: transform 0.9s cubic-bezier(0.45, 0.05, 0.15, 1), opacity 0.7s ease;
+    display: none;
+  }
+
+  .cover-flip-back.active {
+    display: block;
+  }
+
+  .cover-flip-back.fade-out {
+    opacity: 0;
+  }
+
+  .cover-flip-back.shut {
+    transform: rotateY(0deg);
+  }
+
+  /* Old New Mens Club is a physically different, wider trim size than Our
+     Work Is Never Done — its full spreads are 4500x2400 (15/8) and its
+     single pages are 2250x2400 (15/16), rather than the other book's
+     1200/970 and 1275/2063. Everything else about #bookModal2 (the hinge
+     mechanics, the flush-to-center alignment, the flip-card faces, the
+     closing bookend) reuses the exact same rules above — only the actual
+     shape needs to be different, so these are the only properties
+     overridden here, scoped to #bookModal2 so the two books' players can't
+     interfere with each other regardless of source order. */
+  #bookModal2 .spread-player {
+    width: min(100%, calc(78vh * 15 / 8));
+    aspect-ratio: 15 / 8;
+  }
+
+  #bookModal2 .cover-flip-front,
+  #bookModal2 .cover-flip-back {
+    aspect-ratio: 15 / 16;
+  }
+
+  /* SDFC's video gets a bit more breathing room above/below than the
+     other modals' page-flip players, scoped here so it doesn't affect
+     the shared .book-embed-section elsewhere. */
+  #bookModal4 .book-embed-section {
+    padding-top: 90px;
+    padding-bottom: 130px;
+  }
+
+  /* Styles Make Fights is a third, again-different trim size — its full
+     spreads are 4500x2850 (30/19) and its single pages are 2250x2850
+     (15/19). Same deal as #bookModal2 above: only the shape changes,
+     scoped to #bookModal3. */
+  #bookModal3 .spread-player {
+    width: min(100%, calc(78vh * 4500 / 2850));
+    aspect-ratio: 4500 / 2850;
+  }
+
+  #bookModal3 .cover-flip-front,
+  #bookModal3 .cover-flip-back {
+    aspect-ratio: 2250 / 2850;
+  }
+
+  /* Sits in the empty half of the spread-player box beside the (flush-right)
+     cover image, rather than below the player — there's a full half-width
+     of empty space there before the book is opened. Only shown pre-open;
+     .player-hint-playing below takes over once the book is actually
+     playing, since that empty half is gone by then (filled by the
+     slideshow) and the instruction itself has changed. */
+  .player-hint {
+    position: absolute;
+    top: 50%;
+    left: 6%;
+    transform: translateY(-50%);
+    z-index: 21;
+    max-width: 38%;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #1a1a1a;
+    opacity: 0.55;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  /* Persistent (not fading out after the first click, unlike .player-hint
+     above) since it's teaching a real ongoing interaction — where to
+     click to page forward/back — rather than a one-time "how to start"
+     nudge. Sits below the player itself, in normal flow as a sibling of
+     .spread-player, since once opened the player is full of the actual
+     book with no empty margin left to sit in beside it. */
+  .player-hint-playing {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #1a1a1a;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .player-hint-playing.visible {
+    opacity: 0.55;
+  }
+
+  .player-hint.hidden {
+    opacity: 0;
+  }
+
+  @media (max-width: 640px) {
+    header {
       padding-left: 24px;
       padding-right: 24px;
     }
 
-    .thumb {
-      width: 88vw;
+    .controls {
+      right: 24px;
+      bottom: 24px;
     }
   }
 </style>
@@ -250,11 +1046,24 @@
     <div class="reel"></div>
     <div class="reel"></div>
     <div class="reel"></div>
+    <div class="reel"></div>
+    <div class="reel"></div>
+    <div class="reel"></div>
+    <div class="reel"></div>
+    <div class="reel"></div>
+    <div class="reel"></div>
+    <div class="reel"></div>
+    <div class="reel"></div>
+    <div class="reel"></div>
+    <div class="reel"></div>
+    <div class="reel"></div>
+    <div class="reel"></div>
+    <div class="reel"></div>
   </div>
 </div>
 
 <header>
-  <div class="wordmark">Liam</div>
+  <div class="wordmark">LIAM JACOB KENGLA IS A DESIGNER BASED IN LOS ANGELES AND PORTLAND</div>
   <nav>
     <a href="#about">About</a>
     <a href="#work">Work</a>
@@ -263,80 +1072,340 @@
 
 <main>
   <section class="work" id="work">
-    <div class="work-heading">
-      <div class="controls">
-        <button id="prev" aria-label="Previous">&#8592;</button>
-        <button id="next" aria-label="Next">&#8594;</button>
-      </div>
-    </div>
-
     <div class="carousel" id="carousel">
       <div class="card">
-        <div class="thumb is-photo" data-index="01">
+        <div class="thumb is-photo" data-images='[
+          "portfolio projects/ArtDivision/artdivison-freeway_signage-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-quadfold_front-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-quadfold_back-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-bus_stop_poster1-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-bus_stop_poster2-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-bus_stop_poster3-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-instagram-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-planner-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-tablecard-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-totebag-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-instagram_stories-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-pen-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-stationary-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-a_frame-mockup.jpg"
+        ]'>
           <img src="portfolio projects/ArtDivision/artdivison-freeway_signage-mockup.jpg" alt="Art Division &mdash; freeway signage mockup">
         </div>
         <h3>ArtDivision</h3>
-        <span>Branding, Website, Etc.</span>
+        <span>Branding, UI Design [Web]</span>
       </div>
       <div class="card">
-        <div class="thumb" data-index="02" style="--c1:#e4ddd3; --c2:#b9ac97;"></div>
-        <h3>Project Two</h3>
-        <span>Placeholder</span>
+        <div class="thumb is-photo fit-contain" data-opens-products="true" data-images='[
+          "portfolio projects/OrganicoBello/OB-hero-red_bg.jpg?v=2",
+
+          "portfolio projects/OrganicoBello/hand models/OB-penne_rigate-front-hand_model.png",
+          "portfolio projects/OrganicoBello/hand models/OB-penne_rigate-right-hand_model.png",
+
+          "portfolio projects/OrganicoBello/hand models/OB-tomato_bouillon-front-hand_model.png",
+          "portfolio projects/OrganicoBello/hand models/OB-italian_oregano-front-hand_model.png",
+
+          "portfolio projects/OrganicoBello/hand models/OB-tomato_paste-front-hand_model.png",
+          "portfolio projects/OrganicoBello/hand models/OB-vodka_sauce-front-hand_model.png",
+          "portfolio projects/OrganicoBello/hand models/OB-tomato_sauce-front-hand_model.png",
+          "portfolio projects/OrganicoBello/hand models/OB-tomato_sauce-right-hand_model.png",
+          "portfolio projects/OrganicoBello/hand models/OB-bruschetta_spread-front-hand_model.png"
+        ]'>
+          <img src="portfolio projects/OrganicoBello/OB-hero-red_bg.jpg?v=2" alt="Organico Bello &mdash; packaging lineup on red background">
+        </div>
+        <h3>Organico Bello</h3>
+        <span>Packaging</span>
       </div>
       <div class="card">
-        <div class="thumb" data-index="03" style="--c1:#d9e0e4; --c2:#9fb0b8;"></div>
-        <h3>Project Three</h3>
-        <span>Placeholder</span>
+        <div class="thumb is-photo" data-opens-book-2="true" data-images='[
+          "portfolio projects/OldNewMensClub/gallery-web.jpg",
+          "portfolio projects/OldNewMensClub/carousel_preview/spread-112.jpg",
+          "portfolio projects/OldNewMensClub/carousel_preview/spread-096.jpg",
+          "portfolio projects/OldNewMensClub/carousel_preview/spread-086.jpg",
+          "portfolio projects/OldNewMensClub/carousel_preview/spread-070.jpg",
+          "portfolio projects/OldNewMensClub/carousel_preview/spread-114.jpg",
+          "portfolio projects/OldNewMensClub/carousel_preview/spread-080.jpg"
+        ]'>
+          <img src="portfolio projects/OldNewMensClub/gallery-web.jpg" alt="Old New Mens Club &mdash; signage installation">
+        </div>
+        <h3>Old New Mens Club</h3>
+        <span>Book Design</span>
       </div>
       <div class="card">
-        <div class="thumb" data-index="04" style="--c1:#e3dbe6; --c2:#b8a4c0;"></div>
-        <h3>Project Four</h3>
-        <span>Placeholder</span>
+        <div class="thumb is-photo" data-opens-book="true" data-images='[
+          "portfolio projects/OurWorkIsNeverDone/cover-spine-back-thumb.webp",
+          "portfolio projects/OurWorkIsNeverDone/carousel_preview/spread-129.jpg",
+          "portfolio projects/OurWorkIsNeverDone/carousel_preview/spread-072.jpg",
+          "portfolio projects/OurWorkIsNeverDone/carousel_preview/spread-178.jpg",
+          "portfolio projects/OurWorkIsNeverDone/carousel_preview/spread-094.jpg",
+          "portfolio projects/OurWorkIsNeverDone/carousel_preview/spread-162.jpg",
+          "portfolio projects/OurWorkIsNeverDone/carousel_preview/spread-165.jpg"
+        ]'>
+          <img src="portfolio projects/OurWorkIsNeverDone/cover-spine-back-thumb.webp" alt="Our Work Is Never Done &mdash; front cover, spine, and back cover">
+        </div>
+        <h3>Our Work Is Never Done</h3>
+        <span>Book Design</span>
       </div>
       <div class="card">
-        <div class="thumb" data-index="05" style="--c1:#dde4d8; --c2:#a9baa0;"></div>
-        <h3>Project Five</h3>
-        <span>Placeholder</span>
+        <div class="thumb is-photo" data-opens-book-3="true" data-images='[
+          "portfolio projects/StylesMakeFights/cover-front-PLACEHOLDER.webp",
+          "portfolio projects/StylesMakeFights/carousel_preview/spread-029.jpg",
+          "portfolio projects/StylesMakeFights/carousel_preview/spread-015.jpg",
+          "portfolio projects/StylesMakeFights/carousel_preview/spread-041.jpg",
+          "portfolio projects/StylesMakeFights/carousel_preview/spread-065.jpg",
+          "portfolio projects/StylesMakeFights/carousel_preview/spread-010.jpg",
+          "portfolio projects/StylesMakeFights/carousel_preview/spread-070.jpg"
+        ]'>
+          <img src="portfolio projects/StylesMakeFights/cover-front-PLACEHOLDER.webp" alt="Styles Make Fights &mdash; placeholder cover, temporary until real cover art is in">
+        </div>
+        <h3>Styles Make Fights</h3>
+        <span>Book Design</span>
+      </div>
+      <div class="card">
+        <div class="thumb is-photo" data-opens-book-4="true" data-images='[
+          "portfolio projects/SanDiego-Football-Club/web/travel-bus.jpg",
+          "portfolio projects/SanDiego-Football-Club/web/jersey-v1.jpg",
+          "portfolio projects/SanDiego-Football-Club/web/bis-card-mock.jpg",
+          "portfolio projects/SanDiego-Football-Club/web/hoodie-front.jpg",
+          "portfolio projects/SanDiego-Football-Club/web/flag-mock.jpg"
+        ]'>
+          <img src="portfolio projects/SanDiego-Football-Club/web/travel-bus.jpg" alt="San Diego Football Club &mdash; bus wrap mockup">
+        </div>
+        <h3>San Diego Football Club</h3>
+        <span>Branding, Motion, Campaign</span>
       </div>
     </div>
   </section>
 </main>
+
+<div class="controls">
+  <button id="prev" aria-label="Previous">&#8592;</button>
+  <button id="next" aria-label="Next">&#8594;</button>
+</div>
+
+<div class="book-modal" id="bookModal" aria-hidden="true">
+  <button class="book-close" id="bookClose" aria-label="Close">&times;</button>
+  <div class="gallery-scroll" id="galleryScroll">
+    <div class="book-description">
+      <h2>Our Work Is Never Done</h2>
+      <p>Our Work is Never Done, an 800-page book on Mexican-American immigration, features case studies of non-violent protests, community injustices, and stories of labor from the 1930s&ndash;1970s, offering a powerful narrative of Mexican resilience and community.</p>
+      <dl>
+        <div class="dl-col">
+          <div><dt>Design</dt><dd>Liam Jacob Kengla</dd></div>
+          <div><dt>Oversight</dt><dd>River Jukes Hudson<br>Co-Partner at ELLA</dd></div>
+          <div><dt>Trim Size</dt><dd>4.25 x 6.875</dd></div>
+          <div><dt>Typefaces</dt><dd>Aktivest Grotesk<br>Aglet Slab VF</dd></div>
+        </div>
+        <div class="dl-col">
+          <div><dt>Print/Bind</dt><dd>Liam Jacob Kengla</dd></div>
+          <div><dt>Page Count</dt><dd>800</dd></div>
+          <div><dt>Texts by</dt><dd>Selden Menefee, Orin Cassmore, John Webb, R. Matt Abigail, Jazmin Le&oacute;n, Tafolla Carmen, Ronald L. Mize, Alicia C.S. Swords, Ronald A. Garcia, Jacques Levy, Colin Gunckel, and Matt Garcia</dd></div>
+        </div>
+      </dl>
+    </div>
+    <div class="gallery-rows" id="galleryRowsBefore"></div>
+    <div class="book-embed-section">
+      <div class="spread-player" id="spreadPlayer">
+        <img id="spreadPlayerImg" src="" alt="Book spread" draggable="false">
+        <img class="shadow" id="spreadPlayerShadow" src="portfolio projects/OurWorkIsNeverDone/shadow2.png" alt="" aria-hidden="true">
+        <div class="cover-flip cover-flip-front" id="coverFlipFront">
+          <img src="portfolio projects/OurWorkIsNeverDone/cover-front-straight.webp" alt="Our Work Is Never Done &mdash; front cover" draggable="false">
+          <div class="cover-face-back" aria-hidden="true"></div>
+        </div>
+        <div class="cover-flip cover-flip-back" id="coverFlipBack">
+          <img src="portfolio projects/OurWorkIsNeverDone/cover-back-straight.webp" alt="Our Work Is Never Done &mdash; back cover" draggable="false">
+          <div class="cover-face-back" aria-hidden="true"></div>
+        </div>
+        <div class="player-hint" id="playerHint">Click to open</div>
+      </div>
+      <div class="player-hint-playing" id="playerHintPlaying">Hover to stop, click to change page</div>
+    </div>
+    <div class="gallery-rows" id="galleryRowsAfter"></div>
+    <div class="book-contact">
+      <span>Liam Jacob Kengla</span>
+      <span>@mailkengla</span>
+    </div>
+  </div>
+</div>
+
+<div class="book-modal" id="bookModal2" aria-hidden="true">
+  <button class="book-close" id="bookClose2" aria-label="Close">&times;</button>
+  <div class="gallery-scroll" id="galleryScroll2">
+    <div class="book-description">
+      <h2>Old New Mens Club</h2>
+      <p>A journey through post-war Japan&rsquo;s fascination with American workwear and Ivy League style, and how it blossomed into a shared denim culture between the two nations. Highlighting Japanese and American artisan-designers, including Toru Nogami, Eric Steffen, Masayuki Kanatani, Andrew Chen &amp; Johan Lam, Tohru Hamamoto, and Christopher Loiron, who carry this tradition forward with craftsmanship, authenticity, and reinvention today.</p>
+      <dl>
+        <div class="dl-col">
+          <div><dt>Design</dt><dd>Liam Jacob Kengla</dd></div>
+          <div><dt>Texts by</dt><dd>W. David Marx, Samutoro</dd></div>
+          <div><dt>Trim Size</dt><dd>7 3/8 x 8</dd></div>
+          <div><dt>Typefaces</dt><dd>Hiragino Sans<br>Degolite<br>Copperplate</dd></div>
+        </div>
+        <div class="dl-col">
+          <div><dt>Print/Bind</dt><dd>Liam Jacob Kengla</dd></div>
+          <div><dt>Page Count</dt><dd>246</dd></div>
+          <div><dt>Oversight</dt><dd>River Jukes Hudson<br>Co-Partner at ELLA</dd></div>
+        </div>
+      </dl>
+    </div>
+    <div class="gallery-rows" id="galleryRowsBefore2"></div>
+    <div class="book-embed-section">
+      <div class="spread-player" id="spreadPlayer2">
+        <img id="spreadPlayerImg2" src="" alt="Book spread" draggable="false">
+        <img class="shadow" id="spreadPlayerShadow2" src="portfolio projects/OldNewMensClub/shadow2.png" alt="" aria-hidden="true">
+        <div class="cover-flip cover-flip-front" id="coverFlipFront2">
+          <img src="portfolio projects/OldNewMensClub/cover-front-PLACEHOLDER.webp" alt="Old New Mens Club &mdash; placeholder front cover, temporary until real cover scans are in" draggable="false">
+          <div class="cover-face-back" aria-hidden="true"></div>
+        </div>
+        <div class="cover-flip cover-flip-back" id="coverFlipBack2">
+          <img src="portfolio projects/OldNewMensClub/cover-back-PLACEHOLDER.webp" alt="Old New Mens Club &mdash; placeholder back cover, temporary until real cover scans are in" draggable="false">
+          <div class="cover-face-back" aria-hidden="true"></div>
+        </div>
+        <div class="player-hint" id="playerHint2">Click to open</div>
+      </div>
+      <div class="player-hint-playing" id="playerHintPlaying2">Hover to stop, click to change page</div>
+    </div>
+    <div class="gallery-rows" id="galleryRowsAfter2"></div>
+    <div class="book-contact">
+      <span>Liam Jacob Kengla</span>
+      <span>@mailkengla</span>
+    </div>
+  </div>
+</div>
+
+<div class="book-modal" id="bookModal3" aria-hidden="true">
+  <button class="book-close" id="bookClose3" aria-label="Close">&times;</button>
+  <div class="gallery-scroll" id="galleryScroll3">
+    <div class="book-description">
+      <h2>Styles Make Fights</h2>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+      <dl>
+        <div class="dl-col">
+          <div><dt>Design</dt><dd>@mailkengla</dd></div>
+          <div><dt>Oversight</dt><dd>TBD</dd></div>
+          <div><dt>Trim Size</dt><dd>TBD</dd></div>
+          <div><dt>Typefaces</dt><dd>TBD</dd></div>
+        </div>
+        <div class="dl-col">
+          <div><dt>Print/Bind</dt><dd>TBD</dd></div>
+          <div><dt>Page Count</dt><dd>144</dd></div>
+          <div><dt>Texts by</dt><dd>TBD</dd></div>
+        </div>
+      </dl>
+    </div>
+    <div class="gallery-rows" id="galleryRowsBefore3"></div>
+    <div class="book-embed-section">
+      <div class="spread-player" id="spreadPlayer3">
+        <img id="spreadPlayerImg3" src="" alt="Book spread" draggable="false">
+        <img class="shadow" id="spreadPlayerShadow3" src="portfolio projects/StylesMakeFights/shadow2.png" alt="" aria-hidden="true">
+        <div class="cover-flip cover-flip-front" id="coverFlipFront3">
+          <img src="portfolio projects/StylesMakeFights/cover-front-PLACEHOLDER.webp" alt="Styles Make Fights &mdash; placeholder front cover, temporary until real cover art is in" draggable="false">
+          <div class="cover-face-back" aria-hidden="true"></div>
+        </div>
+        <div class="cover-flip cover-flip-back" id="coverFlipBack3">
+          <img src="portfolio projects/StylesMakeFights/cover-back-PLACEHOLDER.webp" alt="Styles Make Fights &mdash; placeholder back cover, temporary until real cover art is in" draggable="false">
+          <div class="cover-face-back" aria-hidden="true"></div>
+        </div>
+        <div class="player-hint" id="playerHint3">Click to open</div>
+      </div>
+      <div class="player-hint-playing" id="playerHintPlaying3">Hover to stop, click to change page</div>
+    </div>
+    <div class="gallery-rows" id="galleryRowsAfter3"></div>
+    <div class="book-contact">
+      <span>Liam Jacob Kengla</span>
+      <span>@mailkengla</span>
+    </div>
+  </div>
+</div>
+
+<div class="book-modal" id="bookModal4" aria-hidden="true">
+  <button class="book-close" id="bookClose4" aria-label="Close">&times;</button>
+  <div class="gallery-scroll" id="galleryScroll4">
+    <div class="book-description">
+      <h2>San Diego Football Club</h2>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+    </div>
+    <div class="brand-gallery" id="brandGalleryBefore4"></div>
+    <div class="book-embed-section">
+      <div class="video-player" id="sdfcVideoPlayer">
+        <img src="portfolio projects/SanDiego-Football-Club/web/video-poster.jpg" alt="San Diego Football Club &mdash; brand video" draggable="false">
+        <video id="sdfcVideo" src="portfolio projects/SanDiego-Football-Club/SDFC-brand-video.mp4" playsinline controls preload="none"></video>
+        <div class="video-hint" id="sdfcVideoHint"><span>Click to play</span></div>
+      </div>
+    </div>
+    <div class="brand-gallery" id="brandGalleryClothing4"></div>
+    <div class="brand-gallery" id="brandGalleryAfter4"></div>
+    <div class="book-description">
+      <h2>San Diego Seahorses</h2>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+    </div>
+    <div class="brand-gallery" id="brandGalleryCampaign4"></div>
+    <div class="book-contact">
+      <span>Liam Jacob Kengla</span>
+      <span>@mailkengla</span>
+    </div>
+  </div>
+</div>
+
+<div class="book-modal" id="productModal" aria-hidden="true">
+  <button class="book-close" id="productClose" aria-label="Close">&times;</button>
+  <div class="gallery-scroll" id="productScroll">
+    <div class="book-description">
+      <h2>Organico Bello</h2>
+    </div>
+    <div class="product-grid" id="productGrid"></div>
+  </div>
+</div>
 
 <script>
   (function () {
     const loader = document.getElementById('loader');
     const reels = Array.from(document.querySelectorAll('.reel'));
     const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const targets = ['L', 'I', 'A', 'M'];
-    const letterHeight = 68;
+    const targets = 'WHAT DO YOU NEED?'.split('');
     const spinCount = 26;
-    const durations = [1300, 1650, 2000, 2350];
+    // Staggered per-reel durations so reels settle left-to-right rather than
+    // all at once; spread across however many reels the target text needs.
+    const BASE_DURATION = 700;
+    const STAGGER = (1500 - BASE_DURATION) / (targets.length - 1);
+    const durations = targets.map((_, i) => BASE_DURATION + i * STAGGER);
 
     document.body.style.overflow = 'hidden';
 
     reels.forEach((reel, i) => {
       const strip = document.createElement('div');
       strip.className = 'reel-strip';
+      // Target first, then the spin letters below it — combined with
+      // starting the strip pulled up and animating down to rest, the reel
+      // falls top-to-bottom onto the target like a real machine, instead of
+      // climbing up to it.
+      const finalSpan = document.createElement('span');
+      finalSpan.textContent = targets[i];
+      strip.appendChild(finalSpan);
       for (let j = 0; j < spinCount; j++) {
         const span = document.createElement('span');
         span.textContent = letters[Math.floor(Math.random() * letters.length)];
         strip.appendChild(span);
       }
-      const finalSpan = document.createElement('span');
-      finalSpan.textContent = targets[i];
-      strip.appendChild(finalSpan);
       reel.appendChild(strip);
 
-      requestAnimationFrame(() => {
-        strip.style.transition = `transform ${durations[i]}ms cubic-bezier(0.12, 0.88, 0.18, 1)`;
-        strip.style.transform = `translateY(-${spinCount * letterHeight}px)`;
-      });
+      // The reel's height is responsive (em-based), so measure it live
+      // rather than assuming a fixed px value.
+      const letterHeight = reel.getBoundingClientRect().height;
+      strip.style.transform = `translateY(-${spinCount * letterHeight}px)`;
+      // Force layout now so the browser commits this starting position
+      // before the transition below is applied — a rAF-based delay for this
+      // is timing-dependent and was the likely source of the unevenness
+      // near the end of the fall.
+      void strip.offsetHeight;
+      strip.style.transition = `transform ${durations[i]}ms cubic-bezier(0.16, 1, 0.3, 1)`;
+      strip.style.transform = 'translateY(0px)';
     });
 
     setTimeout(() => {
       loader.classList.add('hide');
       document.body.style.overflow = '';
-    }, Math.max(...durations) + 500);
+    }, Math.max(...durations) + 350);
   })();
 
   (function () {
@@ -344,105 +1413,283 @@
     const originals = Array.from(track.children);
     const count = originals.length;
 
-    const firstClone = originals[0].cloneNode(true);
-    const lastClone = originals[count - 1].cloneNode(true);
-    track.insertBefore(lastClone, originals[0]);
-    track.appendChild(firstClone);
+    // Explicit pixel box on every thumb rather than a CSS width/aspect-ratio
+    // formula — keeps the box concrete for the hover-grow transform, and
+    // gives us a real px value to derive the 3D panel geometry from.
+    function sizeThumbs() {
+      const wPct = window.innerWidth <= 640 ? 0.88 : 0.92;
+      const w = Math.min(window.innerWidth * wPct, window.innerHeight * 1.22) * 0.9;
+      const h = w * (10 / 16);
+      document.querySelectorAll('.thumb').forEach((t) => {
+        t.style.width = w + 'px';
+        t.style.height = h + 'px';
+      });
+      return w;
+    }
+    let thumbWidth = sizeThumbs();
+
+    // One clone on each side isn't enough buffer for a seamless loop: with
+    // cards fading out past ~2.7 slots from center, a single clone leaves
+    // nothing positioned to slide in from off-screen during the final
+    // stretch before the wrap, so the next card "pops" in instead of
+    // approaching like every other transition. CLONE_COUNT clones on each
+    // side keeps every visible slot continuously populated throughout the
+    // whole loop, at any point in the cycle.
+    const CLONE_COUNT = 4;
+    for (let k = 0; k < CLONE_COUNT; k++) {
+      const fromEnd = originals[count - 1 - k].cloneNode(true);
+      track.insertBefore(fromEnd, track.firstChild);
+      const fromStart = originals[k].cloneNode(true);
+      track.appendChild(fromStart);
+    }
 
     const cards = Array.from(track.children);
-    let index = 1;
 
-    function centerScrollLeft(el) {
-      const trackRect = track.getBoundingClientRect();
-      const elRect = el.getBoundingClientRect();
-      return track.scrollLeft + (elRect.left - trackRect.left) - (track.clientWidth - elRect.width) / 2;
+    // `offset` is the continuous, fractional position (in card-units) that's
+    // currently centered — e.g. 1.5 means halfway between card 1 and 2.
+    // `index` is just the nearest whole card, kept for the arrow buttons.
+    let offset = CLONE_COUNT;
+    let index = CLONE_COUNT;
+
+    // Cards are flat panels hinged around a polygon, like an unrolled
+    // cylinder — not points floating on a smooth circle. Each panel rotates
+    // by exactly its angular slot (rotateY = angle, matching its position
+    // angle exactly — not partial, and not negated, or the panel's facing
+    // direction stops lining up with its own position and neighboring edges
+    // drift apart) and sits at a push-back distance (the "apothem"). The
+    // apothem is derived not from the panel's true half-width but from that
+    // width plus half the gap, so the polygon math still lands each panel's
+    // *virtual* (wider) edge flush against its neighbor's — leaving a real
+    // gap of empty space between the actual (narrower) rendered edges. That
+    // margin also has to comfortably clear the hover-grow scale (see
+    // `.card.is-hovered .thumb`) so a card growing never reaches its
+    // neighbor.
+    //
+    // The gap is a ratio of thumbWidth, not a fixed pixel value — thumbWidth
+    // already shrinks on a smaller window (see sizeThumbs/the resize
+    // listener below), and a fixed-px gap wouldn't shrink along with it, so
+    // it'd end up a bigger and bigger fraction of an ever-smaller card
+    // instead of staying visually proportionate.
+    const ANGLE_STEP = 25;
+    const CARD_GAP_RATIO = 0.065;
+    let apothem = 0;
+
+    // CSS perspective is a fixed pixel distance from the viewer to the
+    // screen plane — it doesn't automatically shrink along with apothem/x/z
+    // (which do, since they're all derived from thumbWidth). Left fixed, a
+    // shrinking scene sits at an ever-larger fraction of that unchanging
+    // viewing distance, which perspective projection reads as *less*
+    // foreshortening — cards end up pushed visibly farther apart, relative
+    // to their own size, the smaller the window gets, even though the "true"
+    // 3D gap (cardGap above) is scaling correctly. Deriving perspective from
+    // thumbWidth too keeps the ratio of scene-depth to viewing-distance
+    // constant, so the projected spacing looks the same proportionally at
+    // any window size. 2 matches the fixed 2000px this replaced at the
+    // desktop size it was originally tuned at (~1000px thumbWidth).
+    const PERSPECTIVE_RATIO = 2;
+
+    function computeGeometry() {
+      const cardGap = thumbWidth * CARD_GAP_RATIO;
+      const halfWidthWithGap = thumbWidth / 2 + cardGap / 2;
+      apothem = halfWidthWithGap / Math.tan((ANGLE_STEP * Math.PI / 180) / 2);
+      track.style.perspective = (thumbWidth * PERSPECTIVE_RATIO) + 'px';
+    }
+    computeGeometry();
+
+    function render() {
+      cards.forEach((card, i) => {
+        const p = i - offset;
+        const angle = p * ANGLE_STEP;
+        const rad = angle * Math.PI / 180;
+        const x = Math.sin(rad) * apothem;
+        const z = (Math.cos(rad) - 1) * apothem;
+        const rotateY = angle;
+        const dist = Math.abs(p);
+        // The no-overlap guarantee (the gap) only holds reliably out to
+        // about 2 slots — past that, the panel is rotated steeply enough
+        // that perspective can eat into the margin. Fully fading (and
+        // disabling hover on) cards before they reach that zone means nobody
+        // ever sees or grows a card back there, so it's moot in practice.
+        const fade = dist <= 1.8 ? 1 : Math.max(0, 1 - (dist - 1.8) / 0.9);
+        card.style.transform =
+          `translate(-50%, -50%) translateX(${x}px) translateZ(${z}px) rotateY(${rotateY}deg)`;
+        card.style.opacity = String(fade);
+        card.style.zIndex = String(1000 - Math.round(dist * 10));
+        card.style.pointerEvents = dist > 2.3 ? 'none' : '';
+      });
     }
 
     let animRaf = null;
 
-    function animateScrollTo(target, duration) {
+    function animateOffsetTo(target, duration) {
       if (animRaf) cancelAnimationFrame(animRaf);
-      track.style.scrollSnapType = 'none';
-      const start = track.scrollLeft;
+      const start = offset;
       const change = target - start;
       const startTime = performance.now();
       function step(now) {
         const t = Math.min((now - startTime) / duration, 1);
         const eased = 1 - Math.pow(1 - t, 3);
-        track.scrollLeft = start + change * eased;
+        offset = start + change * eased;
+        render();
         if (t < 1) {
           animRaf = requestAnimationFrame(step);
         } else {
           animRaf = null;
-          track.style.scrollSnapType = '';
+          // Land exactly on a clone? Jump to the real card it stands in
+          // for before the next nav — otherwise `index` drifts past the
+          // clone range and the following click stutters backward.
+          wrapOffset();
+          render();
+          // The arrow buttons live outside the carousel itself, so clicking
+          // one never fires the track's own mouseenter/mouseleave — resume
+          // idle drift here once the click's animation settles, but only if
+          // the mouse isn't now sitting over the carousel (in which case the
+          // hover handlers are already in charge and will resume it later).
+          if (mouseX === null) startIdleDrift();
         }
       }
       animRaf = requestAnimationFrame(step);
     }
 
     function goTo(i, smooth) {
+      stopIdleDrift();
       index = i;
-      const target = centerScrollLeft(cards[i]);
       if (smooth) {
-        animateScrollTo(target, 380);
+        animateOffsetTo(i, 250);
       } else {
-        track.scrollLeft = target;
+        offset = i;
+        wrapOffset();
+        render();
       }
     }
 
-    goTo(1, false);
+    render();
 
     document.getElementById('next').addEventListener('click', () => goTo(index + 1, true));
     document.getElementById('prev').addEventListener('click', () => goTo(index - 1, true));
 
-    function settle() {
-      const trackRect = track.getBoundingClientRect();
-      const center = trackRect.left + track.clientWidth / 2;
-      let closest = index;
-      let minDist = Infinity;
-      cards.forEach((c, i) => {
-        const r = c.getBoundingClientRect();
-        const dist = Math.abs((r.left + r.width / 2) - center);
-        if (dist < minDist) {
-          minDist = dist;
-          closest = i;
-        }
-      });
-      index = closest;
-      if (index === 0) {
-        goTo(count, false);
-      } else if (index === cards.length - 1) {
-        goTo(1, false);
+    // Keeps the infinite loop illusion: once we scroll past a clone, jump by
+    // exactly one full lap (count card-units) so it lines up with the real
+    // card the clone stands in for. Pure arithmetic — no layout reads.
+    function wrapOffset() {
+      while (offset <= CLONE_COUNT - 1) {
+        offset += count;
+        index += count;
+      }
+      while (offset >= CLONE_COUNT + count) {
+        offset -= count;
+        index -= count;
       }
     }
 
-    if ('onscrollend' in window) {
-      track.addEventListener('scrollend', settle);
-    } else {
-      let settleTimer;
-      track.addEventListener('scroll', () => {
-        clearTimeout(settleTimer);
-        settleTimer = setTimeout(settle, 60);
-      });
+    // Whichever thumbnail sits under the cursor should grow, even while the
+    // carousel is moving underneath a cursor that isn't moving. CSS :hover
+    // only re-evaluates on mouse movement, so this tracks it manually.
+    let hoveredCard = null;
+    let mouseX = null;
+    let mouseY = null;
+
+    // Projects with multiple photos (a `data-images` list on .thumb) cycle
+    // through them on a timer while hovered, so over time you see every shot
+    // of that project. Stopping just freezes the interval — it deliberately
+    // doesn't reset back to the first image, so it holds on whatever was
+    // showing when the cursor left.
+    const CYCLE_INTERVAL = 750;
+    let cycleTimer = null;
+
+    function getCardImages(card) {
+      const thumb = card.querySelector('.thumb');
+      const raw = thumb && thumb.dataset.images;
+      if (!raw) return null;
+      const images = JSON.parse(raw);
+      return images.length > 1 ? images : null;
     }
 
-    window.addEventListener('resize', () => goTo(index, false));
+    // Warm the cache so the first cycle on each image is instant, not a
+    // network wait.
+    document.querySelectorAll('.thumb[data-images]').forEach((thumb) => {
+      JSON.parse(thumb.dataset.images).forEach((src) => {
+        new Image().src = src;
+      });
+    });
+
+    function startImageCycle(card) {
+      const images = getCardImages(card);
+      if (!images) return;
+      const img = card.querySelector('.thumb img');
+      cycleTimer = setInterval(() => {
+        const next = (images.indexOf(img.getAttribute('src')) + 1) % images.length;
+        img.setAttribute('src', images[next]);
+      }, CYCLE_INTERVAL);
+    }
+
+    function stopImageCycle() {
+      if (cycleTimer) {
+        clearInterval(cycleTimer);
+        cycleTimer = null;
+      }
+    }
+
+    function updateHoverFromPoint() {
+      if (mouseX === null) return;
+      const el = document.elementFromPoint(mouseX, mouseY);
+      const card = el ? el.closest('.card') : null;
+      const next = (card && track.contains(card)) ? card : null;
+      if (next !== hoveredCard) {
+        if (hoveredCard) hoveredCard.classList.remove('is-hovered');
+        if (next) next.classList.add('is-hovered');
+        hoveredCard = next;
+        stopImageCycle();
+        if (next) startImageCycle(next);
+      }
+    }
+
+    function clearHover() {
+      if (hoveredCard) {
+        hoveredCard.classList.remove('is-hovered');
+        hoveredCard = null;
+        stopImageCycle();
+      }
+    }
+
+    window.addEventListener('resize', () => {
+      thumbWidth = sizeThumbs();
+      computeGeometry();
+      render();
+    });
 
     const EDGE_ZONE = 0.16;
-    const MAX_SPEED = 9;
+    const MAX_SPEED = 0.015; // card-units per frame
+    // Below this much cumulative movement, a hover near the edge reads as
+    // incidental (cursor just passing through on its way somewhere else —
+    // even taking a screenshot can brush the edge zone for a frame or two)
+    // rather than deliberate scrolling, so it settles back to a clean,
+    // symmetric position instead of leaving a barely-visible permanent
+    // offset. Genuine scrolling moves well past this and is left exactly
+    // where it's stopped, per the "don't fight deliberate navigation with
+    // an unwanted snap" preference.
+    const DRIFT_SETTLE_THRESHOLD = 0.15;
     let hoverDir = 0;
     let hoverSpeed = 0;
     let hoverRaf = null;
+    let autoScrollDrift = 0;
 
     function autoScrollStep() {
-      track.scrollLeft += hoverDir * hoverSpeed;
-      settle();
+      const delta = hoverDir * hoverSpeed;
+      offset += delta;
+      autoScrollDrift += Math.abs(delta);
+      wrapOffset();
+      render();
+      updateHoverFromPoint();
       hoverRaf = requestAnimationFrame(autoScrollStep);
     }
 
     function startAutoScroll() {
-      track.style.scrollSnapType = 'none';
-      if (!hoverRaf) hoverRaf = requestAnimationFrame(autoScrollStep);
+      stopIdleDrift();
+      if (!hoverRaf) {
+        autoScrollDrift = 0;
+        hoverRaf = requestAnimationFrame(autoScrollStep);
+      }
     }
 
     function stopAutoScroll() {
@@ -450,23 +1697,54 @@
         cancelAnimationFrame(hoverRaf);
         hoverRaf = null;
       }
-      track.style.scrollSnapType = '';
-      const trackRect = track.getBoundingClientRect();
-      const center = trackRect.left + track.clientWidth / 2;
-      let closest = index;
-      let minDist = Infinity;
-      cards.forEach((c, i) => {
-        const r = c.getBoundingClientRect();
-        const dist = Math.abs((r.left + r.width / 2) - center);
-        if (dist < minDist) {
-          minDist = dist;
-          closest = i;
-        }
-      });
-      goTo(closest, true);
+      const nearest = Math.round(offset);
+      if (autoScrollDrift < DRIFT_SETTLE_THRESHOLD) {
+        offset = nearest;
+        render();
+      }
+      // Just record where we ended up for future relative nav (arrows,
+      // resize) — don't animate back to a centered card beyond the settle
+      // above. The carousel should rest wherever the user deliberately left
+      // it.
+      index = nearest;
     }
 
+    // Idle auto-drift: runs from the moment the page loads, creeping
+    // forward on its own at a slow constant speed whenever nothing else is
+    // actively driving the carousel — reads as alive right away instead of
+    // sitting frozen until someone touches it. It's fully stopped (not just
+    // slowed down or blended) the instant a real interaction starts —
+    // hovering a card's thumb, trackpad scrolling, or an arrow click — and
+    // only picks back up once that interaction ends.
+    const IDLE_DRIFT_SPEED = 0.0006; // card-units per frame — deliberately tiny
+    let idleDriftRaf = null;
+
+    function idleDriftStep() {
+      offset += IDLE_DRIFT_SPEED;
+      wrapOffset();
+      render();
+      idleDriftRaf = requestAnimationFrame(idleDriftStep);
+    }
+
+    function startIdleDrift() {
+      if (idleDriftRaf) return;
+      idleDriftRaf = requestAnimationFrame(idleDriftStep);
+    }
+
+    function stopIdleDrift() {
+      if (idleDriftRaf) {
+        cancelAnimationFrame(idleDriftRaf);
+        idleDriftRaf = null;
+      }
+    }
+
+    startIdleDrift();
+
     track.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      updateHoverFromPoint();
+
       const rect = track.getBoundingClientRect();
       const ratio = (e.clientX - rect.left) / rect.width;
       if (ratio < EDGE_ZONE) {
@@ -481,13 +1759,1364 @@
         hoverDir = 0;
         stopAutoScroll();
       }
+
+      // Pause idle drift only once the cursor is actually over a card's
+      // thumb — `track` spans the full carousel width (well beyond the
+      // visible cards), so gating on any mousemove inside it paused the
+      // drift while the cursor was still approaching, before it ever
+      // reached an image. Resume the moment it's not over a card, unless
+      // the edge zone above just took over scrolling instead.
+      if (hoveredCard) {
+        stopIdleDrift();
+      } else if (hoverDir === 0) {
+        startIdleDrift();
+      }
     });
 
     track.addEventListener('mouseleave', () => {
+      mouseX = null;
+      mouseY = null;
+      clearHover();
       if (hoverDir !== 0) {
         hoverDir = 0;
         stopAutoScroll();
       }
+      startIdleDrift();
+    });
+
+    // No native scroll container anymore, so the wheel/trackpad gesture is
+    // wired up by hand — same "stays wherever you leave it" behavior as the
+    // edge-hover auto-scroll. Bound to the window (not just the track) so
+    // trackpad scroll drives the carousel no matter where the cursor is on
+    // the page — except over an open book modal, which has its own
+    // scrolling gallery and should keep native scroll behavior.
+    window.addEventListener('wheel', (e) => {
+      if (e.target.closest('.book-modal.open')) return;
+      stopIdleDrift();
+      e.preventDefault();
+      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      offset += delta / apothem;
+      wrapOffset();
+      render();
+      index = Math.round(offset);
+    }, { passive: false });
+  })();
+
+  (function () {
+    const PROJECT_DIR = 'portfolio projects/OurWorkIsNeverDone/';
+    const BOOK_DIR = PROJECT_DIR + 'spreads_web/';
+    const SHADOW_SRC = PROJECT_DIR + 'shadow2.png';
+    const HERO_IMG_SRC = PROJECT_DIR + 'cover-spine-back.jpg';
+    const SPREAD_COUNT = 401;
+    const spreads = [];
+    for (let i = 1; i <= SPREAD_COUNT; i++) {
+      spreads.push(BOOK_DIR + 'spread-' + String(i).padStart(3, '0') + '.jpg');
+    }
+
+    const modal = document.getElementById('bookModal');
+    const closeBtn = document.getElementById('bookClose');
+    const carouselControls = document.querySelector('.controls');
+    const galleryScroll = document.getElementById('galleryScroll');
+    const player = document.getElementById('spreadPlayer');
+    const playerImg = document.getElementById('spreadPlayerImg');
+    const playerShadow = document.getElementById('spreadPlayerShadow');
+    const coverFlipFront = document.getElementById('coverFlipFront');
+    const coverFlipBack = document.getElementById('coverFlipBack');
+    const playerHint = document.getElementById('playerHint');
+    const playerHintPlaying = document.getElementById('playerHintPlaying');
+
+    // Only the true two-page spreads (every index except the very first
+    // and very last) get the crease-shadow overlay — the half-title and
+    // half-final are single pages with no gutter to show one.
+    const isFullSpread = (index) => index !== 0 && index !== spreads.length - 1;
+
+    // A page-by-page flip was too slow to load through for an 800-page
+    // book, and paging through that many spreads by hand isn't realistic
+    // anyway — this plays the interior as a rapid slideshow instead. It
+    // sits behind the real front-cover scan until clicked (no reason to
+    // start pulling images over the network before someone's actually
+    // looking at it); clicking swings that cover open like a real book,
+    // then the slideshow plays through to the half-final page, where the
+    // real back-cover scan swings shut over it before everything silently
+    // resets back to the closed cover, ready to be opened again. Hovering
+    // pauses on whatever frame is currently showing, resuming when the
+    // mouse moves away.
+    const FRAME_MS = 500;
+    const FLIP_MS = 900; // matches the .cover-flip transition duration
+    const END_HOLD_MS = 500; // pause on the half-final page before closing
+    const SHUT_HOLD_MS = 3000; // pause on the shut back cover before resetting
+    const FADE_MS = 700; // matches the .cover-flip-back opacity transition
+    let frameIndex = 0;
+    let timer = null;
+    let paused = false;
+    let started = false;
+    let pendingTimers = [];
+
+    function after(ms, fn) {
+      const id = setTimeout(() => {
+        pendingTimers = pendingTimers.filter((t) => t !== id);
+        fn();
+      }, ms);
+      pendingTimers.push(id);
+      return id;
+    }
+
+    function clearPendingTimers() {
+      pendingTimers.forEach(clearTimeout);
+      pendingTimers = [];
+    }
+
+    // Snaps a cover straight to its open/shut state with no transition —
+    // used to reset the player silently, either before it's ever been seen
+    // or while it's hidden behind the other (currently shut) cover.
+    function snapCover(el, className, on) {
+      el.classList.add('no-transition');
+      el.classList.toggle(className, on);
+      void el.offsetWidth; // force reflow so the toggle above doesn't transition
+      el.classList.remove('no-transition');
+    }
+
+    function preload(src) {
+      const img = new Image();
+      img.src = src;
+    }
+
+    function setPlayerFrame(index) {
+      playerImg.src = spreads[index];
+      playerShadow.style.display = isFullSpread(index) ? '' : 'none';
+      // The half-title sits flush right of the spine (like the front cover
+      // above it); the half-final sits flush left (like the back cover).
+      playerImg.classList.toggle('align-right', index === 0);
+      playerImg.classList.toggle('align-left', index === spreads.length - 1);
+    }
+
+    function showFrame() {
+      setPlayerFrame(frameIndex);
+      preload(spreads[frameIndex + 1]);
+      frameIndex += 1;
+    }
+
+    function resetPlayer() {
+      clearPendingTimers();
+      frameIndex = 0;
+      setPlayerFrame(0);
+      player.classList.remove('started');
+      snapCover(coverFlipFront, 'open', false);
+      coverFlipFront.classList.remove('settled');
+      snapCover(coverFlipBack, 'shut', false);
+      snapCover(coverFlipBack, 'fade-out', false);
+      coverFlipBack.classList.remove('active');
+      playerHint.classList.remove('hidden');
+      playerHintPlaying.classList.remove('visible');
+    }
+
+    // Choreographs the closing bookend once the slideshow has reached the
+    // half-final page: hold briefly, swing the back cover shut over it
+    // (mirroring the opening flip — see .cover-face-back on both covers),
+    // hold shut, then reset the frame and front cover back to their
+    // starting state — still hidden behind the shut, still-opaque back
+    // cover — and fade that back cover to transparent to reveal the reset
+    // state, rather than swinging it back open.
+    function playEnding() {
+      after(END_HOLD_MS, () => {
+        // .active reveals the back cover at its parked rotation (blank
+        // face showing) — a real rendered frame, forced via the reflow
+        // read below, so the .shut transition that follows has something
+        // to actually animate from instead of the two changes collapsing
+        // into one frame with no visible start state.
+        coverFlipBack.classList.add('active');
+        void coverFlipBack.offsetWidth;
+        coverFlipBack.classList.add('shut');
+        after(FLIP_MS + SHUT_HOLD_MS, () => {
+          frameIndex = 0;
+          setPlayerFrame(0);
+          snapCover(coverFlipFront, 'open', false);
+          coverFlipFront.classList.remove('settled');
+          playerHint.classList.remove('hidden');
+          playerHintPlaying.classList.remove('visible');
+          coverFlipBack.classList.add('fade-out');
+          after(FADE_MS, () => {
+            // Fully transparent now — safe to snap the rotation, opacity,
+            // and visibility back to their parked, ready-to-open-again
+            // state with no transition, since nothing is visible to flash.
+            snapCover(coverFlipBack, 'shut', false);
+            snapCover(coverFlipBack, 'fade-out', false);
+            coverFlipBack.classList.remove('active');
+            player.classList.remove('started');
+            started = false;
+          });
+        });
+      });
+    }
+
+    // One tick of forward progress — shared by the timer (automatic) and
+    // the click-to-navigate handler below (manual), so clicking forward
+    // onto the half-final page triggers the closing bookend exactly like
+    // reaching it automatically would, instead of a second, divergent copy
+    // of this logic.
+    function advanceOnce() {
+      if (frameIndex === spreads.length - 1) {
+        setPlayerFrame(frameIndex);
+        clearInterval(timer);
+        timer = null;
+        playEnding();
+        return;
+      }
+      // The half-title stays visible (with the opened front cover's blank
+      // back-face resting beside it) right up until the first real
+      // full-spread frame is about to replace it and fill the whole box —
+      // that's the moment the resting flap needs to get out of the way.
+      if (frameIndex === 1) {
+        coverFlipFront.classList.add('settled');
+      }
+      showFrame();
+    }
+
+    // The mirror of advanceOnce for stepping backward — frameIndex always
+    // points at the *next* frame showFrame would reveal, so the currently
+    // visible one is frameIndex-1; stepping back targets the one before
+    // that. Brings the front cover's resting flap back if it lands on the
+    // half-title, restoring the exact look the player had before ever
+    // advancing past it. Once there's nothing left before the half-title
+    // to step back to, retreating once more reverses the opening flip
+    // instead of just stopping, mirroring how advancing past the end
+    // triggers the closing bookend rather than just stopping there.
+    function retreatOnce() {
+      const current = frameIndex - 1;
+      if (current <= 0) {
+        if (current === 0) closeCoverAndReset();
+        return;
+      }
+      const target = current - 1;
+      setPlayerFrame(target);
+      frameIndex = target + 1;
+      if (target === 0) {
+        coverFlipFront.classList.remove('settled');
+      }
+    }
+
+    // Undoes openCoverAndPlay: removing .open lets the same transition
+    // that opened the cover play in reverse (CSS transitions animate from
+    // wherever the property currently is, so no separate "closing"
+    // keyframes are needed), landing back on the closed, unopened state
+    // once the flip finishes. Unlike resetPlayer() — an instant,
+    // transition-less snap used when the modal itself opens/closes — this
+    // is meant to be watched.
+    function closeCoverAndReset() {
+      clearInterval(timer);
+      timer = null;
+      clearPendingTimers();
+      playerHint.classList.remove('hidden');
+      playerHintPlaying.classList.remove('visible');
+      coverFlipFront.classList.remove('open');
+      after(FLIP_MS, () => {
+        frameIndex = 0;
+        player.classList.remove('started');
+        started = false;
+      });
+    }
+
+    // paused is deliberately left untouched here (not force-reset to
+    // false) — it already reflects whatever the mouse is doing at this
+    // exact moment (see the playerImg mouseenter/mouseleave listeners
+    // below), and since opening requires the cursor to already be over
+    // the cover to click it, it's already true by the time this runs.
+    // That means autoplay doesn't kick in until the cursor actually
+    // leaves the book for the first time after opening, whether or not
+    // any manual paging happened in between.
+    function startSlideshow() {
+      if (started) return;
+      started = true;
+      frameIndex = 1;
+      player.classList.add('started');
+      playerHintPlaying.classList.add('visible');
+      if (timer) clearInterval(timer);
+      timer = setInterval(() => {
+        if (paused) return;
+        advanceOnce();
+      }, FRAME_MS);
+    }
+
+    function stopSlideshow() {
+      started = false;
+      if (timer) clearInterval(timer);
+      timer = null;
+      clearPendingTimers();
+    }
+
+    // First click swings the real front cover open, then hands off to the
+    // slideshow once that flip has finished; ignored while already open or
+    // mid-playthrough (including during the closing bookend, since started
+    // only flips back to false once that finishes).
+    function openCoverAndPlay() {
+      if (started || coverFlipFront.classList.contains('open')) return;
+      playerHint.classList.add('hidden');
+      coverFlipFront.classList.add('open');
+      after(FLIP_MS, startSlideshow);
+    }
+
+    // Pause is bound to the page image itself, not the whole player box —
+    // #spreadPlayerImg is now sized to match its visible content exactly
+    // (see the CSS above), so hovering the empty letterboxed margin beside
+    // a single-page frame no longer counts as hovering "the page." Click
+    // stays on the whole box for opening, since that isn't meant to
+    // require that precision — but once playing, clicking the page itself
+    // steps a frame forward or back depending on which half of the visible
+    // image was clicked, like turning to the next or previous spread by
+    // hand. Guarded on timer !== null so it's only live during ordinary
+    // playback — not before the cover has opened (started is false) and
+    // not during the closing bookend (the timer's already cleared by the
+    // time that starts, see advanceOnce/playEnding).
+    player.addEventListener('click', openCoverAndPlay);
+    playerImg.addEventListener('mouseenter', () => { paused = true; });
+    playerImg.addEventListener('mouseleave', () => { paused = false; });
+    playerImg.addEventListener('click', (e) => {
+      if (!started || timer === null) return;
+      const rect = playerImg.getBoundingClientRect();
+      const ratio = (e.clientX - rect.left) / rect.width;
+      if (ratio < 0.5) {
+        retreatOnce();
+      } else {
+        advanceOnce();
+      }
+    });
+
+    // Highlight-spread gallery around the embedded slideshow, styled after
+    // the way books are usually shown on a design studio's site: full-bleed
+    // spreads in rows of one to three. Hand-picked (spread numbers, i.e.
+    // the NNN in spread-NNN.jpg) for being genuinely photographic interior
+    // spreads rather than essay/citation text pages — swap in different
+    // favorites any time by editing these lists. Page flow: description ->
+    // gallery (hero photo of the physical book, then more spreads) ->
+    // slideshow -> more gallery -> contact.
+    const GALLERY_LAYOUT_BEFORE = [2, 3, 1, 2];
+    const GALLERY_PICKS_BEFORE = [58, 74, 18, 42, 106, 306, 330, 370];
+    const GALLERY_LAYOUT_AFTER = [3, 1, 2, 3, 1];
+    const GALLERY_PICKS_AFTER = [82, 98, 138, 394, 274, 354, 162, 178, 226, 386];
+    let galleryBuilt = false;
+
+    function makeGalleryWrap(src, withShadow) {
+      const wrap = document.createElement('div');
+      wrap.className = 'gallery-img-wrap';
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = '';
+      img.loading = 'lazy';
+      wrap.appendChild(img);
+      if (withShadow) {
+        const shadow = document.createElement('img');
+        shadow.className = 'shadow';
+        shadow.src = SHADOW_SRC;
+        shadow.alt = '';
+        shadow.setAttribute('aria-hidden', 'true');
+        shadow.loading = 'lazy';
+        wrap.appendChild(shadow);
+      }
+      return wrap;
+    }
+
+    function buildGallery() {
+      function fillRows(container, layout, picks) {
+        let cursor = 0;
+        layout.forEach((count) => {
+          const row = document.createElement('div');
+          row.className = 'gallery-row';
+          for (let k = 0; k < count; k++) {
+            row.appendChild(makeGalleryWrap(spreads[picks[cursor++] - 1], true));
+          }
+          container.appendChild(row);
+        });
+      }
+
+      const galleryRowsBefore = document.getElementById('galleryRowsBefore');
+
+      // A real photo of the physical book (front cover, spine, back
+      // cover) rather than an interior spread — no crease-shadow overlay,
+      // since it's a different aspect ratio and already shows a real
+      // spine of its own.
+      const heroRow = document.createElement('div');
+      heroRow.className = 'gallery-row';
+      const heroWrap = makeGalleryWrap(HERO_IMG_SRC, false);
+      heroWrap.classList.add('hero');
+      heroRow.appendChild(heroWrap);
+      galleryRowsBefore.appendChild(heroRow);
+
+      fillRows(galleryRowsBefore, GALLERY_LAYOUT_BEFORE, GALLERY_PICKS_BEFORE);
+      fillRows(document.getElementById('galleryRowsAfter'), GALLERY_LAYOUT_AFTER, GALLERY_PICKS_AFTER);
+      galleryBuilt = true;
+    }
+
+    function openBook() {
+      if (!galleryBuilt) buildGallery();
+      stopSlideshow();
+      resetPlayer();
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      galleryScroll.scrollTop = 0;
+      if (carouselControls) carouselControls.style.visibility = 'hidden';
+    }
+
+    function closeBook() {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (carouselControls) carouselControls.style.visibility = '';
+      stopSlideshow();
+    }
+
+    document.querySelectorAll('[data-opens-book]').forEach((el) => {
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', openBook);
+    });
+
+    closeBtn.addEventListener('click', closeBook);
+
+    // Clicking the blurred/whited-out backdrop should close the gallery,
+    // same as clicking outside any modal. .gallery-scroll has no
+    // background of its own — its content wrappers (the description, each
+    // gallery-rows block, the embed section, the contact line) fill its
+    // full width, so a raw `e.target === galleryScroll` check would never
+    // fire. Instead: a click lands on the backdrop iff its target *is* one
+    // of those wrapper elements directly (i.e. their own padding/empty
+    // space), not a piece of actual content — an image, the slideshow
+    // player, text — nested inside one.
+    galleryScroll.addEventListener('click', (e) => {
+      const wrapper = e.target.closest('.book-description, .gallery-rows, .gallery-row, .book-embed-section, .book-contact');
+      if (wrapper === e.target) closeBook();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!modal.classList.contains('open')) return;
+      if (e.key === 'Escape') closeBook();
+    });
+  })();
+
+  // Old New Mens Club — second book, same mechanism as Our Work Is Never
+  // Done above (see that IIFE's comments for how each piece works), just
+  // pointed at this book's own assets and IDs (everything suffixed "2",
+  // since element IDs can't be shared) and its own trim size (the
+  // aspect-ratio overrides live in the CSS above, scoped to #bookModal2).
+  // No real cover scans yet, so the front/back cover slots use an obvious
+  // placeholder photo instead — swap those two <img src> in the HTML for
+  // the real straightened scans (see how the other book's were prepared)
+  // once they exist, no other changes needed. No hero photo of the
+  // physical book either, for the same reason, so buildGallery here skips
+  // straight to the picked spreads with no hero row first.
+  (function () {
+    const PROJECT_DIR = 'portfolio projects/OldNewMensClub/';
+    const BOOK_DIR = PROJECT_DIR + 'spreads_web/';
+    const SHADOW_SRC = PROJECT_DIR + 'shadow2.png';
+    const SPREAD_COUNT = 129;
+    const spreads = [];
+    for (let i = 1; i <= SPREAD_COUNT; i++) {
+      spreads.push(BOOK_DIR + 'spread-' + String(i).padStart(3, '0') + '.jpg');
+    }
+
+    const modal = document.getElementById('bookModal2');
+    const closeBtn = document.getElementById('bookClose2');
+    const carouselControls = document.querySelector('.controls');
+    const galleryScroll = document.getElementById('galleryScroll2');
+    const player = document.getElementById('spreadPlayer2');
+    const playerImg = document.getElementById('spreadPlayerImg2');
+    const playerShadow = document.getElementById('spreadPlayerShadow2');
+    const coverFlipFront = document.getElementById('coverFlipFront2');
+    const coverFlipBack = document.getElementById('coverFlipBack2');
+    const playerHint = document.getElementById('playerHint2');
+    const playerHintPlaying = document.getElementById('playerHintPlaying2');
+
+    // Only the true two-page spreads (every index except the very first
+    // and very last) get the crease-shadow overlay — the half-title and
+    // half-final are single pages with no gutter to show one.
+    const isFullSpread = (index) => index !== 0 && index !== spreads.length - 1;
+
+    const FRAME_MS = 500;
+    const FLIP_MS = 900;
+    const END_HOLD_MS = 500;
+    const SHUT_HOLD_MS = 3000;
+    const FADE_MS = 700;
+    let frameIndex = 0;
+    let timer = null;
+    let paused = false;
+    let started = false;
+    let pendingTimers = [];
+
+    function after(ms, fn) {
+      const id = setTimeout(() => {
+        pendingTimers = pendingTimers.filter((t) => t !== id);
+        fn();
+      }, ms);
+      pendingTimers.push(id);
+      return id;
+    }
+
+    function clearPendingTimers() {
+      pendingTimers.forEach(clearTimeout);
+      pendingTimers = [];
+    }
+
+    function snapCover(el, className, on) {
+      el.classList.add('no-transition');
+      el.classList.toggle(className, on);
+      void el.offsetWidth;
+      el.classList.remove('no-transition');
+    }
+
+    function preload(src) {
+      const img = new Image();
+      img.src = src;
+    }
+
+    function setPlayerFrame(index) {
+      playerImg.src = spreads[index];
+      playerShadow.style.display = isFullSpread(index) ? '' : 'none';
+      playerImg.classList.toggle('align-right', index === 0);
+      playerImg.classList.toggle('align-left', index === spreads.length - 1);
+    }
+
+    function showFrame() {
+      setPlayerFrame(frameIndex);
+      preload(spreads[frameIndex + 1]);
+      frameIndex += 1;
+    }
+
+    function resetPlayer() {
+      clearPendingTimers();
+      frameIndex = 0;
+      setPlayerFrame(0);
+      player.classList.remove('started');
+      snapCover(coverFlipFront, 'open', false);
+      coverFlipFront.classList.remove('settled');
+      snapCover(coverFlipBack, 'shut', false);
+      snapCover(coverFlipBack, 'fade-out', false);
+      coverFlipBack.classList.remove('active');
+      playerHint.classList.remove('hidden');
+      playerHintPlaying.classList.remove('visible');
+    }
+
+    function playEnding() {
+      after(END_HOLD_MS, () => {
+        coverFlipBack.classList.add('active');
+        void coverFlipBack.offsetWidth;
+        coverFlipBack.classList.add('shut');
+        after(FLIP_MS + SHUT_HOLD_MS, () => {
+          frameIndex = 0;
+          setPlayerFrame(0);
+          snapCover(coverFlipFront, 'open', false);
+          coverFlipFront.classList.remove('settled');
+          playerHint.classList.remove('hidden');
+          playerHintPlaying.classList.remove('visible');
+          coverFlipBack.classList.add('fade-out');
+          after(FADE_MS, () => {
+            snapCover(coverFlipBack, 'shut', false);
+            snapCover(coverFlipBack, 'fade-out', false);
+            coverFlipBack.classList.remove('active');
+            player.classList.remove('started');
+            started = false;
+          });
+        });
+      });
+    }
+
+    // One tick of forward progress — shared by the timer (automatic) and
+    // the click-to-navigate handler below (manual).
+    function advanceOnce() {
+      if (frameIndex === spreads.length - 1) {
+        setPlayerFrame(frameIndex);
+        clearInterval(timer);
+        timer = null;
+        playEnding();
+        return;
+      }
+      if (frameIndex === 1) {
+        coverFlipFront.classList.add('settled');
+      }
+      showFrame();
+    }
+
+    // The mirror of advanceOnce for stepping backward — see the other
+    // book's IIFE for the full explanation of the frameIndex offset.
+    // Retreating past the half-title reverses the opening flip instead of
+    // just stopping — see closeCoverAndReset below.
+    function retreatOnce() {
+      const current = frameIndex - 1;
+      if (current <= 0) {
+        if (current === 0) closeCoverAndReset();
+        return;
+      }
+      const target = current - 1;
+      setPlayerFrame(target);
+      frameIndex = target + 1;
+      if (target === 0) {
+        coverFlipFront.classList.remove('settled');
+      }
+    }
+
+    // Undoes openCoverAndPlay — see the other book's IIFE for the full
+    // rationale, same mechanism, duplicated per book like everything else
+    // in this modal.
+    function closeCoverAndReset() {
+      clearInterval(timer);
+      timer = null;
+      clearPendingTimers();
+      playerHint.classList.remove('hidden');
+      playerHintPlaying.classList.remove('visible');
+      coverFlipFront.classList.remove('open');
+      after(FLIP_MS, () => {
+        frameIndex = 0;
+        player.classList.remove('started');
+        started = false;
+      });
+    }
+
+    // paused is left untouched here — see the other book's IIFE for why.
+    function startSlideshow() {
+      if (started) return;
+      started = true;
+      frameIndex = 1;
+      player.classList.add('started');
+      playerHintPlaying.classList.add('visible');
+      if (timer) clearInterval(timer);
+      timer = setInterval(() => {
+        if (paused) return;
+        advanceOnce();
+      }, FRAME_MS);
+    }
+
+    function stopSlideshow() {
+      started = false;
+      if (timer) clearInterval(timer);
+      timer = null;
+      clearPendingTimers();
+    }
+
+    function openCoverAndPlay() {
+      if (started || coverFlipFront.classList.contains('open')) return;
+      playerHint.classList.add('hidden');
+      coverFlipFront.classList.add('open');
+      after(FLIP_MS, startSlideshow);
+    }
+
+    // Click stays on the whole box for opening; once playing, clicking the
+    // page itself steps a frame forward or back depending on which half of
+    // the visible image was clicked (see the other book's IIFE for the
+    // full rationale — same mechanism, duplicated per book like everything
+    // else in this modal).
+    player.addEventListener('click', openCoverAndPlay);
+    playerImg.addEventListener('mouseenter', () => { paused = true; });
+    playerImg.addEventListener('mouseleave', () => { paused = false; });
+    playerImg.addEventListener('click', (e) => {
+      if (!started || timer === null) return;
+      const rect = playerImg.getBoundingClientRect();
+      const ratio = (e.clientX - rect.left) / rect.width;
+      if (ratio < 0.5) {
+        retreatOnce();
+      } else {
+        advanceOnce();
+      }
+    });
+
+    // Hand-picked highlight spreads, curated and numbered 1-15 (in the
+    // order they appear in the book) by dropping full-res exports into
+    // highlight_spreads_web/ — unlike the other books, the gallery here
+    // doesn't pull from the 129-page slideshow set by page number, since
+    // these picks are their own separate, sequential edit. Swap in
+    // different favorites any time by re-numbering that folder.
+    const HIGHLIGHTS_DIR = PROJECT_DIR + 'highlight_spreads_web/';
+    const HIGHLIGHT_COUNT = 15;
+    const highlights = [];
+    for (let i = 1; i <= HIGHLIGHT_COUNT; i++) {
+      highlights.push(HIGHLIGHTS_DIR + 'highlight-' + String(i).padStart(2, '0') + '.jpg');
+    }
+
+    // Picks 3, 6, 7, and 15 each land in a single-image "hero" row (see the
+    // layout arrays below) where they render close to full width — the
+    // shared 2000px-wide set reads soft blown up that large, so those four
+    // are swapped for a separately exported 3200px version instead. Safe to
+    // mutate highlights[] in place since, unlike spreads[] below, nothing
+    // else (no slideshow) reads from this array.
+    const HERO_DIR = PROJECT_DIR + 'gallery_hero/';
+    [3, 6, 7, 15].forEach((n) => {
+      highlights[n - 1] = HERO_DIR + 'highlight-' + String(n).padStart(2, '0') + '.jpg';
+    });
+
+    const GALLERY_LAYOUT_BEFORE = [2, 1, 2, 1];
+    const GALLERY_PICKS_BEFORE = [1, 2, 3, 4, 5, 6];
+    // Split around the poster row inserted between them in buildGallery —
+    // [1,2] then the poster (itself a "1") then [3,2,1] keeps every
+    // consecutive row a different size, poster included.
+    const GALLERY_LAYOUT_AFTER_1 = [1, 2];
+    const GALLERY_PICKS_AFTER_1 = [7, 8, 9];
+    const GALLERY_LAYOUT_AFTER_2 = [3, 2, 1];
+    const GALLERY_PICKS_AFTER_2 = [10, 11, 12, 13, 14, 15];
+    const POSTER_SRC = PROJECT_DIR + 'poster-web.jpg';
+    let galleryBuilt = false;
+
+    function makeGalleryWrap(src, withShadow) {
+      const wrap = document.createElement('div');
+      wrap.className = 'gallery-img-wrap';
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = '';
+      img.loading = 'lazy';
+      wrap.appendChild(img);
+      if (withShadow) {
+        const shadow = document.createElement('img');
+        shadow.className = 'shadow';
+        shadow.src = SHADOW_SRC;
+        shadow.alt = '';
+        shadow.setAttribute('aria-hidden', 'true');
+        shadow.loading = 'lazy';
+        wrap.appendChild(shadow);
+      }
+      return wrap;
+    }
+
+    function buildGallery() {
+      function fillRows(container, layout, picks) {
+        let cursor = 0;
+        layout.forEach((count) => {
+          const row = document.createElement('div');
+          row.className = 'gallery-row';
+          for (let k = 0; k < count; k++) {
+            row.appendChild(makeGalleryWrap(highlights[picks[cursor++] - 1], true));
+          }
+          container.appendChild(row);
+        });
+      }
+
+      fillRows(document.getElementById('galleryRowsBefore2'), GALLERY_LAYOUT_BEFORE, GALLERY_PICKS_BEFORE);
+
+      const galleryRowsAfter = document.getElementById('galleryRowsAfter2');
+      fillRows(galleryRowsAfter, GALLERY_LAYOUT_AFTER_1, GALLERY_PICKS_AFTER_1);
+
+      // The event poster, mixed into the gallery on its own row — full
+      // portrait size (see .gallery-img-wrap.poster), not squeezed into a
+      // landscape row alongside the spreads. Not a spread itself (a real
+      // printed poster, already photographed flat with no gutter), so no
+      // shadow overlay.
+      const posterRow = document.createElement('div');
+      posterRow.className = 'gallery-row';
+      const posterWrap = makeGalleryWrap(POSTER_SRC, false);
+      posterWrap.classList.add('poster');
+      posterRow.appendChild(posterWrap);
+      galleryRowsAfter.appendChild(posterRow);
+
+      fillRows(galleryRowsAfter, GALLERY_LAYOUT_AFTER_2, GALLERY_PICKS_AFTER_2);
+      galleryBuilt = true;
+    }
+
+    function openBook() {
+      if (!galleryBuilt) buildGallery();
+      stopSlideshow();
+      resetPlayer();
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      galleryScroll.scrollTop = 0;
+      if (carouselControls) carouselControls.style.visibility = 'hidden';
+    }
+
+    function closeBook() {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (carouselControls) carouselControls.style.visibility = '';
+      stopSlideshow();
+    }
+
+    document.querySelectorAll('[data-opens-book-2]').forEach((el) => {
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', openBook);
+    });
+
+    closeBtn.addEventListener('click', closeBook);
+
+    galleryScroll.addEventListener('click', (e) => {
+      const wrapper = e.target.closest('.book-description, .gallery-rows, .gallery-row, .book-embed-section, .book-contact');
+      if (wrapper === e.target) closeBook();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!modal.classList.contains('open')) return;
+      if (e.key === 'Escape') closeBook();
+    });
+  })();
+
+  // Styles Make Fights — third book, same mechanism as the other two (see
+  // Our Work Is Never Done's IIFE for how each piece works). Like that one
+  // (and unlike Old New Mens Club), these raw scans have no gutter crease
+  // baked in, so it uses the shadow2.png overlay again — but like Old New
+  // Mens Club, there's no real cover scan or hero photo of the physical
+  // book yet, so it uses placeholder covers and buildGallery skips straight
+  // to the picked spreads with no hero row first.
+  (function () {
+    const PROJECT_DIR = 'portfolio projects/StylesMakeFights/';
+    const BOOK_DIR = PROJECT_DIR + 'spreads_web/';
+    const SHADOW_SRC = PROJECT_DIR + 'shadow2.png';
+    const SPREAD_COUNT = 73;
+    const spreads = [];
+    for (let i = 1; i <= SPREAD_COUNT; i++) {
+      spreads.push(BOOK_DIR + 'spread-' + String(i).padStart(3, '0') + '.jpg');
+    }
+
+    const modal = document.getElementById('bookModal3');
+    const closeBtn = document.getElementById('bookClose3');
+    const carouselControls = document.querySelector('.controls');
+    const galleryScroll = document.getElementById('galleryScroll3');
+    const player = document.getElementById('spreadPlayer3');
+    const playerImg = document.getElementById('spreadPlayerImg3');
+    const playerShadow = document.getElementById('spreadPlayerShadow3');
+    const coverFlipFront = document.getElementById('coverFlipFront3');
+    const coverFlipBack = document.getElementById('coverFlipBack3');
+    const playerHint = document.getElementById('playerHint3');
+    const playerHintPlaying = document.getElementById('playerHintPlaying3');
+
+    // Only the true two-page spreads (every index except the very first
+    // and very last) get the crease-shadow overlay — the half-title and
+    // half-final are single pages with no gutter to show one.
+    const isFullSpread = (index) => index !== 0 && index !== spreads.length - 1;
+
+    const FRAME_MS = 500;
+    const FLIP_MS = 900;
+    const END_HOLD_MS = 500;
+    const SHUT_HOLD_MS = 3000;
+    const FADE_MS = 700;
+    let frameIndex = 0;
+    let timer = null;
+    let paused = false;
+    let started = false;
+    let pendingTimers = [];
+
+    function after(ms, fn) {
+      const id = setTimeout(() => {
+        pendingTimers = pendingTimers.filter((t) => t !== id);
+        fn();
+      }, ms);
+      pendingTimers.push(id);
+      return id;
+    }
+
+    function clearPendingTimers() {
+      pendingTimers.forEach(clearTimeout);
+      pendingTimers = [];
+    }
+
+    function snapCover(el, className, on) {
+      el.classList.add('no-transition');
+      el.classList.toggle(className, on);
+      void el.offsetWidth;
+      el.classList.remove('no-transition');
+    }
+
+    function preload(src) {
+      const img = new Image();
+      img.src = src;
+    }
+
+    function setPlayerFrame(index) {
+      playerImg.src = spreads[index];
+      playerShadow.style.display = isFullSpread(index) ? '' : 'none';
+      playerImg.classList.toggle('align-right', index === 0);
+      playerImg.classList.toggle('align-left', index === spreads.length - 1);
+    }
+
+    function showFrame() {
+      setPlayerFrame(frameIndex);
+      preload(spreads[frameIndex + 1]);
+      frameIndex += 1;
+    }
+
+    function resetPlayer() {
+      clearPendingTimers();
+      frameIndex = 0;
+      setPlayerFrame(0);
+      player.classList.remove('started');
+      snapCover(coverFlipFront, 'open', false);
+      coverFlipFront.classList.remove('settled');
+      snapCover(coverFlipBack, 'shut', false);
+      snapCover(coverFlipBack, 'fade-out', false);
+      coverFlipBack.classList.remove('active');
+      playerHint.classList.remove('hidden');
+      playerHintPlaying.classList.remove('visible');
+    }
+
+    function playEnding() {
+      after(END_HOLD_MS, () => {
+        coverFlipBack.classList.add('active');
+        void coverFlipBack.offsetWidth;
+        coverFlipBack.classList.add('shut');
+        after(FLIP_MS + SHUT_HOLD_MS, () => {
+          frameIndex = 0;
+          setPlayerFrame(0);
+          snapCover(coverFlipFront, 'open', false);
+          coverFlipFront.classList.remove('settled');
+          playerHint.classList.remove('hidden');
+          playerHintPlaying.classList.remove('visible');
+          coverFlipBack.classList.add('fade-out');
+          after(FADE_MS, () => {
+            snapCover(coverFlipBack, 'shut', false);
+            snapCover(coverFlipBack, 'fade-out', false);
+            coverFlipBack.classList.remove('active');
+            player.classList.remove('started');
+            started = false;
+          });
+        });
+      });
+    }
+
+    function advanceOnce() {
+      if (frameIndex === spreads.length - 1) {
+        setPlayerFrame(frameIndex);
+        clearInterval(timer);
+        timer = null;
+        playEnding();
+        return;
+      }
+      if (frameIndex === 1) {
+        coverFlipFront.classList.add('settled');
+      }
+      showFrame();
+    }
+
+    function retreatOnce() {
+      const current = frameIndex - 1;
+      if (current <= 0) {
+        if (current === 0) closeCoverAndReset();
+        return;
+      }
+      const target = current - 1;
+      setPlayerFrame(target);
+      frameIndex = target + 1;
+      if (target === 0) {
+        coverFlipFront.classList.remove('settled');
+      }
+    }
+
+    function closeCoverAndReset() {
+      clearInterval(timer);
+      timer = null;
+      clearPendingTimers();
+      playerHint.classList.remove('hidden');
+      playerHintPlaying.classList.remove('visible');
+      coverFlipFront.classList.remove('open');
+      after(FLIP_MS, () => {
+        frameIndex = 0;
+        player.classList.remove('started');
+        started = false;
+      });
+    }
+
+    function startSlideshow() {
+      if (started) return;
+      started = true;
+      frameIndex = 1;
+      player.classList.add('started');
+      playerHintPlaying.classList.add('visible');
+      if (timer) clearInterval(timer);
+      timer = setInterval(() => {
+        if (paused) return;
+        advanceOnce();
+      }, FRAME_MS);
+    }
+
+    function stopSlideshow() {
+      started = false;
+      if (timer) clearInterval(timer);
+      timer = null;
+      clearPendingTimers();
+    }
+
+    function openCoverAndPlay() {
+      if (started || coverFlipFront.classList.contains('open')) return;
+      playerHint.classList.add('hidden');
+      coverFlipFront.classList.add('open');
+      after(FLIP_MS, startSlideshow);
+    }
+
+    player.addEventListener('click', openCoverAndPlay);
+    playerImg.addEventListener('mouseenter', () => { paused = true; });
+    playerImg.addEventListener('mouseleave', () => { paused = false; });
+    playerImg.addEventListener('click', (e) => {
+      if (!started || timer === null) return;
+      const rect = playerImg.getBoundingClientRect();
+      const ratio = (e.clientX - rect.left) / rect.width;
+      if (ratio < 0.5) {
+        retreatOnce();
+      } else {
+        advanceOnce();
+      }
+    });
+
+    // Hand-picked (spread numbers, i.e. the NNN in spread-NNN.jpg) for
+    // being genuinely photographic interior spreads rather than the
+    // chapter-opener pages (a solid color panel of text alongside a photo)
+    // that make up most of this book — swap in different favorites any
+    // time by editing these lists. Deliberately one (or two, for the
+    // longer chapters) pick from each of the book's seven color-coded
+    // chapters — United States 1-16, Mexico 17-23, Brazil 24-34, Nigeria
+    // 35-43, Russia 44-52, Japan 53-59, Thailand 60-72 — rather than
+    // clustering picks within just a couple of them, so the gallery reads
+    // as a mix of the book's chapter colors instead of one or two repeated.
+    // Kept in strict page order across the before/after split too (Nigeria's
+    // two picks straddle the slideshow embed) so flipping through the
+    // gallery always moves forward through the book, never jumps back.
+    const GALLERY_LAYOUT_BEFORE = [1, 3];
+    const GALLERY_PICKS_BEFORE = [10, 20, 29, 37];
+    const GALLERY_LAYOUT_AFTER = [2, 1, 2];
+    const GALLERY_PICKS_AFTER = [40, 50, 56, 61, 65];
+    let galleryBuilt = false;
+
+    // Picks 10 and 56 each land in a single-image "hero" row (the lone "1"
+    // in each layout above) where they render close to full width — the
+    // shared 2000px-wide slideshow set reads soft blown up that large, so
+    // just those two are swapped for a separately exported 3200px version.
+    // Can't do this by mutating spreads[] itself (unlike the highlights[]
+    // array in the other book) since spreadPlayer3's slideshow reads from
+    // that same array and needs to stay on the lighter set.
+    const HERO_DIR = PROJECT_DIR + 'gallery_hero/';
+    const GALLERY_HERO = {
+      10: HERO_DIR + 'spread-010.jpg',
+      56: HERO_DIR + 'spread-056.jpg',
+    };
+
+    function makeGalleryWrap(src, withShadow) {
+      const wrap = document.createElement('div');
+      wrap.className = 'gallery-img-wrap';
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = '';
+      img.loading = 'lazy';
+      wrap.appendChild(img);
+      if (withShadow) {
+        const shadow = document.createElement('img');
+        shadow.className = 'shadow';
+        shadow.src = SHADOW_SRC;
+        shadow.alt = '';
+        shadow.setAttribute('aria-hidden', 'true');
+        shadow.loading = 'lazy';
+        wrap.appendChild(shadow);
+      }
+      return wrap;
+    }
+
+    function buildGallery() {
+      function fillRows(container, layout, picks) {
+        let cursor = 0;
+        layout.forEach((count) => {
+          const row = document.createElement('div');
+          row.className = 'gallery-row';
+          for (let k = 0; k < count; k++) {
+            const pick = picks[cursor++];
+            row.appendChild(makeGalleryWrap(GALLERY_HERO[pick] || spreads[pick - 1], true));
+          }
+          container.appendChild(row);
+        });
+      }
+
+      fillRows(document.getElementById('galleryRowsBefore3'), GALLERY_LAYOUT_BEFORE, GALLERY_PICKS_BEFORE);
+      fillRows(document.getElementById('galleryRowsAfter3'), GALLERY_LAYOUT_AFTER, GALLERY_PICKS_AFTER);
+      galleryBuilt = true;
+    }
+
+    function openBook() {
+      if (!galleryBuilt) buildGallery();
+      stopSlideshow();
+      resetPlayer();
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      galleryScroll.scrollTop = 0;
+      if (carouselControls) carouselControls.style.visibility = 'hidden';
+    }
+
+    function closeBook() {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (carouselControls) carouselControls.style.visibility = '';
+      stopSlideshow();
+    }
+
+    document.querySelectorAll('[data-opens-book-3]').forEach((el) => {
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', openBook);
+    });
+
+    closeBtn.addEventListener('click', closeBook);
+
+    galleryScroll.addEventListener('click', (e) => {
+      const wrapper = e.target.closest('.book-description, .gallery-rows, .gallery-row, .book-embed-section, .book-contact');
+      if (wrapper === e.target) closeBook();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!modal.classList.contains('open')) return;
+      if (e.key === 'Escape') closeBook();
+    });
+  })();
+
+  // San Diego Football Club — a pure branding project, not a book, so it
+  // reuses the book modals' open/close chrome (.book-modal/.gallery-scroll/
+  // .book-description/.book-contact) but swaps the page-flip player for a
+  // click-to-play brand video, and builds its gallery out of rows of
+  // mixed-aspect-ratio mockups (see .brand-gallery-row in the CSS above)
+  // instead of uniform book spreads. Ends with a second .book-description
+  // plus its own gallery for the Seahorses youth-league campaign — a
+  // separate sub-project that still lives inside this same modal rather
+  // than getting one of its own.
+  (function () {
+    const PROJECT_DIR = 'portfolio projects/SanDiego-Football-Club/web/';
+
+    const modal = document.getElementById('bookModal4');
+    const closeBtn = document.getElementById('bookClose4');
+    const carouselControls = document.querySelector('.controls');
+    const galleryScroll = document.getElementById('galleryScroll4');
+    const videoPlayer = document.getElementById('sdfcVideoPlayer');
+    const video = document.getElementById('sdfcVideo');
+
+    // size: 'lg' | 'md' | 'sm' (row height tier, biggest for the mockups
+    // that matter most). items: a plain filename, relative to PROJECT_DIR.
+    const BEFORE_ROWS = [
+      { size: 'lg', items: ['flag-mock.jpg'] },
+      { size: 'sm', items: ['bis-card-mock.jpg', 'letterhead-mock.jpg', 'staff-badge.jpg'] },
+      { size: 'lg', items: ['brochure-mock.jpg'] },
+      { size: 'md', items: ['stories.jpg', 'instagram.jpg'] },
+      { size: 'lg', items: ['poster-macro-1.jpg', 'poster-hirving-lozano.jpg', 'logo-poster.jpg'], className: 'before-video' },
+    ];
+    // Left-right pairs, one row per item: jersey (home/away), then
+    // hoodie (front/back), ending with longsleeve (front/back). Longsleeve's
+    // photo is noticeably wider than the other two (landscape vs. upright),
+    // so at the shared size-clothing height it read both too tall and too
+    // wide next to them — it gets the smaller size-md tier instead so it
+    // sits closer in scale to its neighbors, with extra margin (row-tight)
+    // so its shorter row doesn't crowd the taller jersey/hoodie row above it.
+    const CLOTHING_ROWS = [
+      { size: 'clothing', items: ['jersey-v1.png', 'jersey-v3.png'] },
+      { size: 'clothing', items: ['hoodie-front.png', 'hoodie-back.png'] },
+      { size: 'md', items: ['longsleeve-front.png', 'longsleeve-back.png'], className: 'row-longsleeve' },
+    ];
+    const AFTER_ROWS = [
+      { size: 'lg', items: ['travel-bus.jpg'] },
+    ];
+    const CAMPAIGN_ROWS = [
+      { size: 'lg', items: ['campaign/bus-stop.jpg', 'campaign/billboard.jpg', 'campaign/updated-signs.jpg'] },
+    ];
+
+    function makeItem(filename) {
+      const wrap = document.createElement('div');
+      wrap.className = 'brand-item';
+      const img = document.createElement('img');
+      img.loading = 'lazy';
+      img.alt = '';
+      img.src = PROJECT_DIR + filename;
+      wrap.appendChild(img);
+      return wrap;
+    }
+
+    function buildRows(container, rows) {
+      rows.forEach((row) => {
+        const rowEl = document.createElement('div');
+        rowEl.className = 'brand-gallery-row size-' + row.size + (row.className ? ' ' + row.className : '');
+        row.items.forEach((item) => rowEl.appendChild(makeItem(item)));
+        container.appendChild(rowEl);
+      });
+    }
+
+    let galleryBuilt = false;
+    function buildGallery() {
+      buildRows(document.getElementById('brandGalleryBefore4'), BEFORE_ROWS);
+      buildRows(document.getElementById('brandGalleryClothing4'), CLOTHING_ROWS);
+      buildRows(document.getElementById('brandGalleryAfter4'), AFTER_ROWS);
+      buildRows(document.getElementById('brandGalleryCampaign4'), CAMPAIGN_ROWS);
+      galleryBuilt = true;
+    }
+
+    function playVideo() {
+      if (videoPlayer.classList.contains('playing')) return;
+      videoPlayer.classList.add('playing');
+      video.play();
+    }
+
+    // Only touches the <video> element if it was actually started —
+    // calling pause()/currentTime on one that never loaded (preload is
+    // "none" until the first click) throws in some browsers.
+    function resetVideo() {
+      if (videoPlayer.classList.contains('playing')) {
+        video.pause();
+        video.currentTime = 0;
+      }
+      videoPlayer.classList.remove('playing');
+    }
+
+    videoPlayer.addEventListener('click', playVideo);
+
+    function openBook() {
+      if (!galleryBuilt) buildGallery();
+      resetVideo();
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      galleryScroll.scrollTop = 0;
+      if (carouselControls) carouselControls.style.visibility = 'hidden';
+    }
+
+    function closeBook() {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (carouselControls) carouselControls.style.visibility = '';
+      resetVideo();
+    }
+
+    document.querySelectorAll('[data-opens-book-4]').forEach((el) => {
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', openBook);
+    });
+
+    closeBtn.addEventListener('click', closeBook);
+
+    galleryScroll.addEventListener('click', (e) => {
+      const wrapper = e.target.closest('.book-description, .brand-gallery, .brand-gallery-row, .book-embed-section, .book-contact');
+      if (wrapper === e.target) closeBook();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!modal.classList.contains('open')) return;
+      if (e.key === 'Escape') closeBook();
+    });
+  })();
+
+  // Organico Bello's product page — opens the same way as the book
+  // modals above (click-out/Escape to close; backdrop is plain white for
+  // now instead of blurred, see #productModal override below), but its
+  // content is just a grid of the plain white-bg product shots pulled out
+  // of the carousel thumb's cycle (that thumb now only cycles the hero and
+  // the hand-model photos). Each card starts on its front angle and, on
+  // hover, loops through whichever of right/back/left/top that product
+  // actually has and back to front again, for as long as it's hovered;
+  // leaving resets it back to front so the next hover always starts the
+  // same way.
+  (function () {
+    const PROJECT_DIR = 'portfolio projects/OrganicoBello/';
+    const ANGLE_ORDER = ['front', 'right', 'back', 'left', 'top'];
+    const PRODUCTS = [
+      { name: 'Vodka Sauce', slug: 'vodka_sauce', angles: ['front', 'back', 'top'] },
+      { name: 'Tomato Sauce', slug: 'tomato_sauce', angles: ['front', 'right', 'back', 'left'] },
+      { name: 'Bruschetta Spread', slug: 'bruschetta_spread', angles: ['front', 'right', 'back', 'left', 'top'] },
+      { name: 'Tomato Paste', slug: 'tomato_paste', angles: ['front', 'back'] },
+      // Forced onto its own new row (see buildGrid below) so it lands next
+      // to Italian Oregano regardless of how many columns actually fit —
+      // the grid's auto-fill column count changes with viewport width, so
+      // without this the two could end up split across different rows.
+      { name: 'Tomato Bouillon', slug: 'tomato_bouillon', angles: ['front', 'right', 'back', 'left', 'top'], breakRowBefore: true },
+      {
+        name: 'Italian Oregano',
+        slug: 'italian_oregano',
+        angles: ['front', 'right', 'back', 'left', 'top'],
+        // Shot before the OB-<slug>-<angle> naming convention existed, so
+        // its top view needs an explicit filename instead of the pattern
+        // every other angle/product follows.
+        overrides: { top: 'P2Sp26_LiamKengla_OrganicoBello_25.jpg' },
+      },
+      { name: 'Penne Rigate', slug: 'penne_rigate', angles: ['front', 'right', 'back', 'left', 'top'] },
+    ];
+    const SPIN_FRAME_MS = 350;
+
+    function framesFor(product) {
+      return ANGLE_ORDER
+        .filter((angle) => product.angles.includes(angle))
+        .map((angle) => PROJECT_DIR + ((product.overrides && product.overrides[angle]) || ('OB-' + product.slug + '-' + angle + '.jpg')));
+    }
+
+    // Warm the cache so the first hover-spin on each card is instant.
+    PRODUCTS.forEach((product) => {
+      framesFor(product).forEach((src) => { new Image().src = src; });
+    });
+
+    const modal = document.getElementById('productModal');
+    const closeBtn = document.getElementById('productClose');
+    const scroll = document.getElementById('productScroll');
+    const grid = document.getElementById('productGrid');
+    const carouselControls = document.querySelector('.controls');
+    let built = false;
+
+    function buildGrid() {
+      PRODUCTS.forEach((product) => {
+        const frames = framesFor(product);
+
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        if (product.breakRowBefore) card.classList.add('product-card--row-start');
+
+        const photo = document.createElement('div');
+        photo.className = 'product-photo';
+        const img = document.createElement('img');
+        img.src = frames[0];
+        img.alt = product.name;
+        photo.appendChild(img);
+        card.appendChild(photo);
+
+        const label = document.createElement('h4');
+        label.textContent = product.name;
+        card.appendChild(label);
+
+        let timer = null;
+        function stopSpin() {
+          if (timer) {
+            clearInterval(timer);
+            timer = null;
+          }
+        }
+        card.addEventListener('mouseenter', () => {
+          stopSpin();
+          let i = 0;
+          timer = setInterval(() => {
+            i = (i + 1) % frames.length;
+            img.src = frames[i];
+          }, SPIN_FRAME_MS);
+        });
+        card.addEventListener('mouseleave', () => {
+          stopSpin();
+          img.src = frames[0];
+        });
+
+        grid.appendChild(card);
+      });
+      built = true;
+    }
+
+    function openProducts() {
+      if (!built) buildGrid();
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      scroll.scrollTop = 0;
+      if (carouselControls) carouselControls.style.visibility = 'hidden';
+    }
+
+    function closeProducts() {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (carouselControls) carouselControls.style.visibility = '';
+    }
+
+    document.querySelectorAll('[data-opens-products]').forEach((el) => {
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', openProducts);
+    });
+
+    closeBtn.addEventListener('click', closeProducts);
+
+    scroll.addEventListener('click', (e) => {
+      const wrapper = e.target.closest('.book-description, .product-grid');
+      if (wrapper === e.target) closeProducts();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!modal.classList.contains('open')) return;
+      if (e.key === 'Escape') closeProducts();
     });
   })();
 </script>
