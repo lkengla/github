@@ -1538,11 +1538,11 @@
         <img id="spreadPlayerImg2" src="" alt="Book spread" draggable="false">
         <img class="shadow" id="spreadPlayerShadow2" src="portfolio projects/OldNewMensClub/shadow2.png" alt="" aria-hidden="true">
         <div class="cover-flip cover-flip-front" id="coverFlipFront2">
-          <img src="portfolio projects/OldNewMensClub/cover-front.png" alt="Old New Mens Club &mdash; front cover" draggable="false">
+          <img src="portfolio projects/OldNewMensClub/cover-front.jpg" alt="Old New Mens Club &mdash; front cover" draggable="false">
           <div class="cover-face-back" aria-hidden="true"></div>
         </div>
         <div class="cover-flip cover-flip-back" id="coverFlipBack2">
-          <img src="portfolio projects/OldNewMensClub/cover-back.png" alt="Old New Mens Club &mdash; back cover" draggable="false">
+          <img src="portfolio projects/OldNewMensClub/cover-back.jpg" alt="Old New Mens Club &mdash; back cover" draggable="false">
           <div class="cover-face-back" aria-hidden="true"></div>
         </div>
         <div class="player-hint" id="playerHint2">Click to open</div>
@@ -1584,11 +1584,11 @@
         <img id="spreadPlayerImg3" src="" alt="Book spread" draggable="false">
         <img class="shadow" id="spreadPlayerShadow3" src="portfolio projects/StylesMakeFights/shadow2.png" alt="" aria-hidden="true">
         <div class="cover-flip cover-flip-front" id="coverFlipFront3">
-          <img src="portfolio projects/StylesMakeFights/cover-front.png" alt="Styles Make Fights &mdash; front cover" draggable="false">
+          <img src="portfolio projects/StylesMakeFights/cover-front.jpg" alt="Styles Make Fights &mdash; front cover" draggable="false">
           <div class="cover-face-back" aria-hidden="true"></div>
         </div>
         <div class="cover-flip cover-flip-back" id="coverFlipBack3">
-          <img src="portfolio projects/StylesMakeFights/cover-back.png" alt="Styles Make Fights &mdash; back cover" draggable="false">
+          <img src="portfolio projects/StylesMakeFights/cover-back.jpg" alt="Styles Make Fights &mdash; back cover" draggable="false">
           <div class="cover-face-back" aria-hidden="true"></div>
         </div>
         <div class="player-hint" id="playerHint3">Click to open</div>
@@ -2563,21 +2563,38 @@
       after(FLIP_MS, startSlideshow);
     }
 
-    // Pause is bound to the page image itself, not the whole player box —
-    // #spreadPlayerImg is now sized to match its visible content exactly
-    // (see the CSS above), so hovering the empty letterboxed margin beside
-    // a single-page frame no longer counts as hovering "the page." Click
-    // stays on the whole box for opening, since that isn't meant to
-    // require that precision — but once playing, clicking the page itself
-    // steps a frame forward or back depending on which half of the visible
-    // image was clicked, like turning to the next or previous spread by
-    // hand. Guarded on timer !== null so it's only live during ordinary
-    // playback — not before the cover has opened (started is false) and
-    // not during the closing bookend (the timer's already cleared by the
-    // time that starts, see advanceOnce/playEnding).
+    // Click stays on the whole player box for opening, since that isn't
+    // meant to require any precision — but once playing, clicking the
+    // page itself steps a frame forward or back depending on which half
+    // of the visible image was clicked, like turning to the next or
+    // previous spread by hand. Guarded on timer !== null so it's only
+    // live during ordinary playback — not before the cover has opened
+    // (started is false) and not during the closing bookend (the timer's
+    // already cleared by the time that starts, see advanceOnce/playEnding).
     player.addEventListener('click', openCoverAndPlay);
-    playerImg.addEventListener('mouseenter', () => { paused = true; });
-    playerImg.addEventListener('mouseleave', () => { paused = false; });
+    // Pause tracks whether the pointer is over the page image itself, not
+    // just somewhere over the player box — #spreadPlayerImg is sized to
+    // match its visible content exactly (see the CSS above), so hovering
+    // the empty letterboxed margin beside a single-page frame shouldn't
+    // count as hovering "the page." That box's size/position changes
+    // between a full two-page spread and a single half-title/half-final
+    // page, though — and mouseenter/mouseleave bound directly to it used
+    // to desync from where the pointer actually was: if a frame swap
+    // shrank the image out from under a stationary cursor, mouseleave
+    // fired (paused = false), but the next frame growing back under that
+    // same still cursor never fired a fresh mouseenter (browsers only
+    // fire enter/leave on real pointer movement crossing a boundary, not
+    // on the boundary moving under a still pointer) — leaving the
+    // slideshow stuck playing under a cursor that looked like it was
+    // still hovering the book. Recomputing containment against the
+    // image's current rect on every mousemove over the stable-sized
+    // outer player box instead sidesteps that entirely.
+    player.addEventListener('mousemove', (e) => {
+      const rect = playerImg.getBoundingClientRect();
+      paused = e.clientX >= rect.left && e.clientX <= rect.right &&
+        e.clientY >= rect.top && e.clientY <= rect.bottom;
+    });
+    player.addEventListener('mouseleave', () => { paused = false; });
     playerImg.addEventListener('click', (e) => {
       if (!started || timer === null) return;
       const rect = playerImg.getBoundingClientRect();
@@ -2710,7 +2727,7 @@
     const PROJECT_DIR = 'portfolio projects/OldNewMensClub/';
     const BOOK_DIR = PROJECT_DIR + 'spreads_web/';
     const SHADOW_SRC = PROJECT_DIR + 'shadow2.png';
-    const HERO_IMG_SRC = PROJECT_DIR + 'cover-front-and-back.png';
+    const HERO_IMG_SRC = PROJECT_DIR + 'cover-front-and-back.jpg';
     const SPREAD_COUNT = 129;
     const spreads = [];
     for (let i = 1; i <= SPREAD_COUNT; i++) {
@@ -2907,8 +2924,15 @@
     // full rationale — same mechanism, duplicated per book like everything
     // else in this modal).
     player.addEventListener('click', openCoverAndPlay);
-    playerImg.addEventListener('mouseenter', () => { paused = true; });
-    playerImg.addEventListener('mouseleave', () => { paused = false; });
+    // See the other book's IIFE for why this is a per-move containment
+    // check against the image's current rect, not mouseenter/mouseleave
+    // bound to the (resizing) image itself.
+    player.addEventListener('mousemove', (e) => {
+      const rect = playerImg.getBoundingClientRect();
+      paused = e.clientX >= rect.left && e.clientX <= rect.right &&
+        e.clientY >= rect.top && e.clientY <= rect.bottom;
+    });
+    player.addEventListener('mouseleave', () => { paused = false; });
     playerImg.addEventListener('click', (e) => {
       if (!started || timer === null) return;
       const rect = playerImg.getBoundingClientRect();
@@ -3069,7 +3093,7 @@
   (function () {
     const PROJECT_DIR = 'portfolio projects/StylesMakeFights/';
     const BOOK_DIR = PROJECT_DIR + 'spreads_web/';
-    const HERO_IMG_SRC = PROJECT_DIR + 'cover-front-and-back.png';
+    const HERO_IMG_SRC = PROJECT_DIR + 'cover-front-and-back.jpg';
     const SHADOW_SRC = PROJECT_DIR + 'shadow2.png';
     const SPREAD_COUNT = 73;
     const spreads = [];
@@ -3252,8 +3276,15 @@
     }
 
     player.addEventListener('click', openCoverAndPlay);
-    playerImg.addEventListener('mouseenter', () => { paused = true; });
-    playerImg.addEventListener('mouseleave', () => { paused = false; });
+    // See Our Work Is Never Done's IIFE for why this is a per-move
+    // containment check against the image's current rect, not
+    // mouseenter/mouseleave bound to the (resizing) image itself.
+    player.addEventListener('mousemove', (e) => {
+      const rect = playerImg.getBoundingClientRect();
+      paused = e.clientX >= rect.left && e.clientX <= rect.right &&
+        e.clientY >= rect.top && e.clientY <= rect.bottom;
+    });
+    player.addEventListener('mouseleave', () => { paused = false; });
     playerImg.addEventListener('click', (e) => {
       if (!started || timer === null) return;
       const rect = playerImg.getBoundingClientRect();
