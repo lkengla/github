@@ -1843,6 +1843,17 @@
     computeGeometry();
 
     function render() {
+      // Centers on the thumb's own height specifically (a fixed px value,
+      // matching sizeThumbs' own w*10/16), not -50% of the whole card's
+      // rendered height — a card's title/subtitle can wrap to a different
+      // number of lines than its neighbors (a longer project description,
+      // a narrower phone width), and -50% of that variable total would
+      // shift the thumb itself up or down to compensate, throwing every
+      // card's image out of alignment with the rest of the row. Pinning
+      // to the thumb's own height instead means extra text height only
+      // ever extends the card further down from a fixed point, never
+      // moves the image.
+      const thumbHeight = thumbWidth * (10 / 16);
       cards.forEach((card, i) => {
         const p = i - offset;
         const angle = p * ANGLE_STEP;
@@ -1858,7 +1869,7 @@
         // ever sees or grows a card back there, so it's moot in practice.
         const fade = dist <= 1.8 ? 1 : Math.max(0, 1 - (dist - 1.8) / 0.9);
         card.style.transform =
-          `translate(-50%, -50%) translateX(${x}px) translateZ(${z}px) rotateY(${rotateY}deg)`;
+          `translate(-50%, ${-thumbHeight / 2}px) translateX(${x}px) translateZ(${z}px) rotateY(${rotateY}deg)`;
         card.style.opacity = String(fade);
         card.style.zIndex = String(1000 - Math.round(dist * 10));
         card.style.pointerEvents = dist > 2.3 ? 'none' : '';
@@ -2246,15 +2257,21 @@
     track.addEventListener('touchmove', (e) => {
       if (!touchActive || e.touches.length !== 1) return;
       const t = e.touches[0];
-      // First move past a small threshold decides, once, whether this
-      // gesture drags the carousel or scrolls the page — everything after
-      // follows whichever it picked, so a drag can't suddenly "catch" a
-      // vertical wobble partway through (or vice versa).
+      // The very first move that shows any clear direction decides, once,
+      // whether this gesture drags the carousel or scrolls the page —
+      // everything after follows whichever it picked, so a drag can't
+      // suddenly "catch" a vertical wobble partway through (or vice
+      // versa). This has to resolve within a couple pixels, not a real
+      // threshold — the browser starts its own native vertical scroll the
+      // moment it sees an unopposed touchmove, and once it has, a later
+      // preventDefault() can't retroactively cancel that.
       if (touchIsHorizontal === null) {
         const totalDx = t.clientX - touchStartX;
         const totalDy = t.clientY - touchStartY;
-        if (Math.abs(totalDx) > 6 || Math.abs(totalDy) > 6) {
-          touchIsHorizontal = Math.abs(totalDx) > Math.abs(totalDy);
+        if (Math.abs(totalDx) > 2 || Math.abs(totalDy) > 2) {
+          touchIsHorizontal = Math.abs(totalDx) >= Math.abs(totalDy);
+        } else {
+          return;
         }
       }
       if (touchIsHorizontal === false) return;
