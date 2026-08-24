@@ -3,7 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Liam</title>
+<title>What do you need?</title>
+<meta name="description" content="Liam Jacob Kengla is a designer based in Los Angeles and Portland.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="What do you need?">
+<meta property="og:description" content="Liam Jacob Kengla is a designer based in Los Angeles and Portland.">
+<meta property="og:image" content="https://503designs.com/portfolio%20projects/OrganicoBello/OB-hero-red_bg.jpg">
+<meta property="og:url" content="https://503designs.com/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What do you need?">
+<meta name="twitter:description" content="Liam Jacob Kengla is a designer based in Los Angeles and Portland.">
+<meta name="twitter:image" content="https://503designs.com/portfolio%20projects/OrganicoBello/OB-hero-red_bg.jpg">
 <style>
   @font-face {
     font-family: "Basier Square Mono";
@@ -140,6 +150,11 @@
     position: relative;
     perspective: 2000px;
     height: calc(min(92vw, 122vh) * 0.625 + 92px);
+    /* Lets the browser handle vertical page scroll natively on touch
+       devices while the JS below (touchstart/move/end) takes over the
+       horizontal drag itself — without this, the browser's own gesture
+       handling and the JS fight over the same touch. */
+    touch-action: pan-y;
   }
 
   .card {
@@ -2090,6 +2105,11 @@
         hoverDir = 0;
         stopAutoScroll();
       }
+      // A touch-momentum coast (see startMomentum below) is the phone
+      // equivalent of the hover auto-scroll above — same invisible-runaway
+      // risk if a modal opens mid-coast, so it gets stopped here too.
+      touchActive = false;
+      stopMomentum();
       clearHover();
       startIdleDrift();
     };
@@ -2154,6 +2174,123 @@
       render();
       index = Math.round(offset);
     }, { passive: false });
+
+    // Touch/thumb drag — phone equivalent of the wheel handler above:
+    // follows the finger 1:1 while dragging, carries the drag's own speed
+    // into a momentum coast once released (see startMomentum below), and
+    // falls back to idle drift once that coast settles or the drag turns
+    // out to be a vertical page scroll instead. Bound to `track` itself,
+    // not window — unlike trackpad scroll there's no ambiguity about what
+    // a touch starting elsewhere on the page should do, and scoping it
+    // this way means a touch that starts inside an open book modal (a
+    // different DOM subtree layered on top, see pauseCarouselForModal
+    // above) never reaches this listener in the first place.
+    let touchActive = false;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchLastX = 0;
+    let touchLastTime = 0;
+    let touchVelocity = 0; // card-units per ms
+    let touchIsHorizontal = null; // null until the first move decides it
+    let momentumRaf = null;
+
+    function stopMomentum() {
+      if (momentumRaf) {
+        cancelAnimationFrame(momentumRaf);
+        momentumRaf = null;
+      }
+    }
+
+    // Exponential decay, normalized to a ~60fps frame rather than a fixed
+    // per-call factor — startMomentum's own step() runs on rAF like
+    // everything else here, so its real frame interval (dt) varies with
+    // the display/browser instead of always being ~16.67ms.
+    const MOMENTUM_FRICTION = 0.94;
+    const MOMENTUM_MIN_VELOCITY = 0.00004;
+
+    function startMomentum(initialVelocity) {
+      stopMomentum();
+      let velocity = initialVelocity;
+      let lastTime = performance.now();
+      function step(now) {
+        const dt = now - lastTime;
+        lastTime = now;
+        offset += velocity * dt;
+        wrapOffset();
+        render();
+        velocity *= Math.pow(MOMENTUM_FRICTION, dt / 16.67);
+        if (Math.abs(velocity) < MOMENTUM_MIN_VELOCITY) {
+          momentumRaf = null;
+          index = Math.round(offset);
+          startIdleDrift();
+          return;
+        }
+        momentumRaf = requestAnimationFrame(step);
+      }
+      momentumRaf = requestAnimationFrame(step);
+    }
+
+    track.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) return;
+      touchActive = true;
+      touchIsHorizontal = null;
+      const t = e.touches[0];
+      touchStartX = touchLastX = t.clientX;
+      touchStartY = t.clientY;
+      touchLastTime = performance.now();
+      touchVelocity = 0;
+      stopMomentum();
+      stopIdleDrift();
+    }, { passive: true });
+
+    track.addEventListener('touchmove', (e) => {
+      if (!touchActive || e.touches.length !== 1) return;
+      const t = e.touches[0];
+      // First move past a small threshold decides, once, whether this
+      // gesture drags the carousel or scrolls the page — everything after
+      // follows whichever it picked, so a drag can't suddenly "catch" a
+      // vertical wobble partway through (or vice versa).
+      if (touchIsHorizontal === null) {
+        const totalDx = t.clientX - touchStartX;
+        const totalDy = t.clientY - touchStartY;
+        if (Math.abs(totalDx) > 6 || Math.abs(totalDy) > 6) {
+          touchIsHorizontal = Math.abs(totalDx) > Math.abs(totalDy);
+        }
+      }
+      if (touchIsHorizontal === false) return;
+      e.preventDefault();
+      const now = performance.now();
+      const dt = Math.max(now - touchLastTime, 1);
+      const dx = t.clientX - touchLastX;
+      // Content follows the finger (drag left -> carousel advances, same
+      // direction native horizontal scrolling would move) — the opposite
+      // sign from the wheel handler above, which advances on a *positive*
+      // deltaX instead.
+      const delta = -dx / apothem;
+      offset += delta;
+      wrapOffset();
+      render();
+      index = Math.round(offset);
+      touchVelocity = delta / dt;
+      touchLastX = t.clientX;
+      touchLastTime = now;
+    }, { passive: false });
+
+    track.addEventListener('touchend', () => {
+      if (!touchActive) return;
+      touchActive = false;
+      if (touchIsHorizontal) {
+        startMomentum(touchVelocity);
+      } else {
+        startIdleDrift();
+      }
+    });
+
+    track.addEventListener('touchcancel', () => {
+      if (!touchActive) return;
+      touchActive = false;
+      startIdleDrift();
+    });
   })();
 
   (function () {
