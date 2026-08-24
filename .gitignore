@@ -1,1 +1,6 @@
 .DS_Store
+
+# Raw WRC source files (16000x10667, 140-244MB each) — exceed GitHub's
+# 100MB push limit. Only the downsized web JPGs in this folder are used
+# by the site.
+portfolio projects/WRC/*copy.png

@@ -296,8 +296,11 @@
 
   /* Extra breathing room after the hero photo specifically, separating it
      from the rest of the gallery rather than reading as part of the same
-     tight row-to-row rhythm. */
-  #galleryRowsBefore .gallery-row:first-child {
+     tight row-to-row rhythm. Shared across all three books' "before" rows
+     since each one's hero row is likewise its first child. */
+  #galleryRowsBefore .gallery-row:first-child,
+  #galleryRowsBefore2 .gallery-row:first-child,
+  #galleryRowsBefore3 .gallery-row:first-child {
     margin-bottom: 100px;
   }
 
@@ -320,6 +323,14 @@
      height, since both clamp to the same viewport-relative cap. */
   .gallery-img-wrap.hero {
     aspect-ratio: 2000 / 1203;
+  }
+
+  /* Old New Mens Club and Styles Make Fights use a flat front-and-back
+     cover shot instead of a photo of the physical book, at its own
+     (shared, since both were exported the same way) real aspect-ratio. */
+  #galleryRowsBefore2 .gallery-img-wrap.hero,
+  #galleryRowsBefore3 .gallery-img-wrap.hero {
+    aspect-ratio: 5160 / 3456;
   }
 
   /* A real event poster mixed into Old New Mens Club's gallery — tall and
@@ -414,6 +425,82 @@
     opacity: 0.85;
   }
 
+  /* Contact page — no title of its own (the close button is enough
+     context), so the whole block is centered as a unit in the modal
+     viewport (vertically via #contactScroll's flex below, horizontally
+     via .book-description's existing margin:0 auto) — not text-align, the
+     block itself sits in the middle of the page. */
+  #contactScroll {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .contact-page {
+    padding: 0 24px;
+  }
+
+  /* Section headings read at the same size as the degree titles below
+     them (see .contact-edu dt) rather than a smaller uppercase eyebrow.
+     Only "What do you need?" — the one actual call to action on this
+     page — is bold/uppercase; everything else (this heading included)
+     stays plain weight, so that emphasis doesn't get diluted by
+     competing bold text elsewhere. */
+  .contact-page h3 {
+    font-size: 16px;
+    font-weight: 400;
+    margin: 48px 0 20px;
+  }
+
+  .contact-page h3:first-of-type {
+    margin-top: 0;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .contact-edu {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin: 0;
+  }
+
+  .contact-edu dt {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .contact-edu dd {
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 4px 0 0;
+    opacity: 0.85;
+  }
+
+  /* Email/Cell are plain text, not buttons — same size/weight as the
+     degree titles and section headings above (one consistent scale for
+     everything on this page), same hover treatment as the nav links
+     (see header nav a). */
+  .contact-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .contact-option {
+    font-size: 16px;
+    font-weight: 400;
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.2s ease;
+  }
+
+  .contact-option:hover {
+    opacity: 0.6;
+  }
+
   /* Organico Bello's product page — one white-bg product photo per item,
      hover-spinning through its own angle shots (see the JS below). Plain
      white backdrop instead of the book modals' blur, for now. */
@@ -423,18 +510,72 @@
     -webkit-backdrop-filter: none;
   }
 
-  .product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 48px 32px;
-    padding: 0 5% 100px;
+  /* The full-lineup shot, full-bleed at the very top of the modal — the
+     only section on this page that's full-page (the per-pair lead-in
+     shots below are not, see .product-lead-in). Cropped 10% off both top
+     and bottom (the source photo is 2400x1500; 2/1 leaves the middle
+     2400x1200 of it) via a fixed aspect-ratio rather than height:100vh —
+     width still runs the full page, but height now follows from that
+     ratio instead of the viewport. */
+  .product-hero {
+    width: 100%;
+    aspect-ratio: 2 / 1;
   }
 
-  /* Forces the card back to column 1 — since column 1 of the row it'd
-     otherwise land in is already taken, the grid bumps it down to a new
-     row instead, without leaving a gap behind it. */
-  .product-card--row-start {
-    grid-column-start: 1;
+  .product-hero img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Each pair's hand-model lead-in shot (see PRODUCT_GROUPS in the JS
+     below) — unlike the top hero above, this stays on the plain padded
+     page rather than running full-bleed/full-page. No vertical
+     margin/padding of its own; the .product-grid on either side of it
+     (below) supplies equal spacing top and bottom, so the gap in is the
+     same as the gap out. */
+  .product-lead-in {
+    padding: 0 5%;
+  }
+
+  .product-lead-in img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 3840 / 2400;
+    object-fit: cover;
+  }
+
+  /* Fixed 2-up on desktop/tablet — larger cards, two products highlighted
+     at a time per group — rather than however many 240px cards happen to
+     fit the viewport. Mobile keeps the old auto-fill behavior (see the
+     max-width:640px override below) since this resize is desktop/tablet-
+     only. Equal top/bottom padding so the gap into a grid (from the
+     description or a lead-in shot) matches the gap out of it (into the
+     next lead-in shot, or the bottom of the page); the first grid sits
+     right under the description's own padding, so it needs less. */
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 48px 32px;
+    padding: 100px 5%;
+  }
+
+  /* Penne Rigate's grid — the one group with only a single card (see
+     PRODUCT_GROUPS in the JS below) — centers that card at the same width
+     a paired card would have, rather than leaving it stuck in column 1. */
+  .product-grid:has(.product-card:only-child) {
+    display: flex;
+    justify-content: center;
+  }
+
+  .product-grid:has(.product-card:only-child) .product-card {
+    width: 100%;
+    max-width: calc((100% - 32px) / 2);
+  }
+
+  .product-groups > .product-grid:first-child {
+    padding-top: 40px;
   }
 
   .product-photo {
@@ -456,7 +597,8 @@
     font-size: 16px;
     font-weight: 500;
     line-height: 1.2;
-    margin: 14px 0 0;
+    margin: 24px 0 0;
+    text-align: center;
   }
 
   .book-embed-section {
@@ -559,6 +701,116 @@
     object-fit: contain;
   }
 
+  /* Annotated crest breakdown, right under the flag mockup — five callouts
+     pointing at specific features of the crest, three on the left and two
+     on the right (matching how the crest's own detail sits: mostly on the
+     left/center, with the shield's outline and the FC lockup reading more
+     to the right). The whole figure is a single relative box at a fixed
+     aspect-ratio, so the crest image and every callout's line/text can be
+     positioned with plain percentages instead of JS-measured pixels —
+     the ratio keeps them all in lock-step at any viewport width. The
+     figure's own aspect-ratio (89/50) and the image band's left/width
+     (31%/38%) are chosen together so the image box exactly matches the
+     crest artwork's real aspect-ratio (SDFC_Crest-trimmed.png is
+     3401x5126) with no letterboxing — every callout's top% below is
+     therefore also the crest's own local Y% for the feature it points to.
+     Margin-top pulls it up closer to the flag row above it (the
+     .brand-gallery-row before it already carries its own bottom margin,
+     which reads as too much stacked with this figure's own breathing
+     room otherwise). */
+  .crest-breakdown-figure {
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    aspect-ratio: 89 / 50;
+    margin: -24px auto 64px;
+  }
+
+  .crest-img-wrap {
+    position: absolute;
+    left: 31%;
+    width: 38%;
+    top: 0;
+    height: 100%;
+  }
+
+  .crest-img-wrap img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .crest-line {
+    position: absolute;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.35;
+  }
+
+  .crest-line.crest-line-left {
+    left: 28%;
+    width: 3%;
+  }
+
+  .crest-line.crest-line-right {
+    left: 69%;
+    width: 3%;
+  }
+
+  .crest-label {
+    position: absolute;
+    width: 25%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    line-height: 1.55;
+    opacity: 0.85;
+  }
+
+  .crest-label.crest-label-left {
+    left: 2%;
+    text-align: right;
+  }
+
+  .crest-label.crest-label-right {
+    left: 73%;
+    text-align: left;
+  }
+
+  @media (max-width: 640px) {
+    /* The percentage layout above only works with text and crest
+       side-by-side — too narrow to hold both on mobile, so this switches
+       to a plain stacked read instead: the crest first, then every
+       callout underneath it in order, lines dropped since there's
+       nothing left for them to connect. */
+    .crest-breakdown-figure {
+      position: static;
+      aspect-ratio: auto;
+      max-width: 360px;
+      margin: 0 auto 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .crest-line {
+      display: none;
+    }
+
+    .crest-img-wrap {
+      position: static;
+      width: 60%;
+      margin: 0 auto;
+    }
+
+    .crest-label {
+      position: static;
+      width: 100%;
+      transform: none;
+      text-align: center !important;
+    }
+  }
+
   /* The click-to-play brand video, sitting in .book-embed-section exactly
      where the other projects' page-flip player does. A fixed 16:9 box
      (the video's own shape) rather than a book trim size, with a poster
@@ -625,6 +877,12 @@
   }
 
   @media (max-width: 640px) {
+    /* Mobile keeps the original auto-fill sizing — the fixed 2-up grid
+       above is a desktop/tablet-only change. */
+    .product-grid {
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+
     .brand-gallery-row.size-lg {
       --row-h: 38vh;
     }
@@ -959,7 +1217,7 @@
      other modals' page-flip players, scoped here so it doesn't affect
      the shared .book-embed-section elsewhere. */
   #bookModal4 .book-embed-section {
-    padding-top: 90px;
+    padding-top: 150px;
     padding-bottom: 130px;
   }
 
@@ -1065,36 +1323,13 @@
 <header>
   <div class="wordmark">LIAM JACOB KENGLA IS A DESIGNER BASED IN LOS ANGELES AND PORTLAND</div>
   <nav>
-    <a href="#about">About</a>
-    <a href="#work">Work</a>
+    <a href="#" data-opens-contact="true">Contact</a>
   </nav>
 </header>
 
 <main>
   <section class="work" id="work">
     <div class="carousel" id="carousel">
-      <div class="card">
-        <div class="thumb is-photo" data-images='[
-          "portfolio projects/ArtDivision/artdivison-freeway_signage-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-quadfold_front-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-quadfold_back-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-bus_stop_poster1-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-bus_stop_poster2-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-bus_stop_poster3-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-instagram-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-planner-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-tablecard-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-totebag-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-instagram_stories-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-pen-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-stationary-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-a_frame-mockup.jpg"
-        ]'>
-          <img src="portfolio projects/ArtDivision/artdivison-freeway_signage-mockup.jpg" alt="Art Division &mdash; freeway signage mockup">
-        </div>
-        <h3>ArtDivision</h3>
-        <span>Branding, UI Design [Web]</span>
-      </div>
       <div class="card">
         <div class="thumb is-photo fit-contain" data-opens-products="true" data-images='[
           "portfolio projects/OrganicoBello/OB-hero-red_bg.jpg?v=2",
@@ -1115,6 +1350,40 @@
         </div>
         <h3>Organico Bello</h3>
         <span>Packaging</span>
+      </div>
+      <div class="card">
+        <div class="thumb is-photo" data-images='[
+          "portfolio projects/ArtDivision/artdivison-freeway_signage-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-quadfold_front-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-quadfold_back-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-bus_stop_poster1-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-bus_stop_poster2-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-bus_stop_poster3-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-instagram-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-planner-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-tablecard-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-totebag-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-instagram_stories-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-pen-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-stationary-mockup.jpg",
+          "portfolio projects/ArtDivision/artdivison-a_frame-mockup.jpg"
+        ]'>
+          <img src="portfolio projects/ArtDivision/artdivison-freeway_signage-mockup.jpg" alt="Art Division &mdash; freeway signage mockup">
+        </div>
+        <h3>ArtDivision [COMING SOON]</h3>
+        <span>Branding, UI Design [Web]</span>
+      </div>
+      <div class="card">
+        <div class="thumb is-photo" data-images='[
+          "portfolio projects/WRC/wrc-estonia-wayfinding.jpg",
+          "portfolio projects/WRC/wrc-acropolis-podium-wayfinding.jpg",
+          "portfolio projects/WRC/wrc-monte-carlo-wayfinding.jpg",
+          "portfolio projects/WRC/wrc-podium-wayfinding.jpg"
+        ]'>
+          <img src="portfolio projects/WRC/wrc-estonia-wayfinding.jpg" alt="World Rally Championship &mdash; event wayfinding mockup">
+        </div>
+        <h3>World Rally Championship [COMING SOON]</h3>
+        <span>Logo Design, Event Branding, UI [Web], Book Design, Typeface Design</span>
       </div>
       <div class="card">
         <div class="thumb is-photo" data-opens-book-2="true" data-images='[
@@ -1148,7 +1417,6 @@
       </div>
       <div class="card">
         <div class="thumb is-photo" data-opens-book-3="true" data-images='[
-          "portfolio projects/StylesMakeFights/cover-front-PLACEHOLDER.webp",
           "portfolio projects/StylesMakeFights/carousel_preview/spread-029.jpg",
           "portfolio projects/StylesMakeFights/carousel_preview/spread-015.jpg",
           "portfolio projects/StylesMakeFights/carousel_preview/spread-041.jpg",
@@ -1156,7 +1424,7 @@
           "portfolio projects/StylesMakeFights/carousel_preview/spread-010.jpg",
           "portfolio projects/StylesMakeFights/carousel_preview/spread-070.jpg"
         ]'>
-          <img src="portfolio projects/StylesMakeFights/cover-front-PLACEHOLDER.webp" alt="Styles Make Fights &mdash; placeholder cover, temporary until real cover art is in">
+          <img src="portfolio projects/StylesMakeFights/carousel_preview/spread-029.jpg" alt="Styles Make Fights &mdash; interior spread">
         </div>
         <h3>Styles Make Fights</h3>
         <span>Book Design</span>
@@ -1164,10 +1432,10 @@
       <div class="card">
         <div class="thumb is-photo" data-opens-book-4="true" data-images='[
           "portfolio projects/SanDiego-Football-Club/web/travel-bus.jpg",
-          "portfolio projects/SanDiego-Football-Club/web/jersey-v1.jpg",
-          "portfolio projects/SanDiego-Football-Club/web/bis-card-mock.jpg",
-          "portfolio projects/SanDiego-Football-Club/web/hoodie-front.jpg",
-          "portfolio projects/SanDiego-Football-Club/web/flag-mock.jpg"
+          "portfolio projects/SanDiego-Football-Club/web/staff-badge.jpg",
+          "portfolio projects/SanDiego-Football-Club/web/flag-mock.jpg",
+          "portfolio projects/SanDiego-Football-Club/web/instagram.jpg",
+          "portfolio projects/SanDiego-Football-Club/web/stories.jpg"
         ]'>
           <img src="portfolio projects/SanDiego-Football-Club/web/travel-bus.jpg" alt="San Diego Football Club &mdash; bus wrap mockup">
         </div>
@@ -1189,15 +1457,16 @@
     <div class="book-description">
       <h2>Our Work Is Never Done</h2>
       <p>Our Work is Never Done, an 800-page book on Mexican-American immigration, features case studies of non-violent protests, community injustices, and stories of labor from the 1930s&ndash;1970s, offering a powerful narrative of Mexican resilience and community.</p>
+      <p>Designed as an intimate read, the book uses a one-column format, long image sequences, and personal stories. Its small trim size evokes a field journal, while its unusual length creates a bible-like presence in the hand. Created in reaction to the current administration&rsquo;s views and actions on immigration, the book is a passionate, content-rich record of Mexican-American history.</p>
       <dl>
         <div class="dl-col">
-          <div><dt>Design</dt><dd>Liam Jacob Kengla</dd></div>
+          <div><dt>Design</dt><dd>L.J. Kengla</dd></div>
           <div><dt>Oversight</dt><dd>River Jukes Hudson<br>Co-Partner at ELLA</dd></div>
           <div><dt>Trim Size</dt><dd>4.25 x 6.875</dd></div>
           <div><dt>Typefaces</dt><dd>Aktivest Grotesk<br>Aglet Slab VF</dd></div>
         </div>
         <div class="dl-col">
-          <div><dt>Print/Bind</dt><dd>Liam Jacob Kengla</dd></div>
+          <div><dt>Print/Bind</dt><dd>L.J. Kengla</dd></div>
           <div><dt>Page Count</dt><dd>800</dd></div>
           <div><dt>Texts by</dt><dd>Selden Menefee, Orin Cassmore, John Webb, R. Matt Abigail, Jazmin Le&oacute;n, Tafolla Carmen, Ronald L. Mize, Alicia C.S. Swords, Ronald A. Garcia, Jacques Levy, Colin Gunckel, and Matt Garcia</dd></div>
         </div>
@@ -1236,13 +1505,13 @@
       <p>A journey through post-war Japan&rsquo;s fascination with American workwear and Ivy League style, and how it blossomed into a shared denim culture between the two nations. Highlighting Japanese and American artisan-designers, including Toru Nogami, Eric Steffen, Masayuki Kanatani, Andrew Chen &amp; Johan Lam, Tohru Hamamoto, and Christopher Loiron, who carry this tradition forward with craftsmanship, authenticity, and reinvention today.</p>
       <dl>
         <div class="dl-col">
-          <div><dt>Design</dt><dd>Liam Jacob Kengla</dd></div>
+          <div><dt>Design</dt><dd>L.J. Kengla</dd></div>
           <div><dt>Texts by</dt><dd>W. David Marx, Samutoro</dd></div>
           <div><dt>Trim Size</dt><dd>7 3/8 x 8</dd></div>
           <div><dt>Typefaces</dt><dd>Hiragino Sans<br>Degolite<br>Copperplate</dd></div>
         </div>
         <div class="dl-col">
-          <div><dt>Print/Bind</dt><dd>Liam Jacob Kengla</dd></div>
+          <div><dt>Print/Bind</dt><dd>L.J. Kengla</dd></div>
           <div><dt>Page Count</dt><dd>246</dd></div>
           <div><dt>Oversight</dt><dd>River Jukes Hudson<br>Co-Partner at ELLA</dd></div>
         </div>
@@ -1254,11 +1523,11 @@
         <img id="spreadPlayerImg2" src="" alt="Book spread" draggable="false">
         <img class="shadow" id="spreadPlayerShadow2" src="portfolio projects/OldNewMensClub/shadow2.png" alt="" aria-hidden="true">
         <div class="cover-flip cover-flip-front" id="coverFlipFront2">
-          <img src="portfolio projects/OldNewMensClub/cover-front-PLACEHOLDER.webp" alt="Old New Mens Club &mdash; placeholder front cover, temporary until real cover scans are in" draggable="false">
+          <img src="portfolio projects/OldNewMensClub/cover-front.png" alt="Old New Mens Club &mdash; front cover" draggable="false">
           <div class="cover-face-back" aria-hidden="true"></div>
         </div>
         <div class="cover-flip cover-flip-back" id="coverFlipBack2">
-          <img src="portfolio projects/OldNewMensClub/cover-back-PLACEHOLDER.webp" alt="Old New Mens Club &mdash; placeholder back cover, temporary until real cover scans are in" draggable="false">
+          <img src="portfolio projects/OldNewMensClub/cover-back.png" alt="Old New Mens Club &mdash; back cover" draggable="false">
           <div class="cover-face-back" aria-hidden="true"></div>
         </div>
         <div class="player-hint" id="playerHint2">Click to open</div>
@@ -1278,18 +1547,19 @@
   <div class="gallery-scroll" id="galleryScroll3">
     <div class="book-description">
       <h2>Styles Make Fights</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+      <p>As martial arts become increasingly politicized and reduced to ideas of national or cultural ownership, Styles Make Fights responds by showing combat sports as a global exchange of techniques, traditions, and cultures. Rather than focusing on one style or region, the book explores how these disciplines have evolved, influenced one another, and continue to shape modern combat sports.</p>
+      <p>By tracing these connections, the book aims to destigmatize combat sports and present them as an art form rooted in community. Through graphics, stories, and interviews, it explores the people, traditions, and shared influences that connect fighting styles across regions and continents, revealing combat sports as a global culture.</p>
       <dl>
         <div class="dl-col">
-          <div><dt>Design</dt><dd>@mailkengla</dd></div>
-          <div><dt>Oversight</dt><dd>TBD</dd></div>
-          <div><dt>Trim Size</dt><dd>TBD</dd></div>
-          <div><dt>Typefaces</dt><dd>TBD</dd></div>
+          <div><dt>Design</dt><dd>L.J. Kengla</dd></div>
+          <div><dt>Oversight</dt><dd>Mathew Herrera<br>Senior Visual Communications Designer @DisneyExperiences</dd></div>
+          <div><dt>Trim Size</dt><dd>7 1/2 x 9 1/2</dd></div>
+          <div><dt>Typefaces</dt><dd>Franklin Gothic ATF</dd></div>
         </div>
         <div class="dl-col">
-          <div><dt>Print/Bind</dt><dd>TBD</dd></div>
+          <div><dt>Print/Bind</dt><dd>L.J. Kengla</dd></div>
           <div><dt>Page Count</dt><dd>144</dd></div>
-          <div><dt>Texts by</dt><dd>TBD</dd></div>
+          <div><dt>Texts by</dt><dd>CombatPit, Diaz Combat Sports, Medium, Bethany Platanella, BoxRope Team, Jiu Jitsu Brotherhood, Alex Paddle, Sidekick Boxing, Afrocritik, Fight Library, Russia Beyond, Bleacher Report, Evolve MMA, Lionheart Muay Thai, Yokkao Promotions, World Fitness, and Revolution Phuket</dd></div>
         </div>
       </dl>
     </div>
@@ -1299,11 +1569,11 @@
         <img id="spreadPlayerImg3" src="" alt="Book spread" draggable="false">
         <img class="shadow" id="spreadPlayerShadow3" src="portfolio projects/StylesMakeFights/shadow2.png" alt="" aria-hidden="true">
         <div class="cover-flip cover-flip-front" id="coverFlipFront3">
-          <img src="portfolio projects/StylesMakeFights/cover-front-PLACEHOLDER.webp" alt="Styles Make Fights &mdash; placeholder front cover, temporary until real cover art is in" draggable="false">
+          <img src="portfolio projects/StylesMakeFights/cover-front.png" alt="Styles Make Fights &mdash; front cover" draggable="false">
           <div class="cover-face-back" aria-hidden="true"></div>
         </div>
         <div class="cover-flip cover-flip-back" id="coverFlipBack3">
-          <img src="portfolio projects/StylesMakeFights/cover-back-PLACEHOLDER.webp" alt="Styles Make Fights &mdash; placeholder back cover, temporary until real cover art is in" draggable="false">
+          <img src="portfolio projects/StylesMakeFights/cover-back.png" alt="Styles Make Fights &mdash; back cover" draggable="false">
           <div class="cover-face-back" aria-hidden="true"></div>
         </div>
         <div class="player-hint" id="playerHint3">Click to open</div>
@@ -1323,7 +1593,33 @@
   <div class="gallery-scroll" id="galleryScroll4">
     <div class="book-description">
       <h2>San Diego Football Club</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+      <p>This proposed rebrand of San Diego FC was developed for the club&rsquo;s inaugural season, building a bold, cinematic identity rooted in the character and history of San Diego. The crest combines mission-inspired arches, a shield-shaped outline, and a custom anchor, all designed to symbolize the city&rsquo;s architecture, proximity to the Pacific coastline, naval heritage, and military community.</p>
+      <p>The visual and promotional language is built around fan engagement and positive mantras and slogans such as &ldquo;The City&rsquo;s Anchor,&rdquo; &ldquo;Our Strength, Our Anchor,&rdquo; and &ldquo;Making Waves That Matter.&rdquo; The rebrand embraces the energy of the team and its supporters, intentionally moving away from the increasingly corporate design and language of modern sports in favor of something bold, local, and community-driven.</p>
+      <dl>
+        <div class="dl-col">
+          <div><dt>Oversight</dt><dd>Pamela Olecki<br>Associate Professor, ArtCenter College of Design</dd></div>
+        </div>
+      </dl>
+    </div>
+    <div class="brand-gallery" id="brandGalleryFlag4"></div>
+    <div class="crest-breakdown-figure">
+      <div class="crest-img-wrap">
+        <img src="portfolio projects/SanDiego-Football-Club/SDFC_Crest-trimmed.png" alt="San Diego Football Club &mdash; crest, annotated" loading="lazy">
+      </div>
+      <div class="crest-line crest-line-left" style="top: 7%;"></div>
+      <div class="crest-label crest-label-left" style="top: 7%;">Twin arches nod to San Diego&rsquo;s mission architecture and coastal skyline.</div>
+
+      <div class="crest-line crest-line-left" style="top: 40%;"></div>
+      <div class="crest-label crest-label-left" style="top: 40%;">The &ldquo;S&rdquo; and &ldquo;D&rdquo; are built from the anchor&rsquo;s own form &mdash; rounded counters that double as the crest&rsquo;s structure.</div>
+
+      <div class="crest-line crest-line-left" style="top: 82.5%;"></div>
+      <div class="crest-label crest-label-left" style="top: 82.5%;">The anchor honors the city&rsquo;s bond with the Pacific, its naval history, and its military community.</div>
+
+      <div class="crest-line crest-line-right" style="top: 35%;"></div>
+      <div class="crest-label crest-label-right" style="top: 35%;">A shield silhouette gives the mark its weight &mdash; built to read as strength and resilience at any size.</div>
+
+      <div class="crest-line crest-line-right" style="top: 89%;"></div>
+      <div class="crest-label crest-label-right" style="top: 89%;">&ldquo;FC&rdquo; sits nested at the anchor&rsquo;s base, grounding the mark without competing with it.</div>
     </div>
     <div class="brand-gallery" id="brandGalleryBefore4"></div>
     <div class="book-embed-section">
@@ -1337,7 +1633,7 @@
     <div class="brand-gallery" id="brandGalleryAfter4"></div>
     <div class="book-description">
       <h2>San Diego Seahorses</h2>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+      <p>A proposed youth extension of San Diego FC, the San Diego Seahorses is a U-14 soccer team sponsored by SDFC and designed with a complementary visual identity. The program creates a professional, branded environment for young players to develop their skills while providing SDFC with a meaningful opportunity to engage with and invest in the youth of the San Diego community, working alongside a generation that can grow with the club.</p>
     </div>
     <div class="brand-gallery" id="brandGalleryCampaign4"></div>
     <div class="book-contact">
@@ -1350,10 +1646,45 @@
 <div class="book-modal" id="productModal" aria-hidden="true">
   <button class="book-close" id="productClose" aria-label="Close">&times;</button>
   <div class="gallery-scroll" id="productScroll">
+    <div class="product-hero">
+      <img src="portfolio projects/OrganicoBello/OB-hero-red_bg.jpg?v=2" alt="Organico Bello &mdash; full product lineup">
+    </div>
     <div class="book-description">
       <h2>Organico Bello</h2>
+      <p>This proposed rebrand of Organico Bello centers the packaging around the quality and simplicity of its ingredients. Instead of following other brands that place the tomato front and center, the design leaves it off the label, allowing the product itself to stand out.</p>
+      <p>Made from recycled Birch paper that matches the natural color of fresh pasta, the packaging becomes a canvas for the ingredients themselves. The colors of the tomato-based ingredients visually coat the pasta-colored packaging, creating a direct connection between the food and its container. Cutouts keep the food visible, while the glass jars preserve the ingredients while, most importantly, keeping them visible from every angle. The custom label wraps frame the product rather than conceal it like a standard label.</p>
+      <p>Rooted in Naples&rsquo; tradition of wholesome, ingredient-first cooking, the packaging follows the same philosophy as the food itself: let the ingredients speak for themselves.</p>
+      <dl>
+        <div class="dl-col">
+          <div><dt>Oversight</dt><dd>Ania Borysiewicz<br>Founder of Ladder Design</dd></div>
+        </div>
+      </dl>
     </div>
-    <div class="product-grid" id="productGrid"></div>
+    <div class="product-groups" id="productGroups"></div>
+  </div>
+</div>
+
+<div class="book-modal" id="contactModal" aria-hidden="true">
+  <button class="book-close" id="contactClose" aria-label="Close">&times;</button>
+  <div class="gallery-scroll" id="contactScroll">
+    <div class="book-description contact-page">
+      <h3>What do you need?</h3>
+      <div class="contact-options">
+        <a class="contact-option" href="mailto:kenglaliam@gmail.com">kenglaliam@gmail.com</a>
+        <a class="contact-option" href="sms:5037030544">503-703-0544</a>
+      </div>
+      <h3>Education</h3>
+      <dl class="contact-edu">
+        <div>
+          <dt>BFA Graphic Design</dt>
+          <dd>ArtCenter College of Design<br>2023&ndash;Present</dd>
+        </div>
+        <div>
+          <dt>BS in Art &amp; Technology</dt>
+          <dd>University of Oregon<br>2020&ndash;2023</dd>
+        </div>
+      </dl>
+    </div>
   </div>
 </div>
 
@@ -1739,6 +2070,29 @@
     }
 
     startIdleDrift();
+
+    // Opening any project modal covers the carousel with a different DOM
+    // subtree — `track`'s own mousemove listener (below) stops firing the
+    // instant the cursor is over that overlay, since bubbling never
+    // reaches an element the pointer isn't actually over. Without this,
+    // whatever hoverDir/hoverSpeed the edge-hover auto-scroll last had
+    // right before the modal opened stays frozen in place, and
+    // autoScrollStep keeps driving the carousel at that same speed anyway
+    // — invisibly, the whole time the modal is open — since nothing ever
+    // tells it to stop. That silent, potentially long-running drive is
+    // what read as the carousel "catching up" in a rush once the modal
+    // closed and the result became visible again. Each modal's open
+    // handler calls this to hand the carousel back to plain idle drift
+    // (see startIdleDrift above) for as long as it stays open — slow and
+    // harmless to leave running unattended, unlike the hover auto-scroll.
+    window.pauseCarouselForModal = function () {
+      if (hoverDir !== 0) {
+        hoverDir = 0;
+        stopAutoScroll();
+      }
+      clearHover();
+      startIdleDrift();
+    };
 
     track.addEventListener('mousemove', (e) => {
       mouseX = e.clientX;
@@ -2155,6 +2509,7 @@
       document.body.style.overflow = 'hidden';
       galleryScroll.scrollTop = 0;
       if (carouselControls) carouselControls.style.visibility = 'hidden';
+      if (window.pauseCarouselForModal) window.pauseCarouselForModal();
     }
 
     function closeBook() {
@@ -2197,16 +2552,11 @@
   // pointed at this book's own assets and IDs (everything suffixed "2",
   // since element IDs can't be shared) and its own trim size (the
   // aspect-ratio overrides live in the CSS above, scoped to #bookModal2).
-  // No real cover scans yet, so the front/back cover slots use an obvious
-  // placeholder photo instead — swap those two <img src> in the HTML for
-  // the real straightened scans (see how the other book's were prepared)
-  // once they exist, no other changes needed. No hero photo of the
-  // physical book either, for the same reason, so buildGallery here skips
-  // straight to the picked spreads with no hero row first.
   (function () {
     const PROJECT_DIR = 'portfolio projects/OldNewMensClub/';
     const BOOK_DIR = PROJECT_DIR + 'spreads_web/';
     const SHADOW_SRC = PROJECT_DIR + 'shadow2.png';
+    const HERO_IMG_SRC = PROJECT_DIR + 'cover-front-and-back.png';
     const SPREAD_COUNT = 129;
     const spreads = [];
     for (let i = 1; i <= SPREAD_COUNT; i++) {
@@ -2485,7 +2835,21 @@
         });
       }
 
-      fillRows(document.getElementById('galleryRowsBefore2'), GALLERY_LAYOUT_BEFORE, GALLERY_PICKS_BEFORE);
+      const galleryRowsBefore = document.getElementById('galleryRowsBefore2');
+
+      // A flat front-and-back cover shot rather than an interior highlight
+      // — same "greets you first" treatment as Our Work Is Never Done's
+      // hero row above, so it needs its own real aspect-ratio (see the
+      // #galleryRowsBefore2 .gallery-img-wrap.hero override in the CSS)
+      // rather than the shared spread default.
+      const heroRow = document.createElement('div');
+      heroRow.className = 'gallery-row';
+      const heroWrap = makeGalleryWrap(HERO_IMG_SRC, false);
+      heroWrap.classList.add('hero');
+      heroRow.appendChild(heroWrap);
+      galleryRowsBefore.appendChild(heroRow);
+
+      fillRows(galleryRowsBefore, GALLERY_LAYOUT_BEFORE, GALLERY_PICKS_BEFORE);
 
       const galleryRowsAfter = document.getElementById('galleryRowsAfter2');
       fillRows(galleryRowsAfter, GALLERY_LAYOUT_AFTER_1, GALLERY_PICKS_AFTER_1);
@@ -2515,6 +2879,7 @@
       document.body.style.overflow = 'hidden';
       galleryScroll.scrollTop = 0;
       if (carouselControls) carouselControls.style.visibility = 'hidden';
+      if (window.pauseCarouselForModal) window.pauseCarouselForModal();
     }
 
     function closeBook() {
@@ -2546,13 +2911,11 @@
   // Styles Make Fights — third book, same mechanism as the other two (see
   // Our Work Is Never Done's IIFE for how each piece works). Like that one
   // (and unlike Old New Mens Club), these raw scans have no gutter crease
-  // baked in, so it uses the shadow2.png overlay again — but like Old New
-  // Mens Club, there's no real cover scan or hero photo of the physical
-  // book yet, so it uses placeholder covers and buildGallery skips straight
-  // to the picked spreads with no hero row first.
+  // baked in, so it uses the shadow2.png overlay again.
   (function () {
     const PROJECT_DIR = 'portfolio projects/StylesMakeFights/';
     const BOOK_DIR = PROJECT_DIR + 'spreads_web/';
+    const HERO_IMG_SRC = PROJECT_DIR + 'cover-front-and-back.png';
     const SHADOW_SRC = PROJECT_DIR + 'shadow2.png';
     const SPREAD_COUNT = 73;
     const spreads = [];
@@ -2814,7 +3177,21 @@
         });
       }
 
-      fillRows(document.getElementById('galleryRowsBefore3'), GALLERY_LAYOUT_BEFORE, GALLERY_PICKS_BEFORE);
+      const galleryRowsBefore = document.getElementById('galleryRowsBefore3');
+
+      // A flat front-and-back cover shot rather than an interior spread —
+      // same "greets you first" treatment as Our Work Is Never Done's hero
+      // row, so it needs its own real aspect-ratio (see the
+      // #galleryRowsBefore3 .gallery-img-wrap.hero override in the CSS)
+      // rather than the shared spread default.
+      const heroRow = document.createElement('div');
+      heroRow.className = 'gallery-row';
+      const heroWrap = makeGalleryWrap(HERO_IMG_SRC, false);
+      heroWrap.classList.add('hero');
+      heroRow.appendChild(heroWrap);
+      galleryRowsBefore.appendChild(heroRow);
+
+      fillRows(galleryRowsBefore, GALLERY_LAYOUT_BEFORE, GALLERY_PICKS_BEFORE);
       fillRows(document.getElementById('galleryRowsAfter3'), GALLERY_LAYOUT_AFTER, GALLERY_PICKS_AFTER);
       galleryBuilt = true;
     }
@@ -2828,6 +3205,7 @@
       document.body.style.overflow = 'hidden';
       galleryScroll.scrollTop = 0;
       if (carouselControls) carouselControls.style.visibility = 'hidden';
+      if (window.pauseCarouselForModal) window.pauseCarouselForModal();
     }
 
     function closeBook() {
@@ -2877,8 +3255,13 @@
 
     // size: 'lg' | 'md' | 'sm' (row height tier, biggest for the mockups
     // that matter most). items: a plain filename, relative to PROJECT_DIR.
-    const BEFORE_ROWS = [
+    // The flag gets its own row/container (see buildGallery below) so the
+    // crest breakdown figure — static HTML, not built from these rows —
+    // can sit between it and the rest of BEFORE_ROWS.
+    const FLAG_ROW = [
       { size: 'lg', items: ['flag-mock.jpg'] },
+    ];
+    const BEFORE_ROWS = [
       { size: 'sm', items: ['bis-card-mock.jpg', 'letterhead-mock.jpg', 'staff-badge.jpg'] },
       { size: 'lg', items: ['brochure-mock.jpg'] },
       { size: 'md', items: ['stories.jpg', 'instagram.jpg'] },
@@ -2925,6 +3308,7 @@
 
     let galleryBuilt = false;
     function buildGallery() {
+      buildRows(document.getElementById('brandGalleryFlag4'), FLAG_ROW);
       buildRows(document.getElementById('brandGalleryBefore4'), BEFORE_ROWS);
       buildRows(document.getElementById('brandGalleryClothing4'), CLOTHING_ROWS);
       buildRows(document.getElementById('brandGalleryAfter4'), AFTER_ROWS);
@@ -2959,6 +3343,7 @@
       document.body.style.overflow = 'hidden';
       galleryScroll.scrollTop = 0;
       if (carouselControls) carouselControls.style.visibility = 'hidden';
+      if (window.pauseCarouselForModal) window.pauseCarouselForModal();
     }
 
     function closeBook() {
@@ -2977,7 +3362,7 @@
     closeBtn.addEventListener('click', closeBook);
 
     galleryScroll.addEventListener('click', (e) => {
-      const wrapper = e.target.closest('.book-description, .brand-gallery, .brand-gallery-row, .book-embed-section, .book-contact');
+      const wrapper = e.target.closest('.book-description, .brand-gallery, .brand-gallery-row, .crest-breakdown-figure, .book-embed-section, .book-contact');
       if (wrapper === e.target) closeBook();
     });
 
@@ -2989,37 +3374,46 @@
 
   // Organico Bello's product page — opens the same way as the book
   // modals above (click-out/Escape to close; backdrop is plain white for
-  // now instead of blurred, see #productModal override below), but its
-  // content is just a grid of the plain white-bg product shots pulled out
-  // of the carousel thumb's cycle (that thumb now only cycles the hero and
-  // the hand-model photos). Each card starts on its front angle and, on
-  // hover, loops through whichever of right/back/left/top that product
-  // actually has and back to front again, for as long as it's hovered;
-  // leaving resets it back to front so the next hover always starts the
-  // same way.
+  // now instead of blurred, see #productModal override below). Content is
+  // the full-lineup hero shot (see .product-hero in the HTML) up top, the
+  // description below it, then one 2-up grid per pair of plain white-bg
+  // product photos (hover-spinning through whichever angles each product
+  // actually has, pulled out of the carousel thumb's own cycle) — the two
+  // sauces, the two spices, the spread and the paste, with Penne Rigate
+  // left over on its own in the final grid. Every pair but the sauces
+  // (already visible in the top hero) gets its own hand-model shot
+  // leading into it (see .product-lead-in), standing in for that top
+  // hero — the top hero is the only full-page section on this page.
   (function () {
     const PROJECT_DIR = 'portfolio projects/OrganicoBello/';
+    const HAND_DIR = PROJECT_DIR + 'hand models/';
     const ANGLE_ORDER = ['front', 'right', 'back', 'left', 'top'];
-    const PRODUCTS = [
-      { name: 'Vodka Sauce', slug: 'vodka_sauce', angles: ['front', 'back', 'top'] },
-      { name: 'Tomato Sauce', slug: 'tomato_sauce', angles: ['front', 'right', 'back', 'left'] },
-      { name: 'Bruschetta Spread', slug: 'bruschetta_spread', angles: ['front', 'right', 'back', 'left', 'top'] },
-      { name: 'Tomato Paste', slug: 'tomato_paste', angles: ['front', 'back'] },
-      // Forced onto its own new row (see buildGrid below) so it lands next
-      // to Italian Oregano regardless of how many columns actually fit —
-      // the grid's auto-fill column count changes with viewport width, so
-      // without this the two could end up split across different rows.
-      { name: 'Tomato Bouillon', slug: 'tomato_bouillon', angles: ['front', 'right', 'back', 'left', 'top'], breakRowBefore: true },
-      {
-        name: 'Italian Oregano',
-        slug: 'italian_oregano',
-        angles: ['front', 'right', 'back', 'left', 'top'],
-        // Shot before the OB-<slug>-<angle> naming convention existed, so
-        // its top view needs an explicit filename instead of the pattern
-        // every other angle/product follows.
-        overrides: { top: 'P2Sp26_LiamKengla_OrganicoBello_25.jpg' },
-      },
-      { name: 'Penne Rigate', slug: 'penne_rigate', angles: ['front', 'right', 'back', 'left', 'top'] },
+    const vodkaSauce = { name: 'Vodka Sauce', slug: 'vodka_sauce', angles: ['front', 'back', 'top'] };
+    const tomatoSauce = { name: 'Tomato Sauce', slug: 'tomato_sauce', angles: ['front', 'right', 'back', 'left'] };
+    const tomatoBouillon = { name: 'Tomato Bouillon', slug: 'tomato_bouillon', angles: ['front', 'right', 'back', 'left', 'top'] };
+    const italianOregano = {
+      name: 'Italian Oregano',
+      slug: 'italian_oregano',
+      angles: ['front', 'right', 'back', 'left', 'top'],
+      // Shot before the OB-<slug>-<angle> naming convention existed, so
+      // its top view needs an explicit filename instead of the pattern
+      // every other angle/product follows.
+      overrides: { top: 'P2Sp26_LiamKengla_OrganicoBello_25.jpg' },
+    };
+    const bruschettaSpread = { name: 'Bruschetta Spread', slug: 'bruschetta_spread', angles: ['front', 'right', 'back', 'left', 'top'] };
+    const tomatoPaste = { name: 'Tomato Paste', slug: 'tomato_paste', angles: ['front', 'back'] };
+    const penneRigate = { name: 'Penne Rigate', slug: 'penne_rigate', angles: ['front', 'right', 'back', 'left', 'top'] };
+
+    // Each group is a pair's product grid, optionally led into by a
+    // hand-model shot of one of its own products (see .product-lead-in) —
+    // standing in for the top hero for whichever pair isn't already
+    // covered by it. The sauces are visible in the top hero itself, so
+    // they get no lead-in of their own.
+    const PRODUCT_GROUPS = [
+      { products: [vodkaSauce, tomatoSauce] },
+      { products: [tomatoBouillon, italianOregano], leadInProduct: tomatoBouillon },
+      { products: [bruschettaSpread, tomatoPaste], leadInProduct: bruschettaSpread },
+      { products: [penneRigate], leadInProduct: penneRigate },
     ];
     const SPIN_FRAME_MS = 350;
 
@@ -3029,70 +3423,94 @@
         .map((angle) => PROJECT_DIR + ((product.overrides && product.overrides[angle]) || ('OB-' + product.slug + '-' + angle + '.jpg')));
     }
 
+    function handShotFor(product) {
+      return HAND_DIR + 'OB-' + product.slug + '-front-hand_model.png';
+    }
+
     // Warm the cache so the first hover-spin on each card is instant.
-    PRODUCTS.forEach((product) => {
-      framesFor(product).forEach((src) => { new Image().src = src; });
+    PRODUCT_GROUPS.forEach((group) => {
+      group.products.forEach((product) => {
+        framesFor(product).forEach((src) => { new Image().src = src; });
+      });
     });
 
     const modal = document.getElementById('productModal');
     const closeBtn = document.getElementById('productClose');
     const scroll = document.getElementById('productScroll');
-    const grid = document.getElementById('productGrid');
+    const groupsContainer = document.getElementById('productGroups');
     const carouselControls = document.querySelector('.controls');
     let built = false;
 
-    function buildGrid() {
-      PRODUCTS.forEach((product) => {
-        const frames = framesFor(product);
-
-        const card = document.createElement('div');
-        card.className = 'product-card';
-        if (product.breakRowBefore) card.classList.add('product-card--row-start');
-
-        const photo = document.createElement('div');
-        photo.className = 'product-photo';
-        const img = document.createElement('img');
-        img.src = frames[0];
-        img.alt = product.name;
-        photo.appendChild(img);
-        card.appendChild(photo);
-
-        const label = document.createElement('h4');
-        label.textContent = product.name;
-        card.appendChild(label);
-
-        let timer = null;
-        function stopSpin() {
-          if (timer) {
-            clearInterval(timer);
-            timer = null;
-          }
+    function buildGroups() {
+      PRODUCT_GROUPS.forEach((group) => {
+        if (group.leadInProduct) {
+          const leadInWrap = document.createElement('div');
+          leadInWrap.className = 'product-lead-in';
+          const leadInImg = document.createElement('img');
+          leadInImg.src = handShotFor(group.leadInProduct);
+          leadInImg.alt = group.leadInProduct.name + ' — hand model shot';
+          leadInImg.loading = 'lazy';
+          leadInWrap.appendChild(leadInImg);
+          groupsContainer.appendChild(leadInWrap);
         }
-        card.addEventListener('mouseenter', () => {
-          stopSpin();
-          let i = 0;
-          timer = setInterval(() => {
-            i = (i + 1) % frames.length;
-            img.src = frames[i];
-          }, SPIN_FRAME_MS);
-        });
-        card.addEventListener('mouseleave', () => {
-          stopSpin();
+
+        const grid = document.createElement('div');
+        grid.className = 'product-grid';
+
+        group.products.forEach((product) => {
+          const frames = framesFor(product);
+
+          const card = document.createElement('div');
+          card.className = 'product-card';
+
+          const photo = document.createElement('div');
+          photo.className = 'product-photo';
+          const img = document.createElement('img');
           img.src = frames[0];
+          img.alt = product.name;
+          photo.appendChild(img);
+          card.appendChild(photo);
+
+          const label = document.createElement('h4');
+          label.textContent = product.name;
+          card.appendChild(label);
+
+          let timer = null;
+          function stopSpin() {
+            if (timer) {
+              clearInterval(timer);
+              timer = null;
+            }
+          }
+          card.addEventListener('mouseenter', () => {
+            stopSpin();
+            let i = 0;
+            timer = setInterval(() => {
+              i = (i + 1) % frames.length;
+              img.src = frames[i];
+            }, SPIN_FRAME_MS);
+          });
+          card.addEventListener('mouseleave', () => {
+            stopSpin();
+            img.src = frames[0];
+          });
+
+          grid.appendChild(card);
         });
 
-        grid.appendChild(card);
+        groupsContainer.appendChild(grid);
       });
       built = true;
     }
 
     function openProducts() {
-      if (!built) buildGrid();
+      if (!built) buildGroups();
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
       scroll.scrollTop = 0;
       if (carouselControls) carouselControls.style.visibility = 'hidden';
+      if (window.pauseCarouselForModal) window.pauseCarouselForModal();
     }
 
     function closeProducts() {
@@ -3110,13 +3528,61 @@
     closeBtn.addEventListener('click', closeProducts);
 
     scroll.addEventListener('click', (e) => {
-      const wrapper = e.target.closest('.book-description, .product-grid');
+      const wrapper = e.target.closest('.book-description, .product-hero, .product-groups, .product-grid, .product-lead-in');
       if (wrapper === e.target) closeProducts();
     });
 
     document.addEventListener('keydown', (e) => {
       if (!modal.classList.contains('open')) return;
       if (e.key === 'Escape') closeProducts();
+    });
+  })();
+
+  // Contact — same open/close chrome as the book/product modals above
+  // (click-out/Escape to close, blurred backdrop), but static content: an
+  // education summary and two direct actions rather than a project
+  // gallery. Email opens the native mail app; Cell opens the native
+  // messaging app with the number already filled in via the sms: URI
+  // scheme, the same way mailto: does for email.
+  (function () {
+    const modal = document.getElementById('contactModal');
+    const closeBtn = document.getElementById('contactClose');
+    const scroll = document.getElementById('contactScroll');
+    const carouselControls = document.querySelector('.controls');
+
+    function openContact() {
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      scroll.scrollTop = 0;
+      if (carouselControls) carouselControls.style.visibility = 'hidden';
+      if (window.pauseCarouselForModal) window.pauseCarouselForModal();
+    }
+
+    function closeContact() {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (carouselControls) carouselControls.style.visibility = '';
+    }
+
+    document.querySelectorAll('[data-opens-contact]').forEach((el) => {
+      el.addEventListener('click', (e) => {
+        e.preventDefault();
+        openContact();
+      });
+    });
+
+    closeBtn.addEventListener('click', closeContact);
+
+    scroll.addEventListener('click', (e) => {
+      const wrapper = e.target.closest('.book-description');
+      if (wrapper === e.target) closeContact();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (!modal.classList.contains('open')) return;
+      if (e.key === 'Escape') closeContact();
     });
   })();
 </script>
