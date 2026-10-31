@@ -188,7 +188,6 @@
 
   body.project-open header {
     z-index: 3020;
-    pointer-events: none;
   }
 
   body.project-open header .home {
@@ -241,6 +240,23 @@
      place, standing in for the modal's own close button. */
   body.contact-open header {
     z-index: 3020;
+  }
+
+  /* While the contact page is open the header is just "Work" (it already
+     shows the email), centered on the K between the corner marks. */
+  body.contact-open header .info {
+    justify-content: center;
+  }
+
+  body.contact-open header .info address {
+    display: none;
+  }
+
+  /* Off the homepage, the whole header is the way back (see the header
+     click JS). */
+  body.project-open header,
+  body.contact-open header {
+    cursor: pointer;
   }
 
   #contactClose {
@@ -827,7 +843,7 @@
     }
   }
 
-  /* Contact page — no title of its own (the close button is enough
+  /* Contact page — no title of its own (the header's Work link is enough
      context), so the whole block is centered as a unit in the modal
      viewport (vertically via #contactScroll's flex below, horizontally
      via .book-description's existing margin:0 auto) — not text-align, the
@@ -843,52 +859,16 @@
     padding: 0 24px;
   }
 
-  /* Section headings read at the same size as the degree titles below
-     them (see .contact-edu dt) rather than a smaller uppercase eyebrow.
-     Only "What do you need?" — the one actual call to action on this
-     page — is bold/uppercase; everything else (this heading included)
-     stays plain weight, so that emphasis doesn't get diluted by
-     competing bold text elsewhere. */
-  .contact-page h3 {
+  /* Just the email, with a plain (not clickable) note under it, both
+     centered in the middle of the page. */
+  .contact-page {
+    text-align: center;
+  }
+
+  .contact-note {
     font-size: 16px;
-    font-weight: 400;
-    margin: 48px 0 20px;
-  }
-
-  .contact-page h3:first-of-type {
-    margin-top: 0;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-  }
-
-  .contact-edu {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    margin: 0;
-  }
-
-  .contact-edu dt {
-    font-size: 16px;
-    font-weight: 700;
-  }
-
-  .contact-edu dd {
-    font-size: 14px;
-    line-height: 1.5;
-    margin: 4px 0 0;
-    opacity: 0.85;
-  }
-
-  /* Email/Cell are plain text, not buttons — same size/weight as the
-     degree titles and section headings above (one consistent scale for
-     everything on this page), same hover treatment as the nav links
-     (see header a). */
-  .contact-options {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    color: var(--muted);
+    margin: 12px 0 0;
   }
 
   .contact-option {
@@ -1767,18 +1747,18 @@
      has the rest). */
   @media (max-width: 640px), (max-height: 500px) and (pointer: coarse) {
     /* The K's size on phones, as large as the screen width allows:
-       48px side margins + lockup (5.27 x K) + 16px gap + "you need?"
-       (9 x 0.6em at the font size below = 1.485 x K) + 10px gap + corner
-       mark (K / 6) = 74px + 6.92 x K. Up to 46px on wide enough phones,
+       48px side margins + lockup (5.27 x K) + 12px gap + "you need?"
+       (9 x 0.6em at the font size below = 1.447 x K) + 6px gap + corner
+       mark (K / 6) = 66px + 6.884 x K. Up to 47px on wide enough phones,
        shrinking to fit narrower ones. */
     :root {
-      --phone-mark: min(46px, calc((100vw - 74px) / 6.92));
+      --phone-mark: min(47px, calc((100vw - 66px) / 6.884));
     }
 
     header {
       --mark: var(--phone-mark);
       grid-template-columns: minmax(0, 1fr) auto;
-      column-gap: 16px;
+      column-gap: 12px;
       padding-top: 24px;
       padding-left: 24px;
       padding-right: 24px;
@@ -1790,14 +1770,16 @@
 
     /* "What do / you need?" on two lines, centered on the K's height
        between the corner marks (which bracket the K's top and bottom, as
-       on desktop), 10px from them. Sized to match "Graphic Designer" in
-       the lockup: that font's x-height is 22/154 of the K, this one's is
-       0.52em, so 0.275 x K puts their lowercase at the same height. */
+       on desktop), 6px from them. Sized just under "Graphic Designer" in
+       the lockup (whose x-height is 22/154 of the K; this font's is
+       0.52em, so 0.275 x K would match exactly) — optically they read the
+       same, since the lockup's title looked a touch small at an exact
+       match. */
     header .info {
-      font-size: calc(var(--mark) * 0.275);
+      font-size: calc(var(--mark) * 0.268);
       line-height: 1.15;
       white-space: nowrap;
-      padding-right: calc(10px + var(--mark) / 6);
+      padding-right: calc(6px + var(--mark) / 6);
       justify-content: center;
     }
 
@@ -1806,7 +1788,7 @@
     }
 
     header .close {
-      right: calc(var(--mark) / 6 + 10px);
+      right: calc(var(--mark) / 6 + 6px);
     }
 
     header .corner {
@@ -2254,22 +2236,8 @@
   <button class="book-close" id="contactClose" aria-label="Close">&times;</button>
   <div class="gallery-scroll" id="contactScroll">
     <div class="book-description contact-page">
-      <h3>What do you need?</h3>
-      <div class="contact-options">
-        <a class="contact-option" href="mailto:kenglaliam@gmail.com">kenglaliam@gmail.com</a>
-        <a class="contact-option" href="sms:5037030544">503-703-0544</a>
-      </div>
-      <h3>Education</h3>
-      <dl class="contact-edu">
-        <div>
-          <dt>BFA Graphic Design</dt>
-          <dd>ArtCenter College of Design<br>2023&ndash;Present</dd>
-        </div>
-        <div>
-          <dt>BS in Art &amp; Technology</dt>
-          <dd>University of Oregon<br>2020&ndash;2023</dd>
-        </div>
-      </dl>
+      <a class="contact-option" href="mailto:kenglaliam@gmail.com">kenglaliam@gmail.com</a>
+      <p class="contact-note">Resume upon request</p>
     </div>
   </div>
 </div>
@@ -4530,13 +4498,19 @@
     const observer = new MutationObserver(sync);
     projects.forEach((m) => observer.observe(m, { attributes: true, attributeFilter: ['class'] }));
 
-    function closeOpen(e) {
-      e.preventDefault();
+    // On a project or the contact page, a click anywhere on the header
+    // (logo, X, empty space) closes it and returns home. On the homepage
+    // only What do you need? does anything.
+    // What do you need?/Work toggles the contact page itself, so it's
+    // left to its own handler.
+    document.querySelector('header').addEventListener('click', (e) => {
+      if (e.target.closest('#navToggle')) return;
+      if (e.target.closest('#homeLink, #headerClose')) e.preventDefault();
       const open = document.querySelector('.book-modal.open');
-      if (open) open.querySelector('.book-close').click();
-    }
-    document.getElementById('homeLink').addEventListener('click', closeOpen);
-    document.getElementById('headerClose').addEventListener('click', closeOpen);
+      if (!open) return;
+      e.preventDefault();
+      open.querySelector('.book-close').click();
+    });
   })();
 </script>
 
