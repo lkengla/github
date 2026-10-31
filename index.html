@@ -71,51 +71,145 @@
     -webkit-font-smoothing: antialiased;
   }
 
+  /* Laid out like the resume letterhead: lockup on the left, an info
+     block on the right with "What do you need?" level with the top of the
+     K and the contact lines ending level with its bottom, bracketed by
+     corner marks on the right margin. */
   header {
+    --mark: 80px;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 28px 40px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 40px;
+    padding: 40px 40px 24px;
     z-index: 10;
     background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(6px);
   }
 
-  .wordmark {
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-  }
-
-  header nav a {
+  header a {
     color: var(--ink);
     text-decoration: none;
-    font-size: 13px;
-    margin-left: 28px;
     transition: opacity 0.2s ease;
   }
 
-  header nav a:hover {
+  header a:hover {
     opacity: 0.6;
   }
 
+  /* full-lockup.png is 848x188 with clearspace baked in: the K spans
+     x 18-172, y 16-170 (154px square). Scaling by --mark / 154 and
+     cancelling that clearspace makes the box exactly the K's height, so
+     its top-left corner lands on the header's padding (40px from the top
+     and left). The descenders of "Graphic Designer" hang 9px (native)
+     below the K, inside the bottom margin. */
+  header .logo {
+    display: block;
+    height: calc(var(--mark) * 188 / 154);
+    width: auto;
+    margin:
+      calc(var(--mark) * -16 / 154) 0
+      calc(var(--mark) * -18 / 154)
+      calc(var(--mark) * -18 / 154);
+  }
+
+  /* The letterhead leaves 157px between the end of the longest contact
+     line and the corner marks at a 126px K; scaled to --mark that's
+     ~100px, plus the 10px marks themselves. */
+  header .info {
+    position: relative;
+    height: var(--mark);
+    padding-right: calc(var(--mark) * 157 / 126 + 10px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 13px;
+    line-height: 17px;
+  }
+
+  header .info address {
+    font-style: normal;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Corner marks on the right margin, top and bottom of the info block:
+     detail-mark.png is the top-right one; the bottom one is it rotated a
+     quarter turn. */
+  header .corner {
+    position: absolute;
+    right: 0;
+    width: 10px;
+    height: 10px;
+  }
+
+  header .corner.top { top: 0; }
+  header .corner.bottom { bottom: 0; transform: rotate(90deg); }
+
+  /* The logo is the way home. On a project page its box narrows to just
+     the K (square, --mark wide) and clips the rest of the lockup; it only
+     clips there so the descenders of "Graphic Designer" can hang below. */
+  header .home {
+    display: block;
+    width: max-content;
+  }
+
+  /* On a project page the header rides above the modal with only the K
+     left; clicking it closes the project (see the home-link JS). The
+     modal's own close button, Escape and backdrop click still work. */
+  body.project-open header {
+    z-index: 3020;
+    background: transparent;
+    backdrop-filter: none;
+    pointer-events: none;
+  }
+
+  body.project-open header .home {
+    width: var(--mark);
+    overflow: hidden;
+    pointer-events: auto;
+  }
+
+  body.project-open header .info {
+    display: none;
+  }
+
+  /* While Contact is open the header rides above its modal, so the one
+     nav link (Contact <-> Work, see #navToggle) stays put and swaps in
+     place, standing in for the modal's own close button. */
+  body.contact-open header {
+    z-index: 3020;
+    background: transparent;
+    backdrop-filter: none;
+  }
+
+  #contactClose {
+    display: none;
+  }
+
+  /* main spans from the bottom of the logo mark (40px header padding +
+     80px K height) to the bottom of the window. The carousel
+     centers the front thumb in that span, so the gap above the image (to
+     the logo) matches the gap below it (to the window edge). Fixed height
+     + min-height:0 on .work so a carousel taller than the span overflows
+     evenly instead of stretching main and pushing the center down. */
   main {
-    min-height: 100vh;
-    padding-top: 84px;
+    height: 100vh;
+    box-sizing: border-box;
+    padding-top: 120px;
     display: flex;
     flex-direction: column;
   }
 
   .work {
     flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding: 0 0 24px;
   }
 
   .controls {
@@ -276,9 +370,11 @@
     z-index: 3000;
     opacity: 0;
     visibility: hidden;
-    background: rgba(246, 245, 241, 0.6);
-    backdrop-filter: blur(28px);
-    -webkit-backdrop-filter: blur(28px);
+    /* Mostly opaque with a heavy blur, so the homepage behind reads as a
+       faint wash of color and the project page in front stays legible. */
+    background: rgba(246, 245, 241, 0.88);
+    backdrop-filter: blur(48px);
+    -webkit-backdrop-filter: blur(48px);
     transition: opacity 0.35s ease, visibility 0.35s ease;
   }
 
@@ -311,9 +407,8 @@
 
   /* Extra breathing room after the hero photo specifically, separating it
      from the rest of the gallery rather than reading as part of the same
-     tight row-to-row rhythm. Shared across all three books' "before" rows
-     since each one's hero row is likewise its first child. */
-  #galleryRowsBefore .gallery-row:first-child,
+     tight row-to-row rhythm. Our Work Is Never Done's hero moved down to
+     its Bookbinding section, so this only applies to the other two. */
   #galleryRowsBefore2 .gallery-row:first-child,
   #galleryRowsBefore3 .gallery-row:first-child {
     margin-bottom: 100px;
@@ -440,6 +535,219 @@
     opacity: 0.85;
   }
 
+  /* Rotating 3D mockup of Our Work Is Never Done — a placeholder until
+     real 360 photos replace it. Face sizes come straight from the
+     physical book: 4.25 x 6.875 trim, and a 2.63" spine measured off the
+     front/spine/back cover scan (790px of sewing at 300dpi, cropped to
+     the threads alone, so spine-scan.jpg has no background or cover
+     edge in it). Change
+     --book-h to resize; the other two follow the same ratios. Sized off
+     the viewport so the object gets most of a screen to itself. */
+  .book-3d {
+    --book-h: min(72vh, 680px);
+    --book-w: calc(var(--book-h) * 4.25 / 6.875);
+    --book-d: calc(var(--book-h) * 2.63 / 6.875);
+    display: flex;
+    justify-content: center;
+    padding: 12vh 24px 14vh;
+    perspective: 2600px;
+  }
+
+  .book-3d-spin {
+    position: relative;
+    width: var(--book-w);
+    height: var(--book-h);
+    transform-style: preserve-3d;
+    animation: book-3d-turn 18s linear infinite;
+  }
+
+  .book-3d-face {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--book-w);
+    height: var(--book-h);
+    background-size: 100% 100%;
+    backface-visibility: hidden;
+  }
+
+  .book-3d-front {
+    background-image: url("portfolio projects/OurWorkIsNeverDone/cover-front-straight.webp");
+    transform: translateZ(calc(var(--book-d) / 2));
+  }
+
+  .book-3d-back {
+    background-image: url("portfolio projects/OurWorkIsNeverDone/cover-back-straight.webp");
+    transform: rotateY(180deg) translateZ(calc(var(--book-d) / 2));
+  }
+
+  .book-3d-spine,
+  .book-3d-fore {
+    width: var(--book-d);
+    left: calc((var(--book-w) - var(--book-d)) / 2);
+  }
+
+  .book-3d-spine {
+    background-image: url("portfolio projects/OurWorkIsNeverDone/spine-scan.jpg");
+    transform: rotateY(-90deg) translateZ(calc(var(--book-w) / 2));
+  }
+
+  /* Page edges: off-white with fine lines standing in for the stack of
+     leaves, running the length of each edge. */
+  .book-3d-fore,
+  .book-3d-top,
+  .book-3d-bottom {
+    background-color: #eee9de;
+  }
+
+  .book-3d-fore {
+    background-image: repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.06) 0 1px, transparent 1px 3px);
+    transform: rotateY(90deg) translateZ(calc(var(--book-w) / 2));
+  }
+
+  .book-3d-top,
+  .book-3d-bottom {
+    height: var(--book-d);
+    top: calc((var(--book-h) - var(--book-d)) / 2);
+    background-image: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.06) 0 1px, transparent 1px 3px);
+  }
+
+  .book-3d-top {
+    transform: rotateX(90deg) translateZ(calc(var(--book-h) / 2));
+  }
+
+  .book-3d-bottom {
+    transform: rotateX(-90deg) translateZ(calc(var(--book-h) / 2));
+  }
+
+  /* Description and 3D mockup side by side, filling one screen with
+     generous clear space around them. Stacks below 1100px, where the text
+     column gets squeezed into a tall, narrow block; .book-intro
+     then adds nothing and both blocks keep their own stacked padding. */
+  @media (min-width: 1101px) {
+    /* Text on the page's shared --inset margin (lined up with the images
+       below), and the book centered in all the space between the text's
+       right edge and the right margin. That column is never narrower than
+       the book's turning footprint plus 5vw clear on each side; the text
+       column gives way first on narrower screens. */
+    .book-intro {
+      --book-h: min(76vh, 760px, 56vw);
+      display: grid;
+      grid-template-columns: minmax(0, 620px) minmax(calc(var(--book-h) * 0.75 + 10vw), 1fr);
+      align-items: center;
+      gap: 0;
+      min-height: 100vh;
+      box-sizing: border-box;
+      padding: 8vh var(--inset);
+    }
+
+    #bookModal .book-intro .book-description {
+      margin: 0;
+      padding: 0;
+    }
+
+    /* A turning book is about 0.75x as wide as it is tall at its widest
+       angle (front + spine on the diagonal), which is what the column
+       minimum above reserves. Same --book-h as .book-intro, restated
+       because .book-3d sets its own default. 56vw caps it on
+       wide-but-short windows. */
+    .book-intro .book-3d {
+      --book-h: min(76vh, 760px, 56vw);
+      padding: 0;
+    }
+  }
+
+  /* Our Work Is Never Done runs everything on one shared side margin,
+     --inset: the description text, gallery images, inline notes, player,
+     and bookbinding section all start on the same left edge. Single
+     images and the player stay capped at 64vh (vs. the other books'
+     78vh) so they don't overwhelm the page. */
+  #bookModal {
+    --inset: 8%;
+  }
+
+  #bookModal .book-description {
+    max-width: none;
+    padding-left: var(--inset);
+    padding-right: var(--inset);
+  }
+
+  /* Text keeps a readable line length while starting on the margin. */
+  #bookModal .book-description > * {
+    max-width: 680px;
+  }
+
+  #bookModal .gallery-rows {
+    padding: 0 var(--inset) 24px;
+  }
+
+  #bookModal .gallery-row {
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  #bookModal .gallery-row .gallery-img-wrap:only-child {
+    max-height: 64vh;
+  }
+
+  #bookModal .book-embed-section {
+    padding: 48px var(--inset) 80px;
+  }
+
+  #bookModal .spread-player,
+  #bookModal .player-progress {
+    width: min(100%, calc(64vh * 1200 / 970));
+  }
+
+  /* Bookbinding process photos: a mix of portrait and landscape phone
+     shots, so each one grows in proportion to its own aspect ratio and
+     every image in a row comes out the same height. */
+  .binding-row {
+    display: flex;
+    gap: 24px;
+    margin-top: 24px;
+  }
+
+  .binding-row img {
+    display: block;
+    min-width: 0;
+    object-fit: cover;
+  }
+
+  .binding-row img.landscape {
+    flex: 4 1 0;
+    aspect-ratio: 4 / 3;
+  }
+
+  .binding-row img.portrait {
+    flex: 2.25 1 0;
+    aspect-ratio: 3 / 4;
+  }
+
+  @media (max-width: 640px) {
+    #bookModal {
+      --inset: 24px;
+    }
+  }
+
+  @keyframes book-3d-turn {
+    from { transform: rotateY(0deg); }
+    to { transform: rotateY(360deg); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .book-3d-spin {
+      animation: none;
+      transform: rotateY(-30deg);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .book-3d {
+      --book-h: min(60vh, 440px);
+    }
+  }
+
   /* Contact page — no title of its own (the close button is enough
      context), so the whole block is centered as a unit in the modal
      viewport (vertically via #contactScroll's flex below, horizontally
@@ -497,7 +805,7 @@
   /* Email/Cell are plain text, not buttons — same size/weight as the
      degree titles and section headings above (one consistent scale for
      everything on this page), same hover treatment as the nav links
-     (see header nav a). */
+     (see header a). */
   .contact-options {
     display: flex;
     flex-direction: column;
@@ -1263,11 +1571,12 @@
     transform: translateY(-50%);
     z-index: 21;
     max-width: 38%;
-    font-size: 13px;
+    font-size: 15px;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: #1a1a1a;
-    opacity: 0.55;
+    opacity: 0.9;
     transition: opacity 0.3s ease;
     pointer-events: none;
   }
@@ -1282,6 +1591,7 @@
     margin-top: 20px;
     text-align: center;
     font-size: 13px;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: #1a1a1a;
@@ -1291,7 +1601,81 @@
   }
 
   .player-hint-playing.visible {
-    opacity: 0.55;
+    opacity: 0.8;
+  }
+
+  /* Progress through the book, under the player. Same width formula as
+     .spread-player, so the bar spans exactly the open book. The fill is
+     scaled rather than resized so it stays on the compositor. */
+  .player-progress {
+    width: min(100%, calc(78vh * 1200 / 970));
+    margin-top: 44px;
+  }
+
+  .player-progress-bar {
+    height: 2px;
+    background: rgba(26, 26, 26, 0.12);
+    overflow: hidden;
+  }
+
+  .player-progress-fill {
+    height: 100%;
+    background: #1a1a1a;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.25s ease;
+  }
+
+  /* Left page | hint | right page. Equal outer columns keep the hint
+     centered under the book whatever the page numbers' widths. */
+  .player-progress-label {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+    margin-top: 12px;
+    color: #1a1a1a;
+  }
+
+  .player-progress-label .player-page:last-child {
+    justify-self: end;
+  }
+
+  .player-progress-label .player-hint-playing {
+    margin-top: 0;
+  }
+
+  /* min-height holds the row open when one side is empty (a single
+     page), so the hint below doesn't jump. */
+  .player-page {
+    min-height: 1.2em;
+    line-height: 1.2;
+    font-size: 28px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Short notes on what the spreads are doing, set as a cell inside a
+     gallery row beside a spread (see GALLERY_SECTIONS), vertically
+     centered on the image so they read as part of the sequence. */
+  .gallery-text {
+    flex: 1 1 0;
+    min-width: 0;
+    align-self: center;
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #1a1a1a;
+  }
+
+  .gallery-text strong {
+    font-weight: 700;
+  }
+
+  @media (max-width: 640px) {
+    .gallery-row.has-text {
+      flex-direction: column;
+    }
   }
 
   .player-hint.hidden {
@@ -1299,9 +1683,30 @@
   }
 
   @media (max-width: 640px) {
+    /* Phones: smaller lockup, and the info block drops to just the
+       Contact/Work link pinned top-right (the contact page has the rest). */
     header {
+      --mark: 36px;
+      grid-template-columns: minmax(0, 1fr) auto;
+      column-gap: 16px;
+      padding-top: 24px;
       padding-left: 24px;
       padding-right: 24px;
+    }
+
+    header .info address,
+    header .corner {
+      display: none;
+    }
+
+    header .info {
+      font-size: 12px;
+      white-space: nowrap;
+      padding-right: 0;
+    }
+
+    main {
+      padding-top: 60px;
     }
 
     .controls {
@@ -1336,10 +1741,16 @@
 </div>
 
 <header>
-  <div class="wordmark">LIAM JACOB KENGLA IS A DESIGNER BASED IN LOS ANGELES AND PORTLAND</div>
-  <nav>
-    <a href="#" data-opens-contact="true">Contact</a>
-  </nav>
+  <a class="home" href="#" id="homeLink" aria-label="Home"><img class="logo" src="Liam-Kengla-Logo-Assets/full-lockup.png" alt="Liam Kengla, Graphic Designer"></a>
+  <div class="info">
+    <a href="#" id="navToggle">What do you need?</a>
+    <address>
+      <a href="mailto:kenglaliam@gmail.com">kenglaliam@gmail.com</a>
+      <a href="sms:5037030544">[503] 703 0544</a>
+    </address>
+    <img class="corner top" src="Liam-Kengla-Logo-Assets/detail-mark.png" alt="">
+    <img class="corner bottom" src="Liam-Kengla-Logo-Assets/detail-mark.png" alt="">
+  </div>
 </header>
 
 <main>
@@ -1364,7 +1775,7 @@
           <img src="portfolio projects/OrganicoBello/OB-hero-red_bg.jpg?v=2" alt="Organico Bello &mdash; packaging lineup on red background">
         </div>
         <h3>Organico Bello</h3>
-        <span>Packaging</span>
+        <span>Food Packaging</span>
       </div>
       <div class="card">
         <div class="thumb is-photo" data-images='[
@@ -1428,7 +1839,7 @@
           <img src="portfolio projects/OurWorkIsNeverDone/cover-spine-back-thumb.webp" alt="Our Work Is Never Done &mdash; front cover, spine, and back cover">
         </div>
         <h3>Our Work Is Never Done</h3>
-        <span>Book Design</span>
+        <span>Book Design, Bookbinding, Curation</span>
       </div>
       <div class="card">
         <div class="thumb is-photo" data-opens-book-3="true" data-images='[
@@ -1469,25 +1880,42 @@
 <div class="book-modal" id="bookModal" aria-hidden="true">
   <button class="book-close" id="bookClose" aria-label="Close">&times;</button>
   <div class="gallery-scroll" id="galleryScroll">
-    <div class="book-description">
-      <h2>Our Work Is Never Done</h2>
-      <p>Our Work is Never Done, an 800-page book on Mexican-American immigration, features case studies of non-violent protests, community injustices, and stories of labor from the 1930s&ndash;1970s, offering a powerful narrative of Mexican resilience and community.</p>
-      <p>Designed as an intimate read, the book uses a one-column format, long image sequences, and personal stories. Its small trim size evokes a field journal, while its unusual length creates a bible-like presence in the hand. Created in reaction to the current administration&rsquo;s views and actions on immigration, the book is a passionate, content-rich record of Mexican-American history.</p>
-      <dl>
-        <div class="dl-col">
-          <div><dt>Design</dt><dd>L.J. Kengla</dd></div>
-          <div><dt>Oversight</dt><dd>River Jukes Hudson<br>Co-Partner at ELLA</dd></div>
-          <div><dt>Trim Size</dt><dd>4.25 x 6.875</dd></div>
-          <div><dt>Typefaces</dt><dd>Aktivest Grotesk<br>Aglet Slab VF</dd></div>
+    <div class="book-intro">
+      <div class="book-description">
+        <h2>Our Work Is Never Done</h2>
+        <p>Our Work is Never Done, an 800-page book on Mexican-American immigration, features case studies of non-violent protests, community injustices, and stories of labor from the 1930s&ndash;1970s, offering a powerful narrative of Mexican resilience and community.</p>
+        <p>Designed as an intimate read, the book uses a one-column format, long image sequences, and personal stories. Its small trim size evokes a field journal, while its unusual length creates a bible-like presence in the hand. Created in reaction to the current administration&rsquo;s views and actions on immigration, the book is a passionate, content-rich record of Mexican-American history.</p>
+        <dl>
+          <div class="dl-col">
+            <div><dt>Design</dt><dd>L.J. Kengla</dd></div>
+            <div><dt>Oversight</dt><dd>River Jukes Hudson<br>Co-Partner at ELLA</dd></div>
+            <div><dt>Trim Size</dt><dd>4.25 x 6.875</dd></div>
+            <div><dt>Typefaces</dt><dd>Aktivest Grotesk<br>Aglet Slab VF</dd></div>
+          </div>
+          <div class="dl-col">
+            <div><dt>Print/Bind</dt><dd>L.J. Kengla</dd></div>
+            <div><dt>Page Count</dt><dd>800</dd></div>
+            <div><dt>Texts by</dt><dd>Selden Menefee, Orin Cassmore, John Webb, R. Matt Abigail, Jazmin Le&oacute;n, Tafolla Carmen, Ronald L. Mize, Alicia C.S. Swords, Ronald A. Garcia, Jacques Levy, Colin Gunckel, and Matt Garcia</dd></div>
+          </div>
+        </dl>
+      </div>
+      <div class="book-3d" aria-label="Our Work Is Never Done, rotating 3D mockup" role="img">
+        <div class="book-3d-spin">
+          <div class="book-3d-face book-3d-front"></div>
+          <div class="book-3d-face book-3d-back"></div>
+          <div class="book-3d-face book-3d-spine"></div>
+          <div class="book-3d-face book-3d-fore"></div>
+          <div class="book-3d-face book-3d-top"></div>
+          <div class="book-3d-face book-3d-bottom"></div>
         </div>
-        <div class="dl-col">
-          <div><dt>Print/Bind</dt><dd>L.J. Kengla</dd></div>
-          <div><dt>Page Count</dt><dd>800</dd></div>
-          <div><dt>Texts by</dt><dd>Selden Menefee, Orin Cassmore, John Webb, R. Matt Abigail, Jazmin Le&oacute;n, Tafolla Carmen, Ronald L. Mize, Alicia C.S. Swords, Ronald A. Garcia, Jacques Levy, Colin Gunckel, and Matt Garcia</dd></div>
-        </div>
-      </dl>
+      </div>
     </div>
-    <div class="gallery-rows" id="galleryRowsBefore"></div>
+    <div class="gallery-rows" id="galleryRowsBefore">
+      <p class="gallery-text" id="noteIndividuals"><strong>Under-recognized individuals.</strong> Highlighting the stories of people history tends to leave out, like the women who made up much of San Antonio&rsquo;s pecan-shelling workforce, Emma Tenayuca, a central organizer of their 1938 strike, and others.</p>
+    </div>
+    <div class="gallery-rows" id="galleryRowsSequence">
+      <p class="gallery-text" id="noteSequences"><strong>Long image sequences.</strong> Given the current political focus on immigration, the project became a response to the current administration&rsquo;s comments surrounding the future of immigrant policies and communities, which meant representing the subject matter and the gravity of historical events in a way that encourages thoughtful introspection while remaining appropriate and respectful. The Bracero Program chapter follows workers in long runs of photographs, from recruitment in M&eacute;xico to processing centers, the border, and the fields of California, letting the images carry the weight.</p>
+    </div>
     <div class="book-embed-section">
       <div class="spread-player" id="spreadPlayer">
         <img id="spreadPlayerImg" src="" alt="Book spread" draggable="false">
@@ -1502,12 +1930,37 @@
         </div>
         <div class="player-hint" id="playerHint">Click to open</div>
       </div>
-      <div class="player-hint-playing" id="playerHintPlaying">Hover to stop, click to change page</div>
+      <div class="player-progress">
+        <div class="player-progress-bar"><div class="player-progress-fill" id="playerProgressFill"></div></div>
+        <div class="player-progress-label">
+          <span class="player-page" id="playerPageLeft"></span>
+          <span class="player-hint-playing" id="playerHintPlaying">Hover to stop, click to change page</span>
+          <span class="player-page" id="playerPageRight"></span>
+        </div>
+      </div>
     </div>
-    <div class="gallery-rows" id="galleryRowsAfter"></div>
+    <div class="gallery-rows" id="galleryRowsAfter">
+      <p class="gallery-text" id="noteActivists"><strong>Female activist groups.</strong> Giving space to the women who organized, from the International Ladies&rsquo; Garment Workers&rsquo; Union locals in Laredo and San Antonio, including the 1959&ndash;1963 Tex-Son strike, to Dolores Huerta&rsquo;s work with the United Farm Workers.</p>
+    </div>
+    <div class="book-description book-binding">
+      <h2>Bookbinding</h2>
+      <p>Printed on Neenah Cream text paper, cut down by hand from parent sheets, then bound with Japanese bookbinding thread. Every signature in the book is sewn by hand with a French link stitch, with the thread colors chosen from the Mexican flag.</p>
+    </div>
+    <div class="gallery-rows binding-rows">
+      <div class="binding-row">
+        <img class="landscape" src="portfolio projects/OurWorkIsNeverDone/binding/binding-2345.jpg" alt="Printed signatures on Neenah Cream text paper" loading="lazy">
+        <img class="portrait" src="portfolio projects/OurWorkIsNeverDone/binding/binding-2393.jpg" alt="Green and red Japanese bookbinding thread" loading="lazy">
+        <img class="portrait" src="portfolio projects/OurWorkIsNeverDone/binding/binding-2394.jpg" alt="Cream and brown Japanese bookbinding thread" loading="lazy">
+      </div>
+      <div class="binding-row">
+        <img class="portrait" src="portfolio projects/OurWorkIsNeverDone/binding/binding-2449.jpg" alt="The French link stitch across the spine, sewn by hand" loading="lazy">
+        <img class="portrait" src="portfolio projects/OurWorkIsNeverDone/binding/binding-2450.jpg" alt="The sewn spine from an angle" loading="lazy">
+        <img class="landscape" src="portfolio projects/OurWorkIsNeverDone/binding/binding-2398.jpg" alt="Signatures being sewn together in the press" loading="lazy">
+      </div>
+    </div>
+    <div class="gallery-rows" id="galleryRowsBinding"></div>
     <div class="book-contact">
-      <span>Liam Jacob Kengla</span>
-      <span>@mailkengla</span>
+      <span>&copy; Liam Jacob Kengla</span>
     </div>
   </div>
 </div>
@@ -1551,8 +2004,7 @@
     </div>
     <div class="gallery-rows" id="galleryRowsAfter2"></div>
     <div class="book-contact">
-      <span>Liam Jacob Kengla</span>
-      <span>@mailkengla</span>
+      <span>&copy; Liam Jacob Kengla</span>
     </div>
   </div>
 </div>
@@ -1597,8 +2049,7 @@
     </div>
     <div class="gallery-rows" id="galleryRowsAfter3"></div>
     <div class="book-contact">
-      <span>Liam Jacob Kengla</span>
-      <span>@mailkengla</span>
+      <span>&copy; Liam Jacob Kengla</span>
     </div>
   </div>
 </div>
@@ -1652,8 +2103,7 @@
     </div>
     <div class="brand-gallery" id="brandGalleryCampaign4"></div>
     <div class="book-contact">
-      <span>Liam Jacob Kengla</span>
-      <span>@mailkengla</span>
+      <span>&copy; Liam Jacob Kengla</span>
     </div>
   </div>
 </div>
@@ -1794,8 +2244,10 @@
     // `offset` is the continuous, fractional position (in card-units) that's
     // currently centered — e.g. 1.5 means halfway between card 1 and 2.
     // `index` is just the nearest whole card, kept for the arrow buttons.
-    let offset = CLONE_COUNT;
-    let index = CLONE_COUNT;
+    // START_CARD: which card the carousel opens centered on (0 = first).
+    const START_CARD = 0;
+    let offset = CLONE_COUNT + START_CARD;
+    let index = CLONE_COUNT + START_CARD;
 
     // Cards are flat panels hinged around a polygon, like an unrolled
     // cylinder — not points floating on a smooth circle. Each panel rotates
@@ -2332,11 +2784,46 @@
     const coverFlipBack = document.getElementById('coverFlipBack');
     const playerHint = document.getElementById('playerHint');
     const playerHintPlaying = document.getElementById('playerHintPlaying');
+    const playerProgressFill = document.getElementById('playerProgressFill');
+    const playerPageLeft = document.getElementById('playerPageLeft');
+    const playerPageRight = document.getElementById('playerPageRight');
 
     // Only the true two-page spreads (every index except the very first
     // and very last) get the crease-shadow overlay — the half-title and
     // half-final are single pages with no gutter to show one.
     const isFullSpread = (index) => index !== 0 && index !== spreads.length - 1;
+
+    // Page numbering matches the printed folios: the half-title (index 0)
+    // is page 1, spread i is pages 2i–2i+1, and the half-final is the last
+    // page. The closed cover shows no number. Each number sits on the side
+    // of the bar its page is on in the book, so page 1 (a right-hand page)
+    // leaves the left side empty, and the last page (a left-hand page)
+    // leaves the right side empty.
+    const TOTAL_PAGES = 1 + (spreads.length - 2) * 2 + 1;
+    let shownIndex = 0;
+
+    function updateProgress() {
+      let left = '';
+      let right = '';
+      let last = 0;
+      if (coverFlipFront.classList.contains('open')) {
+        if (shownIndex === 0) {
+          last = 1;
+          right = '1';
+        } else if (shownIndex === spreads.length - 1) {
+          last = TOTAL_PAGES;
+          left = String(TOTAL_PAGES);
+          right = '';
+        } else {
+          last = 2 * shownIndex + 1;
+          left = String(2 * shownIndex);
+          right = String(last);
+        }
+      }
+      playerProgressFill.style.transform = 'scaleX(' + (last / TOTAL_PAGES) + ')';
+      playerPageLeft.textContent = left;
+      playerPageRight.textContent = right;
+    }
 
     // A page-by-page flip was too slow to load through for an 800-page
     // book, and paging through that many spreads by hand isn't realistic
@@ -2396,6 +2883,8 @@
       // above it); the half-final sits flush left (like the back cover).
       playerImg.classList.toggle('align-right', index === 0);
       playerImg.classList.toggle('align-left', index === spreads.length - 1);
+      shownIndex = index;
+      updateProgress();
     }
 
     function showFrame() {
@@ -2416,6 +2905,7 @@
       coverFlipBack.classList.remove('active');
       playerHint.classList.remove('hidden');
       playerHintPlaying.classList.remove('visible');
+      updateProgress();
     }
 
     // Choreographs the closing bookend once the slideshow has reached the
@@ -2440,6 +2930,7 @@
           setPlayerFrame(0);
           snapCover(coverFlipFront, 'open', false);
           coverFlipFront.classList.remove('settled');
+          updateProgress();
           playerHint.classList.remove('hidden');
           playerHintPlaying.classList.remove('visible');
           coverFlipBack.classList.add('fade-out');
@@ -2517,6 +3008,7 @@
       playerHint.classList.remove('hidden');
       playerHintPlaying.classList.remove('visible');
       coverFlipFront.classList.remove('open');
+      updateProgress();
       after(FLIP_MS, () => {
         frameIndex = 0;
         player.classList.remove('started');
@@ -2560,6 +3052,7 @@
       if (started || coverFlipFront.classList.contains('open')) return;
       playerHint.classList.add('hidden');
       coverFlipFront.classList.add('open');
+      updateProgress();
       after(FLIP_MS, startSlideshow);
     }
 
@@ -2611,13 +3104,25 @@
     // spreads in rows of one to three. Hand-picked (spread numbers, i.e.
     // the NNN in spread-NNN.jpg) for being genuinely photographic interior
     // spreads rather than essay/citation text pages — swap in different
-    // favorites any time by editing these lists. Page flow: description ->
-    // gallery (hero photo of the physical book, then more spreads) ->
-    // slideshow -> more gallery -> contact.
-    const GALLERY_LAYOUT_BEFORE = [2, 3, 1, 2];
-    const GALLERY_PICKS_BEFORE = [58, 74, 18, 42, 106, 306, 330, 370];
-    const GALLERY_LAYOUT_AFTER = [3, 1, 2, 3, 1];
-    const GALLERY_PICKS_AFTER = [82, 98, 138, 394, 274, 354, 162, 178, 226, 386];
+    // favorites any time by editing these lists. A string in a row is the
+    // id of a .gallery-text paragraph in the markup, moved into that row
+    // so it sits beside the spreads as part of the sequence, never as the
+    // opening row.
+    const GALLERY_SECTIONS = [
+      // Women shelling, pecan shellers waiting at the plant, and a girl at
+      // work, then Emma Tenayuca in jail (1937), the strike's "Unfair"
+      // umbrella, and her 1939 return to San Antonio. Opens on a triple,
+      // then pairs, so the start reads as deliberate.
+      { id: 'galleryRowsBefore', rows: [[35, 51, 23], ['noteIndividuals', 84], [40, 82]] },
+      // The Bracero Program chapter in order: México City and Monterrey
+      // recruitment, the processing centers, the Hidalgo, Texas border
+      // bridge, then the bus, camp, and fields in California.
+      { id: 'galleryRowsSequence', rows: [[122, 126], [133, 137, 144], ['noteSequences', 152], [156], [162, 165, 176]] },
+      // Tex-Son strikers and women picketing from the Juan de la Cruz
+      // funeral chapter, the Laredo ILGWU meeting, then Dolores Huerta's
+      // quote beside her photo.
+      { id: 'galleryRowsAfter', rows: [[195, 228, 386], ['noteActivists', 226], [262, 266]] },
+    ];
     let galleryBuilt = false;
 
     function makeGalleryWrap(src, withShadow) {
@@ -2641,33 +3146,36 @@
     }
 
     function buildGallery() {
-      function fillRows(container, layout, picks) {
-        let cursor = 0;
-        layout.forEach((count) => {
+      function fillRows(container, rows) {
+        rows.forEach((items) => {
           const row = document.createElement('div');
           row.className = 'gallery-row';
-          for (let k = 0; k < count; k++) {
-            row.appendChild(makeGalleryWrap(spreads[picks[cursor++] - 1], true));
-          }
+          items.forEach((item) => {
+            if (typeof item === 'string') {
+              row.classList.add('has-text');
+              row.appendChild(document.getElementById(item));
+            } else {
+              row.appendChild(makeGalleryWrap(spreads[item - 1], true));
+            }
+          });
           container.appendChild(row);
         });
       }
 
-      const galleryRowsBefore = document.getElementById('galleryRowsBefore');
-
       // A real photo of the physical book (front cover, spine, back
       // cover) rather than an interior spread — no crease-shadow overlay,
       // since it's a different aspect ratio and already shows a real
-      // spine of its own.
+      // spine of its own. Lives in the Bookbinding section at the bottom
+      // (the 3D mockup up top already shows the whole object), unlike the
+      // other two books, whose hero still leads their gallery.
       const heroRow = document.createElement('div');
       heroRow.className = 'gallery-row';
       const heroWrap = makeGalleryWrap(HERO_IMG_SRC, false);
       heroWrap.classList.add('hero');
       heroRow.appendChild(heroWrap);
-      galleryRowsBefore.appendChild(heroRow);
+      document.getElementById('galleryRowsBinding').appendChild(heroRow);
 
-      fillRows(galleryRowsBefore, GALLERY_LAYOUT_BEFORE, GALLERY_PICKS_BEFORE);
-      fillRows(document.getElementById('galleryRowsAfter'), GALLERY_LAYOUT_AFTER, GALLERY_PICKS_AFTER);
+      GALLERY_SECTIONS.forEach((s) => fillRows(document.getElementById(s.id), s.rows));
       galleryBuilt = true;
     }
 
@@ -2675,6 +3183,13 @@
       if (!galleryBuilt) buildGallery();
       stopSlideshow();
       resetPlayer();
+      // The 3D mockup's spin runs from page load, so by the time the modal
+      // opens it could be facing any direction. Restarting it here means
+      // it always opens on the front cover.
+      const spin = modal.querySelector('.book-3d-spin');
+      spin.style.animation = 'none';
+      void spin.offsetWidth;
+      spin.style.animation = '';
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
@@ -2708,7 +3223,7 @@
     // space), not a piece of actual content — an image, the slideshow
     // player, text — nested inside one.
     galleryScroll.addEventListener('click', (e) => {
-      const wrapper = e.target.closest('.book-description, .gallery-rows, .gallery-row, .book-embed-section, .book-contact');
+      const wrapper = e.target.closest('.book-intro, .book-description, .book-3d, .gallery-rows, .gallery-row, .book-embed-section, .book-contact');
       if (wrapper === e.target) closeBook();
     });
 
@@ -3076,7 +3591,7 @@
     closeBtn.addEventListener('click', closeBook);
 
     galleryScroll.addEventListener('click', (e) => {
-      const wrapper = e.target.closest('.book-description, .gallery-rows, .gallery-row, .book-embed-section, .book-contact');
+      const wrapper = e.target.closest('.book-intro, .book-description, .book-3d, .gallery-rows, .gallery-row, .book-embed-section, .book-contact');
       if (wrapper === e.target) closeBook();
     });
 
@@ -3409,7 +3924,7 @@
     closeBtn.addEventListener('click', closeBook);
 
     galleryScroll.addEventListener('click', (e) => {
-      const wrapper = e.target.closest('.book-description, .gallery-rows, .gallery-row, .book-embed-section, .book-contact');
+      const wrapper = e.target.closest('.book-intro, .book-description, .book-3d, .gallery-rows, .gallery-row, .book-embed-section, .book-contact');
       if (wrapper === e.target) closeBook();
     });
 
@@ -3734,8 +4249,11 @@
     const closeBtn = document.getElementById('contactClose');
     const scroll = document.getElementById('contactScroll');
     const carouselControls = document.querySelector('.controls');
+    const navToggle = document.getElementById('navToggle');
 
     function openContact() {
+      document.body.classList.add('contact-open');
+      navToggle.textContent = 'Work';
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
@@ -3745,17 +4263,23 @@
     }
 
     function closeContact() {
+      document.body.classList.remove('contact-open');
+      navToggle.textContent = 'What do you need?';
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
       if (carouselControls) carouselControls.style.visibility = '';
     }
 
-    document.querySelectorAll('[data-opens-contact]').forEach((el) => {
-      el.addEventListener('click', (e) => {
-        e.preventDefault();
+    // The header's single link: Contact on the homepage, Work while the
+    // contact page is open, each taking the other's place.
+    navToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (modal.classList.contains('open')) {
+        closeContact();
+      } else {
         openContact();
-      });
+      }
     });
 
     closeBtn.addEventListener('click', closeContact);
@@ -3768,6 +4292,26 @@
     document.addEventListener('keydown', (e) => {
       if (!modal.classList.contains('open')) return;
       if (e.key === 'Escape') closeContact();
+    });
+  })();
+
+  // Project pages: while any project modal (every .book-modal except
+  // Contact) is open, body gets .project-open, which shrinks the header to
+  // just the K. Watching the modals' classes keeps this in one place
+  // instead of in each project's open/close functions. Clicking the logo
+  // closes whatever is open through that modal's own close button, so it
+  // runs the same cleanup (slideshows, carousel resume) as the X.
+  (function () {
+    const projects = [...document.querySelectorAll('.book-modal:not(#contactModal)')];
+    const sync = () => document.body.classList.toggle(
+      'project-open', projects.some((m) => m.classList.contains('open')));
+    const observer = new MutationObserver(sync);
+    projects.forEach((m) => observer.observe(m, { attributes: true, attributeFilter: ['class'] }));
+
+    document.getElementById('homeLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      const open = document.querySelector('.book-modal.open');
+      if (open) open.querySelector('.book-close').click();
     });
   })();
 </script>
