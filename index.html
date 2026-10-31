@@ -96,16 +96,15 @@
   header::before {
     content: "";
     position: absolute;
-    inset: 0 0 -88px;
+    inset: 0 0 -108px;
     z-index: -1;
     pointer-events: none;
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
-    /* Full strength through the whole header (padding included) and 24px
-       past it, then fading out over the 64px below that so there's no
-       hard edge. */
-    mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent);
-    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent);
+    /* Full strength through the whole header (padding included) and 12px
+       past it, then a long, gradual fade over the 96px below that. */
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 96px), transparent);
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 96px), transparent);
   }
 
   header a {
@@ -192,27 +191,48 @@
     pointer-events: none;
   }
 
-  /* The project's X (.book-close: 40px box, 32px down, 40px in from the
-     right) sits under the header's blur on a project page, so the blur
-     leaves a clear circle around it. */
-  body.project-open header::before {
-    mask-image:
-      radial-gradient(circle at calc(100% - 60px) 52px, transparent 24px, #000 34px),
-      linear-gradient(to bottom, #000 calc(100% - 64px), transparent);
-    mask-composite: intersect;
-    -webkit-mask-image:
-      radial-gradient(circle at calc(100% - 60px) 52px, transparent 24px, #000 34px),
-      linear-gradient(to bottom, #000 calc(100% - 64px), transparent);
-    -webkit-mask-composite: source-in;
-  }
-
   body.project-open header .home {
     width: var(--mark);
     overflow: hidden;
     pointer-events: auto;
   }
 
-  body.project-open header .info {
+  /* On a project page the text goes but the corner marks stay, and an X
+     takes its place between them, centered on the K, 10px from the marks.
+     It's the header's own X (the project's sits under the header's blur)
+     and closes the project through the project's X, like the logo does. */
+  body.project-open header .info > :not(.corner):not(.close) {
+    visibility: hidden;
+  }
+
+  header .close {
+    display: none;
+    position: absolute;
+    top: 50%;
+    right: calc(var(--mark) / 8 + 10px);
+    transform: translateY(-50%);
+    padding: 0;
+    border: none;
+    background: none;
+    color: #1a1a1a;
+    font: inherit;
+    font-size: 32px;
+    line-height: 1;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: opacity 0.2s ease;
+  }
+
+  header .close:hover {
+    opacity: 0.6;
+  }
+
+  body.project-open header .close {
+    display: block;
+    visibility: visible;
+  }
+
+  body.project-open .book-close {
     display: none;
   }
 
@@ -1746,8 +1766,17 @@
      to just the What do you need? link pinned top-right (the contact page
      has the rest). */
   @media (max-width: 640px), (max-height: 500px) and (pointer: coarse) {
+    /* The K's size on phones, as large as the screen width allows:
+       48px side margins + lockup (5.27 x K) + 16px gap + "you need?"
+       (9 x 0.6em at the font size below = 1.485 x K) + 10px gap + corner
+       mark (K / 6) = 74px + 6.92 x K. Up to 46px on wide enough phones,
+       shrinking to fit narrower ones. */
+    :root {
+      --phone-mark: min(46px, calc((100vw - 74px) / 6.92));
+    }
+
     header {
-      --mark: 36px;
+      --mark: var(--phone-mark);
       grid-template-columns: minmax(0, 1fr) auto;
       column-gap: 16px;
       padding-top: 24px;
@@ -1759,44 +1788,38 @@
       display: none;
     }
 
-    /* "What do / you need?" on two lines spanning the K's height: the
-       first line's cap tops level with the top of "Liam Kengla", the
-       second line's baseline level with the baseline of "Graphic
-       Designer" (both match the K's top and bottom edges). Line boxes are
-       trimmed to the glyphs with negative margins so the box edges are
-       the text edges. Corner marks as on desktop, scaled down. */
+    /* "What do / you need?" on two lines, centered on the K's height
+       between the corner marks (which bracket the K's top and bottom, as
+       on desktop), 10px from them. Sized to match "Graphic Designer" in
+       the lockup: that font's x-height is 22/154 of the K, this one's is
+       0.52em, so 0.275 x K puts their lowercase at the same height. */
     header .info {
-      font-size: 12px;
-      line-height: 12px;
+      font-size: calc(var(--mark) * 0.275);
+      line-height: 1.15;
       white-space: nowrap;
-      padding-right: calc(var(--mark) * 157 / 126 + 6px);
-    }
-
-    #navToggle {
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      padding-right: calc(10px + var(--mark) / 6);
+      justify-content: center;
     }
 
     #navToggle span {
       display: block;
-      /* Measured at 12px: caps sit 1.25px below the line box top, the
-         baseline 1.5px above its bottom. */
-      margin: -0.104em 0 -0.125em;
+    }
+
+    header .close {
+      right: calc(var(--mark) / 6 + 10px);
     }
 
     header .corner {
-      width: 6px;
-      height: 6px;
+      width: calc(var(--mark) / 6);
+      height: calc(var(--mark) / 6);
     }
 
     main {
-      padding-top: 60px;
+      padding-top: calc(24px + var(--phone-mark));
     }
 
     body.carousel-vertical main {
-      padding-top: 84px;
+      padding-top: calc(48px + var(--phone-mark));
     }
 
     .controls {
@@ -1845,6 +1868,7 @@
       <a href="mailto:kenglaliam@gmail.com">kenglaliam@gmail.com</a>
       <a href="sms:5037030544">[503] 703 0544</a>
     </address>
+    <button class="close" id="headerClose" aria-label="Close">&times;</button>
     <img class="corner top" src="Liam-Kengla-Logo-Assets/detail-mark.png" alt="">
     <img class="corner bottom" src="Liam-Kengla-Logo-Assets/detail-mark.png" alt="">
   </div>
@@ -4506,11 +4530,13 @@
     const observer = new MutationObserver(sync);
     projects.forEach((m) => observer.observe(m, { attributes: true, attributeFilter: ['class'] }));
 
-    document.getElementById('homeLink').addEventListener('click', (e) => {
+    function closeOpen(e) {
       e.preventDefault();
       const open = document.querySelector('.book-modal.open');
       if (open) open.querySelector('.book-close').click();
-    });
+    }
+    document.getElementById('homeLink').addEventListener('click', closeOpen);
+    document.getElementById('headerClose').addEventListener('click', closeOpen);
   })();
 </script>
 
