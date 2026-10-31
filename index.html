@@ -96,13 +96,14 @@
   header::before {
     content: "";
     position: absolute;
-    inset: 0 0 -64px;
+    inset: 0 0 -88px;
     z-index: -1;
     pointer-events: none;
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
-    /* Full strength through the whole header (padding included), then
-       fading out over the 64px below it so there's no hard edge. */
+    /* Full strength through the whole header (padding included) and 24px
+       past it, then fading out over the 64px below that so there's no
+       hard edge. */
     mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent);
     -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent);
   }
@@ -1754,15 +1755,40 @@
       padding-right: 24px;
     }
 
-    header .info address,
-    header .corner {
+    header .info address {
       display: none;
     }
 
+    /* "What do / you need?" on two lines spanning the K's height: the
+       first line's cap tops level with the top of "Liam Kengla", the
+       second line's baseline level with the baseline of "Graphic
+       Designer" (both match the K's top and bottom edges). Line boxes are
+       trimmed to the glyphs with negative margins so the box edges are
+       the text edges. Corner marks as on desktop, scaled down. */
     header .info {
       font-size: 12px;
+      line-height: 12px;
       white-space: nowrap;
-      padding-right: 0;
+      padding-right: calc(var(--mark) * 157 / 126 + 6px);
+    }
+
+    #navToggle {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    #navToggle span {
+      display: block;
+      /* Measured at 12px: caps sit 1.25px below the line box top, the
+         baseline 1.5px above its bottom. */
+      margin: -0.104em 0 -0.125em;
+    }
+
+    header .corner {
+      width: 6px;
+      height: 6px;
     }
 
     main {
@@ -1814,7 +1840,7 @@
 <header>
   <a class="home" href="#" id="homeLink" aria-label="Home"><img class="logo" src="Liam-Kengla-Logo-Assets/full-lockup.png" alt="Liam Kengla, Graphic Designer"></a>
   <div class="info">
-    <a href="#" id="navToggle">What do you need?</a>
+    <a href="#" id="navToggle"><span>What do</span> <span>you need?</span></a>
     <address>
       <a href="mailto:kenglaliam@gmail.com">kenglaliam@gmail.com</a>
       <a href="sms:5037030544">[503] 703 0544</a>
@@ -4436,7 +4462,7 @@
 
     function closeContact() {
       document.body.classList.remove('contact-open');
-      navToggle.textContent = 'What do you need?';
+      navToggle.innerHTML = '<span>What do</span> <span>you need?</span>';
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
