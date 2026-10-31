@@ -86,8 +86,25 @@
     column-gap: 40px;
     padding: 40px 40px 24px;
     z-index: 10;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(6px);
+  }
+
+  /* Anything that scrolls or moves under the header (a project page, the
+     contact page, a carousel card) goes out of focus instead of running
+     into the logo. Clear, no white wash, and on its own layer rather than
+     the header itself so the mask that fades its bottom edge out doesn't
+     also fade the logo. */
+  header::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 -64px;
+    z-index: -1;
+    pointer-events: none;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    /* Full strength through the whole header (padding included), then
+       fading out over the 64px below it so there's no hard edge. */
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent);
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent);
   }
 
   header a {
@@ -160,11 +177,32 @@
   /* On a project page the header rides above the modal with only the K
      left; clicking it closes the project (see the home-link JS). The
      modal's own close button, Escape and backdrop click still work. */
+  /* The horizontal homepage carousel sits right under the header with
+     nothing scrolling past, so there the blur stays inside the header box
+     instead of reaching down onto the front card's top edge. */
+  body:not(.project-open):not(.contact-open):not(.carousel-vertical) header::before {
+    bottom: 0;
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
+  }
+
   body.project-open header {
     z-index: 3020;
-    background: transparent;
-    backdrop-filter: none;
     pointer-events: none;
+  }
+
+  /* The project's X (.book-close: 40px box, 32px down, 40px in from the
+     right) sits under the header's blur on a project page, so the blur
+     leaves a clear circle around it. */
+  body.project-open header::before {
+    mask-image:
+      radial-gradient(circle at calc(100% - 60px) 52px, transparent 24px, #000 34px),
+      linear-gradient(to bottom, #000 calc(100% - 64px), transparent);
+    mask-composite: intersect;
+    -webkit-mask-image:
+      radial-gradient(circle at calc(100% - 60px) 52px, transparent 24px, #000 34px),
+      linear-gradient(to bottom, #000 calc(100% - 64px), transparent);
+    -webkit-mask-composite: source-in;
   }
 
   body.project-open header .home {
@@ -182,8 +220,6 @@
      place, standing in for the modal's own close button. */
   body.contact-open header {
     z-index: 3020;
-    background: transparent;
-    backdrop-filter: none;
   }
 
   #contactClose {
@@ -257,6 +293,28 @@
     left: 50%;
     transform-style: preserve-3d;
     will-change: transform;
+  }
+
+  /* Phones and tablets held upright (see VERTICAL_QUERY in the carousel
+     JS): the same carousel turned on its side, cards stacked top to
+     bottom on a cylinder that rolls up and down. It fills all the height
+     under the header, and owns every touch on it so a vertical drag rolls
+     the cards instead of trying to scroll the page. */
+  body.carousel-vertical .carousel {
+    flex: 1;
+    height: auto;
+    touch-action: none;
+    margin-bottom: 24px;
+    /* Cards fade out over the carousel's top and bottom 40px, so they
+       never run into the header or off the bottom of the screen. */
+    mask-image: linear-gradient(to bottom, transparent, #000 40px, #000 calc(100% - 40px), transparent);
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 40px, #000 calc(100% - 40px), transparent);
+  }
+
+  /* The carousel starts where the header (and its padding) ends, not
+     just under the logo like the horizontal one. */
+  body.carousel-vertical main {
+    padding-top: 144px;
   }
 
   .thumb {
@@ -1682,9 +1740,11 @@
     opacity: 0;
   }
 
-  @media (max-width: 640px) {
-    /* Phones: smaller lockup, and the info block drops to just the
-       Contact/Work link pinned top-right (the contact page has the rest). */
+  /* Phones (and phones turned sideways, where the desktop header would
+     eat a third of the screen): smaller lockup, and the info block drops
+     to just the What do you need? link pinned top-right (the contact page
+     has the rest). */
+  @media (max-width: 640px), (max-height: 500px) and (pointer: coarse) {
     header {
       --mark: 36px;
       grid-template-columns: minmax(0, 1fr) auto;
@@ -1709,9 +1769,20 @@
       padding-top: 60px;
     }
 
+    body.carousel-vertical main {
+      padding-top: 84px;
+    }
+
     .controls {
       right: 24px;
       bottom: 24px;
+    }
+  }
+
+  /* Phones and tablets: swiping drives the carousel, so no arrows. */
+  @media (hover: none) and (pointer: coarse) {
+    .controls {
+      display: none;
     }
   }
 </style>
@@ -2212,14 +2283,50 @@
     // Explicit pixel box on every thumb rather than a CSS width/aspect-ratio
     // formula — keeps the box concrete for the hover-grow transform, and
     // gives us a real px value to derive the 3D panel geometry from.
+    // Phones/tablets only: on a short screen (a phone turned sideways)
+    // the thumb is also capped so it, with room above it and the title
+    // below it, fits in the space under the header.
+    const TOUCH_QUERY = window.matchMedia('(hover: none) and (pointer: coarse)');
+
     function sizeThumbs() {
       const wPct = window.innerWidth <= 640 ? 0.88 : 0.92;
-      const w = Math.min(window.innerWidth * wPct, window.innerHeight * 1.22) * 0.9;
+      let w = Math.min(window.innerWidth * wPct, window.innerHeight * 1.22) * 0.9;
+      if (TOUCH_QUERY.matches && !document.body.classList.contains('carousel-vertical')) {
+        const top = parseFloat(getComputedStyle(document.querySelector('main')).paddingTop);
+        const maxH = window.innerHeight - top - 2 * 76;
+        w = Math.min(w, maxH * 1.6);
+      }
       const h = w * (10 / 16);
       document.querySelectorAll('.thumb').forEach((t) => {
         t.style.width = w + 'px';
         t.style.height = h + 'px';
       });
+      return w;
+    }
+
+    // Touch devices held upright roll the carousel vertically instead
+    // (body.carousel-vertical). hover:none + pointer:coarse keeps laptops
+    // and desktops on the horizontal one whatever shape the window is.
+    // Everything else — idle drift, drag with momentum, wrapping, fade,
+    // arrows — is shared; only the axis changes.
+    const VERTICAL_QUERY = window.matchMedia('(hover: none) and (pointer: coarse) and (orientation: portrait)');
+    let vertical = false;
+
+    // In vertical mode each card is one panel of the cylinder: thumb plus
+    // the title/subtitle under it, as wide as the thumb so the text wraps
+    // under its own image. Titles wrap to different numbers of lines, so
+    // panels differ in height (see the vertical geometry below).
+    function sizeCards() {
+      vertical = VERTICAL_QUERY.matches;
+      document.body.classList.toggle('carousel-vertical', vertical);
+      const w = sizeThumbs();
+      track.querySelectorAll('.card').forEach((c) => {
+        c.style.width = vertical ? w + 'px' : '';
+      });
+      const prev = document.getElementById('prev');
+      const next = document.getElementById('next');
+      prev.innerHTML = vertical ? '&#8593;' : '&#8592;';
+      next.innerHTML = vertical ? '&#8595;' : '&#8594;';
       return w;
     }
     let thumbWidth = sizeThumbs();
@@ -2240,6 +2347,7 @@
     }
 
     const cards = Array.from(track.children);
+    thumbWidth = sizeCards();
 
     // `offset` is the continuous, fractional position (in card-units) that's
     // currently centered — e.g. 1.5 means halfway between card 1 and 2.
@@ -2286,11 +2394,39 @@
     // desktop size it was originally tuned at (~1000px thumbWidth).
     const PERSPECTIVE_RATIO = 2;
 
+    // Vertical geometry: panels of different heights on one cylinder.
+    // The apothem comes from the shortest card at the usual ANGLE_STEP;
+    // each card then takes up exactly the angle its own height (plus the
+    // gap) needs at that distance, so every edge still meets its
+    // neighbor's and a card with long text just takes a bigger slice
+    // instead of every card being padded out to the tallest one.
+    // centerAngle[i] is card i's position around the cylinder in degrees.
+    let centerAngle = [];
+
     function computeGeometry() {
       const cardGap = thumbWidth * CARD_GAP_RATIO;
-      const halfWidthWithGap = thumbWidth / 2 + cardGap / 2;
-      apothem = halfWidthWithGap / Math.tan((ANGLE_STEP * Math.PI / 180) / 2);
+      const halfTan = Math.tan((ANGLE_STEP * Math.PI / 180) / 2);
+      if (vertical) {
+        const heights = cards.map((c) => c.offsetHeight);
+        apothem = (Math.min(...heights) / 2 + cardGap / 2) / halfTan;
+        const half = heights.map((h) => Math.atan((h / 2 + cardGap / 2) / apothem) * 180 / Math.PI);
+        centerAngle = [0];
+        for (let i = 1; i < cards.length; i++) {
+          centerAngle[i] = centerAngle[i - 1] + half[i - 1] + half[i];
+        }
+      } else {
+        const halfWidthWithGap = thumbWidth / 2 + cardGap / 2;
+        apothem = halfWidthWithGap / halfTan;
+      }
       track.style.perspective = (thumbWidth * PERSPECTIVE_RATIO) + 'px';
+    }
+
+    // The cylinder angle sitting at center for a fractional offset,
+    // easing between neighboring cards' angles.
+    function angleAtOffset() {
+      const i = Math.max(0, Math.min(cards.length - 2, Math.floor(offset)));
+      const f = offset - i;
+      return centerAngle[i] + (centerAngle[i + 1] - centerAngle[i]) * f;
     }
     computeGeometry();
 
@@ -2306,22 +2442,28 @@
       // ever extends the card further down from a fixed point, never
       // moves the image.
       const thumbHeight = thumbWidth * (10 / 16);
+      const centered = vertical ? angleAtOffset() : 0;
       cards.forEach((card, i) => {
         const p = i - offset;
-        const angle = p * ANGLE_STEP;
+        const angle = vertical ? centerAngle[i] - centered : p * ANGLE_STEP;
         const rad = angle * Math.PI / 180;
         const x = Math.sin(rad) * apothem;
         const z = (Math.cos(rad) - 1) * apothem;
         const rotateY = angle;
         const dist = Math.abs(p);
+        // Vertical: the same panel math on the other axis, each card
+        // pivoting around its own center (thumb + text). rotateX is
+        // negated because CSS's y axis points down — a card below center
+        // tips its bottom edge away.
         // The no-overlap guarantee (the gap) only holds reliably out to
         // about 2 slots — past that, the panel is rotated steeply enough
         // that perspective can eat into the margin. Fully fading (and
         // disabling hover on) cards before they reach that zone means nobody
         // ever sees or grows a card back there, so it's moot in practice.
         const fade = dist <= 1.8 ? 1 : Math.max(0, 1 - (dist - 1.8) / 0.9);
-        card.style.transform =
-          `translate(-50%, ${-thumbHeight / 2}px) translateX(${x}px) translateZ(${z}px) rotateY(${rotateY}deg)`;
+        card.style.transform = vertical
+          ? `translate(-50%, -50%) translateY(${x}px) translateZ(${z}px) rotateX(${-rotateY}deg)`
+          : `translate(-50%, ${-thumbHeight / 2}px) translateX(${x}px) translateZ(${z}px) rotateY(${rotateY}deg)`;
         card.style.opacity = String(fade);
         card.style.zIndex = String(1000 - Math.round(dist * 10));
         card.style.pointerEvents = dist > 2.3 ? 'none' : '';
@@ -2461,11 +2603,17 @@
       }
     }
 
-    window.addEventListener('resize', () => {
-      thumbWidth = sizeThumbs();
+    // Also covers turning a phone or tablet sideways and back, which
+    // fires resize (and flips VERTICAL_QUERY) — sizeCards switches axis.
+    function relayout() {
+      thumbWidth = sizeCards();
       computeGeometry();
       render();
-    });
+    }
+    window.addEventListener('resize', relayout);
+    // Card heights (vertical mode) depend on the text, so measure again
+    // once the web font has replaced the fallback.
+    document.fonts.ready.then(relayout);
 
     const EDGE_ZONE = 0.16;
     const MAX_SPEED = 0.015; // card-units per frame
@@ -2654,6 +2802,10 @@
     let touchLastX = 0;
     let touchLastTime = 0;
     let touchVelocity = 0; // card-units per ms
+    // Recent [time, offset] pairs during a drag: release speed is averaged
+    // over the last ~60ms instead of read off the final, often jittery,
+    // single move — and a finger that stopped before lifting carries none.
+    let touchSamples = [];
     let touchIsHorizontal = null; // null until the first move decides it
     let momentumRaf = null;
 
@@ -2668,12 +2820,16 @@
     // per-call factor — startMomentum's own step() runs on rAF like
     // everything else here, so its real frame interval (dt) varies with
     // the display/browser instead of always being ~16.67ms.
-    const MOMENTUM_FRICTION = 0.94;
+    // Friction is gentle and the release speed is boosted, so a hard,
+    // fast flick spins the carousel around a lap or two before settling
+    // while a slow drag-and-release barely carries on.
+    const MOMENTUM_FRICTION = 0.97;
+    const FLICK_BOOST = 3;
     const MOMENTUM_MIN_VELOCITY = 0.00004;
 
     function startMomentum(initialVelocity) {
       stopMomentum();
-      let velocity = initialVelocity;
+      let velocity = initialVelocity * FLICK_BOOST;
       let lastTime = performance.now();
       function step(now) {
         const dt = now - lastTime;
@@ -2698,10 +2854,12 @@
       touchActive = true;
       touchIsHorizontal = null;
       const t = e.touches[0];
-      touchStartX = touchLastX = t.clientX;
+      touchStartX = t.clientX;
       touchStartY = t.clientY;
+      touchLastX = vertical ? t.clientY : t.clientX;
       touchLastTime = performance.now();
       touchVelocity = 0;
+      touchSamples = [[touchLastTime, offset]];
       stopMomentum();
       stopIdleDrift();
     }, { passive: true });
@@ -2717,11 +2875,14 @@
       // threshold — the browser starts its own native vertical scroll the
       // moment it sees an unopposed touchmove, and once it has, a later
       // preventDefault() can't retroactively cancel that.
+      // (Named for the horizontal carousel; in vertical mode the roles
+      // swap and "horizontal" means "along the carousel's axis".)
       if (touchIsHorizontal === null) {
-        const totalDx = t.clientX - touchStartX;
-        const totalDy = t.clientY - touchStartY;
-        if (Math.abs(totalDx) > 2 || Math.abs(totalDy) > 2) {
-          touchIsHorizontal = Math.abs(totalDx) >= Math.abs(totalDy);
+        let along = t.clientX - touchStartX;
+        let across = t.clientY - touchStartY;
+        if (vertical) [along, across] = [across, along];
+        if (Math.abs(along) > 2 || Math.abs(across) > 2) {
+          touchIsHorizontal = Math.abs(along) >= Math.abs(across);
         } else {
           return;
         }
@@ -2730,7 +2891,8 @@
       e.preventDefault();
       const now = performance.now();
       const dt = Math.max(now - touchLastTime, 1);
-      const dx = t.clientX - touchLastX;
+      const pos = vertical ? t.clientY : t.clientX;
+      const dx = pos - touchLastX;
       // Content follows the finger (drag left -> carousel advances, same
       // direction native horizontal scrolling would move) — the opposite
       // sign from the wheel handler above, which advances on a *positive*
@@ -2741,7 +2903,9 @@
       render();
       index = Math.round(offset);
       touchVelocity = delta / dt;
-      touchLastX = t.clientX;
+      touchSamples.push([now, offset]);
+      while (touchSamples.length > 2 && now - touchSamples[1][0] > 60) touchSamples.shift();
+      touchLastX = pos;
       touchLastTime = now;
     }, { passive: false });
 
@@ -2749,6 +2913,14 @@
       if (!touchActive) return;
       touchActive = false;
       if (touchIsHorizontal) {
+        const now = performance.now();
+        const [t0, o0] = touchSamples[0];
+        const [t1, o1] = touchSamples[touchSamples.length - 1];
+        // offset can jump a whole lap mid-drag (wrapOffset); undo that.
+        let moved = o1 - o0;
+        if (moved > count / 2) moved -= count;
+        if (moved < -count / 2) moved += count;
+        touchVelocity = (now - t1 > 80 || t1 === t0) ? 0 : moved / (t1 - t0);
         startMomentum(touchVelocity);
       } else {
         startIdleDrift();
