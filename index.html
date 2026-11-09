@@ -791,12 +791,12 @@
   }
 
   .book-3d-front {
-    background-image: url("portfolio projects/OurWorkIsNeverDone/cover-front-straight.webp");
+    background-image: url("portfolio projects/OurWorkIsNeverDone/cover-front-straight-1520.webp");
     transform: translateZ(calc(var(--book-d) / 2));
   }
 
   .book-3d-back {
-    background-image: url("portfolio projects/OurWorkIsNeverDone/cover-back-straight.webp");
+    background-image: url("portfolio projects/OurWorkIsNeverDone/cover-back-straight-1520.webp");
     transform: rotateY(180deg) translateZ(calc(var(--book-d) / 2));
   }
 
@@ -3265,10 +3265,10 @@
       </div>
       <div class="card">
         <div class="thumb is-photo fit-contain" data-opens-products="true" data-images='[
-          "portfolio projects/OrganicoBello/OB-hero-red_bg.jpg?v=2",
-          "portfolio projects/OrganicoBello/web/hand models/OB-penne_rigate-front-hand_model.jpg"
+          "portfolio projects/OrganicoBello/OB-hero-red_bg.webp",
+          "portfolio projects/OrganicoBello/web/hand models/OB-penne_rigate-front-hand_model.webp"
         ]'>
-          <img fetchpriority="high" src="portfolio projects/OrganicoBello/OB-hero-red_bg.jpg?v=2" alt="Organico Bello &mdash; full product lineup">
+          <img fetchpriority="high" src="portfolio projects/OrganicoBello/OB-hero-red_bg.webp" alt="Organico Bello &mdash; full product lineup">
         </div>
         <h3>Organico Bello</h3>
         <span>Food Packaging</span>
@@ -3375,11 +3375,11 @@
         <img id="spreadPlayerImg" src="" alt="Book spread" draggable="false">
         <img class="shadow" id="spreadPlayerShadow" data-src="portfolio projects/OurWorkIsNeverDone/shadow2.png" alt="" aria-hidden="true">
         <div class="cover-flip cover-flip-front" id="coverFlipFront">
-          <img data-src="portfolio projects/OurWorkIsNeverDone/cover-front-straight.webp" alt="Our Work Is Never Done &mdash; front cover" draggable="false">
+          <img data-src="portfolio projects/OurWorkIsNeverDone/cover-front-straight-1520.webp" alt="Our Work Is Never Done &mdash; front cover" draggable="false">
           <div class="cover-face-back" aria-hidden="true"></div>
         </div>
         <div class="cover-flip cover-flip-back" id="coverFlipBack">
-          <img data-src="portfolio projects/OurWorkIsNeverDone/cover-back-straight.webp" alt="Our Work Is Never Done &mdash; back cover" draggable="false">
+          <img data-src="portfolio projects/OurWorkIsNeverDone/cover-back-straight-1520.webp" alt="Our Work Is Never Done &mdash; back cover" draggable="false">
           <div class="cover-face-back" aria-hidden="true"></div>
         </div>
         <div class="player-hint" id="playerHint">Click to open</div>
@@ -3696,7 +3696,7 @@
   <button class="book-close" id="productClose" aria-label="Close">&times;</button>
   <div class="gallery-scroll" id="productScroll">
     <div class="product-hero">
-      <img data-src="portfolio projects/OrganicoBello/OB-hero-red_bg.jpg?v=2" alt="Organico Bello &mdash; full product lineup">
+      <img data-src="portfolio projects/OrganicoBello/OB-hero-red_bg.webp" alt="Organico Bello &mdash; full product lineup">
     </div>
     <div class="book-description">
       <h2>Organico Bello</h2>
@@ -3807,9 +3807,9 @@
   // are written as data-src so they don't compete with the carousel; a
   // page's images start loading when it opens (hydrate). Meanwhile, while
   // the "What do you need?" intro plays, the carousel previews load first
-  // (fetchpriority high), then the carousel's project pages in carousel
-  // order, then the Playground thumbnails. Lazy images further down a
-  // page still wait until they're scrolled near.
+  // (fetchpriority high), then the carousel's project pages one at a time
+  // in carousel order. Lazy images further down a page still wait until
+  // they're scrolled near.
   (function () {
     function hydrate(root) {
       if (!root) return;
@@ -3820,20 +3820,53 @@
     }
     window.hydrateImages = hydrate;
 
+    // Resolves once a page's eager images have arrived (lazy ones are left
+    // to scroll), or after a timeout so one slow file never stalls the rest.
+    function settled(root, ms) {
+      const imgs = [...root.querySelectorAll('img')].filter((img) => img.loading !== 'lazy' && img.getAttribute('src') && !img.complete);
+      const all = Promise.all(imgs.map((img) => new Promise((done) => {
+        img.addEventListener('load', done, { once: true });
+        img.addEventListener('error', done, { once: true });
+      })));
+      return Promise.race([all, new Promise((done) => setTimeout(done, ms))]);
+    }
+
+    // Background preloading runs one project at a time, so on a slow
+    // connection each finishes instead of all of them crawling together.
+    // When a page is opened it gets the whole connection: the queue waits
+    // until that page's images are in before preloading anything else.
+    let busy = Promise.resolve();
+    function focusOn(root) {
+      hydrate(root);
+      busy = settled(root, 8000);
+    }
     document.querySelectorAll('.book-modal').forEach((modal) => {
       new MutationObserver(() => {
-        if (modal.classList.contains('open')) hydrate(modal);
+        if (modal.classList.contains('open')) focusOn(modal);
       }).observe(modal, { attributes: true, attributeFilter: ['class'] });
     });
+
+    // The Playground isn't preloaded in the background at all; its
+    // thumbnails start as soon as the pointer heads for its link.
+    const playground = document.getElementById('playground');
+    const playgroundLink = document.getElementById('playgroundLink');
+    ['pointerenter', 'focus', 'touchstart'].forEach((ev) => playgroundLink.addEventListener(ev, () => hydrate(playground), { once: true, passive: true }));
 
     const previews = [...document.querySelectorAll('#carousel img')];
     const previewsLoaded = Promise.all(previews.map((img) => img.complete
       ? Promise.resolve()
       : new Promise((done) => { img.addEventListener('load', done, { once: true }); img.addEventListener('error', done, { once: true }); })));
     const ahead = ['wrcModal', 'bookModal', 'productModal'].map((id) => document.getElementById(id));
-    Promise.race([previewsLoaded, new Promise((done) => setTimeout(done, 2500))]).then(() => {
-      ahead.forEach((modal, i) => setTimeout(() => hydrate(modal), i * 400));
-      setTimeout(() => hydrate(document.getElementById('playground')), ahead.length * 400);
+    Promise.race([previewsLoaded, new Promise((done) => setTimeout(done, 2500))]).then(async () => {
+      for (const modal of ahead) {
+        // Wait out any page the visitor opened (it may open another
+        // meanwhile, hence the loop).
+        let current;
+        do { current = busy; await current; } while (current !== busy);
+        if (!modal.querySelector('img[data-src]')) continue;
+        hydrate(modal);
+        await settled(modal, 6000);
+      }
     });
   })();
 
@@ -6129,7 +6162,7 @@
       // Shot before the OB-<slug>-<angle> naming convention existed, so
       // its top view needs an explicit filename instead of the pattern
       // every other angle/product follows.
-      overrides: { top: 'P2Sp26_LiamKengla_OrganicoBello_25.jpg' },
+      overrides: { top: 'P2Sp26_LiamKengla_OrganicoBello_25.webp' },
     };
     const bruschettaSpread = { name: 'Bruschetta Spread', slug: 'bruschetta_spread', angles: ['front', 'right', 'back', 'left', 'top'] };
     const tomatoPaste = { name: 'Tomato Paste', slug: 'tomato_paste', angles: ['front', 'back'] };
@@ -6151,11 +6184,11 @@
     function framesFor(product) {
       return ANGLE_ORDER
         .filter((angle) => product.angles.includes(angle))
-        .map((angle) => WEB_DIR + ((product.overrides && product.overrides[angle]) || ('OB-' + product.slug + '-' + angle + '.jpg')));
+        .map((angle) => WEB_DIR + ((product.overrides && product.overrides[angle]) || ('OB-' + product.slug + '-' + angle + '.webp')));
     }
 
     function handShotFor(product) {
-      return HAND_DIR + 'OB-' + product.slug + '-front-hand_model.jpg';
+      return HAND_DIR + 'OB-' + product.slug + '-front-hand_model.webp';
     }
 
     // A product's other angles load the first time its card is hovered
