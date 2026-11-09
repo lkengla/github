@@ -1541,10 +1541,9 @@
     gap: calc(var(--size) * 0.22);
   }
 
-  /* Glyph PNGs are black; inverted to white on the black panel. */
+  /* White glyph PNGs (type/white/) on the black panel. */
   .type-line .tg {
     width: var(--size);
-    filter: invert(1);
   }
 
   /* The caret is one stroke of the typeface wide. */
@@ -6753,29 +6752,53 @@
     ];
     const TYPE_MS = 85;
     const ERASE_MS = 38;
-    const glyphFile = (c) => TYPE_DIR + (c === '&' ? 'amp' : c) + '.png';
-    'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach((c) => { new Image().src = glyphFile(c); });
+    // White copies of the glyphs (pixel-for-pixel inversions of the black
+    // ones) so the panel needs no per-glyph CSS filter.
+    const glyphFile = (c) => TYPE_DIR + 'white/' + (c === '&' ? 'amp' : c) + '.png';
+    // Every glyph is fetched and decoded once, up front; typing clones these
+    // already-decoded images, so no keystroke waits on a decode.
+    const glyphCache = {};
+    const glyphsReady = Promise.all('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((c) => {
+      const img = new Image();
+      img.className = 'tg';
+      img.alt = '';
+      img.decoding = 'sync';
+      img.src = glyphFile(c);
+      glyphCache[c] = img;
+      return img.decode().catch(() => {});
+    }));
 
+    // The line is edited one keystroke at a time (append or remove a single
+    // glyph) instead of being rebuilt, so each tick touches one element.
+    const caret = document.createElement('span');
+    caret.className = 'type-caret';
+    function newWord() {
+      const group = document.createElement('div');
+      group.className = 'type-word';
+      typeLine.appendChild(group);
+      return group;
+    }
+    function addChar(c) {
+      if (c === ' ') { newWord().appendChild(caret); return; }
+      const last = typeLine.lastElementChild || newWord();
+      last.insertBefore(glyphCache[c].cloneNode(), caret.parentNode === last ? caret : null);
+    }
+    function removeChar() {
+      const last = typeLine.lastElementChild;
+      if (!last) return;
+      const glyphs = last.querySelectorAll('.tg');
+      if (glyphs.length) { glyphs[glyphs.length - 1].remove(); return; }
+      // An empty word: the space before it is what's being erased.
+      last.remove();
+      const prev = typeLine.lastElementChild;
+      if (prev) prev.appendChild(caret);
+    }
     function renderTyped(text, withCaret) {
       typeLine.textContent = '';
-      const words = text.split(' ');
-      words.forEach((word, i) => {
-        const group = document.createElement('div');
-        group.className = 'type-word';
-        word.split('').forEach((c) => {
-          const g = document.createElement('img');
-          g.className = 'tg';
-          g.src = glyphFile(c);
-          g.alt = '';
-          group.appendChild(g);
-        });
-        if (withCaret && i === words.length - 1) {
-          const caret = document.createElement('span');
-          caret.className = 'type-caret';
-          group.appendChild(caret);
-        }
-        typeLine.appendChild(group);
-      });
+      newWord();
+      if (withCaret) typeLine.lastElementChild.appendChild(caret);
+      text.split('').forEach(addChar);
+      if (!withCaret) caret.remove();
     }
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -6791,7 +6814,7 @@
       if (step.type !== undefined) {
         if (typed.length < step.type.length) {
           typed = step.type.slice(0, typed.length + 1);
-          renderTyped(typed, true);
+          addChar(typed[typed.length - 1]);
           delay = typed.endsWith(' ') ? TYPE_MS * 2 : TYPE_MS;
         } else {
           typeStep = (typeStep + 1) % TYPE_SCRIPT.length;
@@ -6799,7 +6822,7 @@
       } else if (step.erase) {
         if (typed.length) {
           typed = typed.slice(0, -1);
-          renderTyped(typed, true);
+          removeChar();
           delay = ERASE_MS;
         } else {
           typeStep = (typeStep + 1) % TYPE_SCRIPT.length;
@@ -6814,7 +6837,8 @@
     function startTyping() {
       if (typeRunning || reduceMotion) return;
       typeRunning = true;
-      typeTick();
+      // First play waits for the glyphs to be decoded (instant after that).
+      glyphsReady.then(() => { if (typeRunning) { clearTimeout(typeTimer); typeTick(); } });
     }
 
     function stopTyping() {
