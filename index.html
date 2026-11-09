@@ -16,6 +16,7 @@
 <meta name="twitter:title" content="What do you need?">
 <meta name="twitter:description" content="Liam Jacob Kengla is a designer based in Los Angeles and Portland.">
 <meta name="twitter:image" content="https://503designs.com/portfolio%20projects/OrganicoBello/OB-hero-red_bg.jpg">
+<link rel="preload" href="fonts/BasierSquareMono-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <style>
   @font-face {
     font-family: "Basier Square Mono";
@@ -798,6 +799,11 @@
   .book-3d-back {
     background-image: url("portfolio projects/OurWorkIsNeverDone/cover-back-straight-1520.webp");
     transform: rotateY(180deg) translateZ(calc(var(--book-d) / 2));
+  }
+
+  /* The 3D book's cover scans wait with the rest of its page. */
+  #bookModal:not(.hydrated) .book-3d-face {
+    background-image: none !important;
   }
 
   .book-3d-spine,
@@ -3219,6 +3225,73 @@
     <div class="reel"></div>
   </div>
 </div>
+<script>
+  (function () {
+    const loader = document.getElementById('loader');
+    const reels = Array.from(document.querySelectorAll('.reel'));
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const targets = 'WHAT DO YOU NEED?'.split('');
+    const spinCount = 26;
+    // Staggered per-reel durations so reels settle left-to-right rather than
+    // all at once; spread across however many reels the target text needs.
+    const BASE_DURATION = 700;
+    const STAGGER = (1500 - BASE_DURATION) / (targets.length - 1);
+    const durations = targets.map((_, i) => BASE_DURATION + i * STAGGER);
+
+    document.body.style.overflow = 'hidden';
+
+    function spin() {
+    reels.forEach((reel, i) => {
+      const strip = document.createElement('div');
+      strip.className = 'reel-strip';
+      // Target first, then the spin letters below it — combined with
+      // starting the strip pulled up and animating down to rest, the reel
+      // falls top-to-bottom onto the target like a real machine, instead of
+      // climbing up to it.
+      const finalSpan = document.createElement('span');
+      finalSpan.textContent = targets[i];
+      strip.appendChild(finalSpan);
+      for (let j = 0; j < spinCount; j++) {
+        const span = document.createElement('span');
+        span.textContent = letters[Math.floor(Math.random() * letters.length)];
+        strip.appendChild(span);
+      }
+      reel.appendChild(strip);
+
+      // The reel's height is responsive (em-based), so measure it live
+      // rather than assuming a fixed px value.
+      const letterHeight = reel.getBoundingClientRect().height;
+      strip.style.transform = `translateY(-${spinCount * letterHeight}px)`;
+      // Force layout now so the browser commits this starting position
+      // before the transition below is applied — a rAF-based delay for this
+      // is timing-dependent and was the likely source of the unevenness
+      // near the end of the fall.
+      void strip.offsetHeight;
+      strip.style.transition = `transform ${durations[i]}ms cubic-bezier(0.16, 1, 0.3, 1)`;
+      strip.style.transform = 'translateY(0px)';
+    });
+
+    // Lifts once the spin has landed and the page beneath is built.
+    const landed = new Promise((done) => setTimeout(done, Math.max(...durations) + 350));
+    const built = document.readyState === 'loading'
+      ? new Promise((done) => document.addEventListener('DOMContentLoaded', done, { once: true }))
+      : Promise.resolve();
+    Promise.all([landed, built]).then(() => {
+      loader.classList.add('hide');
+      document.body.style.overflow = '';
+    });
+    }
+
+    // Runs as soon as the loader's markup arrives, not after the whole page,
+    // and waits (briefly) for the mono face so the letters don't swap fonts
+    // mid-spin. Two frames' grace lets the browser paint before it starts.
+    const fontReady = document.fonts && document.fonts.load
+      ? document.fonts.load('400 1em "Basier Square Mono"') : Promise.resolve();
+    Promise.race([fontReady, new Promise((done) => setTimeout(done, 1200))])
+      .then(() => requestAnimationFrame(() => requestAnimationFrame(spin)));
+  })();
+
+</script>
 
 <header>
   <a class="home" href="#" id="homeLink" aria-label="Home"><img class="logo" src="Liam-Kengla-Logo-Assets/full-lockup.png" alt="Liam Kengla, Graphic Designer"></a>
@@ -3239,21 +3312,21 @@
   <section class="work" id="work">
     <div class="carousel" id="carousel">
       <div class="card">
-        <div class="thumb is-photo" data-opens-wrc="true" data-images='[
+        <div class="thumb is-photo" data-opens-wrc="true" style="background: url(data:image/webp;base64,UklGRtwAAABXRUJQVlA4INAAAACwBACdASoYABAAPrVInkmnJCKhMAgA4BaJQBOmUAnANoOg4KxX1Q1hUk8rxfkwAP7mht88bs/NV3t9qc6LjMkDeelewMhDqPinF/c2lLHGgr89iYD9VDxPY+m+V5cYls3ACtXnQVbLsJJOfiBJbzfqcL+jsqVhBVI6aLDQCNKUwNZJ3OKVYuCmNgMyZu4G0vaTnrPqzgVbZSmSvSdkc2TPWW//OwKzNeZH0f092wSaELMOGL66Bn0+AYy04OjHSdA0gaj/03h9v40Cj/KWU4AA) center / cover" data-images='[
           "portfolio projects/WRC/web/wrc-acropolis.jpg",
           "portfolio projects/WRC/web/wrc-podium.jpg"
         ]'>
-          <img fetchpriority="high" src="portfolio projects/WRC/web/wrc-acropolis.jpg" alt="World Rally Championship &mdash; Acropolis Rally Greece podium">
+          <img fetchpriority="high" src="portfolio projects/carousel-first/wrc.webp" data-full="portfolio projects/WRC/web/wrc-acropolis.jpg" alt="World Rally Championship &mdash; Acropolis Rally Greece podium">
         </div>
         <h3>World Rally Championship</h3>
         <span>Logo Design, Event Branding, UI [Web], Book Design, Typeface Design</span>
       </div>
       <div class="card">
-        <div class="thumb is-photo" data-opens-book="true" data-images='[
+        <div class="thumb is-photo" data-opens-book="true" style="background: url(data:image/webp;base64,UklGRrgAAABXRUJQVlA4IKwAAABwBACdASoYAA8APrUwqVCnIiSjGADgFolsAJ0yhHABz3cBymaF4kzvyVgM8AD+OngzvvD9FhuDVEXTX1lcGr3mmtg6j2x1d8YiR/YZWVyi1N//Yg14tKi/ht6QeVg7qwgHUz8VvyPn/1aLP/S7MeqLr/ihvb7reQYSRrKuUDuKV2KwThPSdSaAR8FLeW3WZ5g5UtYUqSp4T8knraZEp4lpgLGgPsaJO37iSAAA) center / cover" data-images='[
           "portfolio projects/OurWorkIsNeverDone/cover-spine-back-thumb.webp",
           "portfolio projects/OurWorkIsNeverDone/carousel_preview/spread-162.jpg"
         ]'>
-          <img fetchpriority="high" src="portfolio projects/OurWorkIsNeverDone/cover-spine-back-thumb.webp" alt="Our Work Is Never Done &mdash; front cover, spine, and back cover">
+          <img fetchpriority="high" src="portfolio projects/carousel-first/owind.webp" data-full="portfolio projects/OurWorkIsNeverDone/cover-spine-back-thumb.webp" alt="Our Work Is Never Done &mdash; front cover, spine, and back cover">
         </div>
         <h3>Our Work Is Never Done</h3>
         <span>Book Design, Bookbinding, Curation</span>
@@ -3264,11 +3337,11 @@
         <span>UI Design, Curation</span>
       </div>
       <div class="card">
-        <div class="thumb is-photo fit-contain" data-opens-products="true" data-images='[
+        <div class="thumb is-photo fit-contain" data-opens-products="true" style="background: url(data:image/webp;base64,UklGRrIAAABXRUJQVlA4IKYAAABwBACdASoYAA8APrVInkmnJCKhMAgA4BaJbACdMoRwAc/VCBRoyKTPnOFV8AD+4uYXUEkR7YKnKqpvRHyQd34UnMeNVKJve13FusZvMmeQ+ZbkdqEfvDSlFD1zRhgoJZiZ1UpnjF/HxO2jqqOOJvdAwJJrXfqNYBYCrXhU3WXrBNRH3cj68XcwR1ANbFXJ5enbW4cJ0fM7oybTIZ+4f18V6we6QAAA) center / contain no-repeat" data-images='[
           "portfolio projects/OrganicoBello/OB-hero-red_bg.webp",
           "portfolio projects/OrganicoBello/web/hand models/OB-penne_rigate-front-hand_model.webp"
         ]'>
-          <img fetchpriority="high" src="portfolio projects/OrganicoBello/OB-hero-red_bg.webp" alt="Organico Bello &mdash; full product lineup">
+          <img fetchpriority="high" src="portfolio projects/carousel-first/ob.webp" data-full="portfolio projects/OrganicoBello/OB-hero-red_bg.webp" alt="Organico Bello &mdash; full product lineup">
         </div>
         <h3>Organico Bello</h3>
         <span>Food Packaging</span>
@@ -3753,56 +3826,6 @@
 </div>
 
 <script>
-  (function () {
-    const loader = document.getElementById('loader');
-    const reels = Array.from(document.querySelectorAll('.reel'));
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const targets = 'WHAT DO YOU NEED?'.split('');
-    const spinCount = 26;
-    // Staggered per-reel durations so reels settle left-to-right rather than
-    // all at once; spread across however many reels the target text needs.
-    const BASE_DURATION = 700;
-    const STAGGER = (1500 - BASE_DURATION) / (targets.length - 1);
-    const durations = targets.map((_, i) => BASE_DURATION + i * STAGGER);
-
-    document.body.style.overflow = 'hidden';
-
-    reels.forEach((reel, i) => {
-      const strip = document.createElement('div');
-      strip.className = 'reel-strip';
-      // Target first, then the spin letters below it — combined with
-      // starting the strip pulled up and animating down to rest, the reel
-      // falls top-to-bottom onto the target like a real machine, instead of
-      // climbing up to it.
-      const finalSpan = document.createElement('span');
-      finalSpan.textContent = targets[i];
-      strip.appendChild(finalSpan);
-      for (let j = 0; j < spinCount; j++) {
-        const span = document.createElement('span');
-        span.textContent = letters[Math.floor(Math.random() * letters.length)];
-        strip.appendChild(span);
-      }
-      reel.appendChild(strip);
-
-      // The reel's height is responsive (em-based), so measure it live
-      // rather than assuming a fixed px value.
-      const letterHeight = reel.getBoundingClientRect().height;
-      strip.style.transform = `translateY(-${spinCount * letterHeight}px)`;
-      // Force layout now so the browser commits this starting position
-      // before the transition below is applied — a rAF-based delay for this
-      // is timing-dependent and was the likely source of the unevenness
-      // near the end of the fall.
-      void strip.offsetHeight;
-      strip.style.transition = `transform ${durations[i]}ms cubic-bezier(0.16, 1, 0.3, 1)`;
-      strip.style.transform = 'translateY(0px)';
-    });
-
-    setTimeout(() => {
-      loader.classList.add('hide');
-      document.body.style.overflow = '';
-    }, Math.max(...durations) + 350);
-  })();
-
   // Loading order. Images on the project pages, About, and the Playground
   // are written as data-src so they don't compete with the carousel; a
   // page's images start loading when it opens (hydrate). Meanwhile, while
@@ -3817,8 +3840,30 @@
         img.src = img.dataset.src;
         img.removeAttribute('data-src');
       });
+      // Only when it changes: setting the class at all counts as a change
+      // to the page observers below, which would loop.
+      if (!root.classList.contains('hydrated')) root.classList.add('hydrated');
     }
     window.hydrateImages = hydrate;
+
+    // Images the page scripts build inside a project page wait, like the
+    // HTML ones, until that page opens or its turn comes to preload: an
+    // image headed for a page that hasn't been hydrated keeps its URL in
+    // data-src. Checked a beat later so an image built and then attached
+    // in the same step is judged by where it ends up.
+    function waiting(img) {
+      const page = img.closest('.book-modal, #playground');
+      return page && !page.classList.contains('hydrated');
+    }
+    window.setSrc = (img, url) => {
+      if (img.isConnected && !waiting(img)) { img.src = url; return; }
+      img.dataset.src = url;
+      queueMicrotask(() => {
+        if (img.dataset.src !== url || waiting(img)) return;
+        img.src = url;
+        img.removeAttribute('data-src');
+      });
+    };
 
     // Resolves once a page's eager images have arrived (lazy ones are left
     // to scroll), or after a timeout so one slow file never stalls the rest.
@@ -3842,7 +3887,9 @@
     }
     document.querySelectorAll('.book-modal').forEach((modal) => {
       new MutationObserver(() => {
-        if (modal.classList.contains('open')) focusOn(modal);
+        const open = modal.classList.contains('open');
+        if (open && !modal._wasOpen) focusOn(modal);
+        modal._wasOpen = open;
       }).observe(modal, { attributes: true, attributeFilter: ['class'] });
     });
 
@@ -3852,18 +3899,60 @@
     const playgroundLink = document.getElementById('playgroundLink');
     ['pointerenter', 'focus', 'touchstart'].forEach((ev) => playgroundLink.addEventListener(ev, () => hydrate(playground), { once: true, passive: true }));
 
+    // First, only the carousel: light versions of the three front images
+    // (with tiny inline blurs behind them so a card is never blank), then
+    // the full-resolution ones swapped in, and only then anything else.
     const previews = [...document.querySelectorAll('#carousel img')];
     const previewsLoaded = Promise.all(previews.map((img) => img.complete
       ? Promise.resolve()
       : new Promise((done) => { img.addEventListener('load', done, { once: true }); img.addEventListener('error', done, { once: true }); })));
+
+    let openGate;
+    const gate = new Promise((done) => { openGate = done; });
+    // Other scripts' extras (card hover images, book strips, glyphs) wait
+    // for the gate, or run at once if their page is opened first.
+    window.afterCarousel = (fn, page) => {
+      let ran = false;
+      const run = () => { if (!ran) { ran = true; fn(); } };
+      gate.then(run);
+      if (page) {
+        if (page.classList.contains('open')) run();
+        else new MutationObserver((_, obs) => {
+          if (page.classList.contains('open')) { obs.disconnect(); run(); }
+        }).observe(page, { attributes: true, attributeFilter: ['class'] });
+      }
+    };
+
+    function upgradeCarousel() {
+      const fulls = [...new Set([...document.querySelectorAll('#carousel img[data-full]')].map((img) => img.dataset.full))];
+      return Promise.all(fulls.map((url) => new Promise((done) => {
+        const hi = new Image();
+        hi.onload = () => {
+          (hi.decode ? hi.decode() : Promise.resolve()).catch(() => {}).then(() => {
+            document.querySelectorAll('#carousel img[data-full]').forEach((img) => {
+              if (img.dataset.full === url) { img.src = url; img.removeAttribute('data-full'); }
+            });
+            done();
+          });
+        };
+        hi.onerror = done;
+        hi.src = url;
+      })));
+    }
+
     const ahead = ['wrcModal', 'bookModal', 'productModal'].map((id) => document.getElementById(id));
-    Promise.race([previewsLoaded, new Promise((done) => setTimeout(done, 2500))]).then(async () => {
+    Promise.race([previewsLoaded, new Promise((done) => setTimeout(done, 30000))]).then(async () => {
+      // Placeholders off once the real images are in (they'd otherwise
+      // show in the letterbox of a contained image).
+      document.querySelectorAll('#carousel .thumb').forEach((t) => { t.style.background = ''; });
+      await Promise.race([upgradeCarousel(), new Promise((done) => setTimeout(done, 30000))]);
+      openGate();
       for (const modal of ahead) {
         // Wait out any page the visitor opened (it may open another
         // meanwhile, hence the loop).
         let current;
         do { current = busy; await current; } while (current !== busy);
-        if (!modal.querySelector('img[data-src]')) continue;
+        if (modal.classList.contains('hydrated')) continue;
         hydrate(modal);
         await settled(modal, 6000);
       }
@@ -4162,9 +4251,11 @@
 
     // Warm the cache so the first cycle on each image is instant, not a
     // network wait.
-    document.querySelectorAll('.thumb[data-images]').forEach((thumb) => {
-      JSON.parse(thumb.dataset.images).forEach((src) => {
-        new Image().src = src;
+    window.afterCarousel(() => {
+      document.querySelectorAll('.thumb[data-images]').forEach((thumb) => {
+        JSON.parse(thumb.dataset.images).forEach((src) => {
+          new Image().src = src;
+        });
       });
     });
 
@@ -4593,7 +4684,7 @@
     el.style.setProperty('--fw', frameW + 'px');
     el.style.setProperty('--fh', frameH + 'px');
     el.style.height = frameH + 'px';
-    el.style.setProperty('--strip-sprite', "url('" + sprite + "')");
+    window.afterCarousel(() => el.style.setProperty('--strip-sprite', "url('" + sprite + "')"), el.closest('.book-modal'));
     el.style.setProperty('--strip-size', (cols * frameW) + 'px ' + (Math.ceil(count / cols) * frameH) + 'px');
     const track = document.createElement('div');
     track.className = 'strip-track';
@@ -4862,7 +4953,7 @@
     }
 
     function setPlayerFrame(index) {
-      playerImg.src = spreads[index];
+      window.setSrc(playerImg, spreads[index]);
       playerShadow.style.display = isFullSpread(index) ? '' : 'none';
       // The half-title sits flush right of the spine (like the front cover
       // above it); the half-final sits flush left (like the back cover).
@@ -5168,14 +5259,14 @@
       const wrap = document.createElement('div');
       wrap.className = 'gallery-img-wrap';
       const img = document.createElement('img');
-      img.src = src;
+      window.setSrc(img, src);
       img.alt = 'Our Work Is Never Done — interior spread';
       img.loading = 'lazy';
       wrap.appendChild(img);
       if (withShadow) {
         const shadow = document.createElement('img');
         shadow.className = 'shadow';
-        shadow.src = SHADOW_SRC;
+        window.setSrc(shadow, SHADOW_SRC);
         shadow.alt = '';
         shadow.setAttribute('aria-hidden', 'true');
         shadow.loading = 'lazy';
@@ -5369,7 +5460,7 @@
     }
 
     function setPlayerFrame(index) {
-      playerImg.src = spreads[index];
+      window.setSrc(playerImg, spreads[index]);
       playerShadow.style.display = isFullSpread(index) ? '' : 'none';
       playerImg.classList.toggle('align-right', index === 0);
       playerImg.classList.toggle('align-left', index === spreads.length - 1);
@@ -5564,14 +5655,14 @@
       const wrap = document.createElement('div');
       wrap.className = 'gallery-img-wrap';
       const img = document.createElement('img');
-      img.src = src;
+      window.setSrc(img, src);
       img.alt = 'Old New Mens Club — interior spread';
       img.loading = 'lazy';
       wrap.appendChild(img);
       if (withShadow) {
         const shadow = document.createElement('img');
         shadow.className = 'shadow';
-        shadow.src = SHADOW_SRC;
+        window.setSrc(shadow, SHADOW_SRC);
         shadow.alt = '';
         shadow.setAttribute('aria-hidden', 'true');
         shadow.loading = 'lazy';
@@ -5736,7 +5827,7 @@
     }
 
     function setPlayerFrame(index) {
-      playerImg.src = spreads[index];
+      window.setSrc(playerImg, spreads[index]);
       playerShadow.style.display = isFullSpread(index) ? '' : 'none';
       playerImg.classList.toggle('align-right', index === 0);
       playerImg.classList.toggle('align-left', index === spreads.length - 1);
@@ -5912,14 +6003,14 @@
       const wrap = document.createElement('div');
       wrap.className = 'gallery-img-wrap';
       const img = document.createElement('img');
-      img.src = src;
+      window.setSrc(img, src);
       img.alt = 'Styles Make Fights — interior spread';
       img.loading = 'lazy';
       wrap.appendChild(img);
       if (withShadow) {
         const shadow = document.createElement('img');
         shadow.className = 'shadow';
-        shadow.src = SHADOW_SRC;
+        window.setSrc(shadow, SHADOW_SRC);
         shadow.alt = '';
         shadow.setAttribute('aria-hidden', 'true');
         shadow.loading = 'lazy';
@@ -6055,7 +6146,7 @@
       const img = document.createElement('img');
       img.loading = 'lazy';
       img.alt = 'San Diego Football Club — ' + filename.replace(/^.*\//, '').replace(/\.[a-z]+$/, '').replace(/[-_]/g, ' ');
-      img.src = PROJECT_DIR + filename;
+      window.setSrc(img, PROJECT_DIR + filename);
       wrap.appendChild(img);
       return wrap;
     }
@@ -6207,7 +6298,7 @@
           const leadInWrap = document.createElement('div');
           leadInWrap.className = 'product-lead-in';
           const leadInImg = document.createElement('img');
-          leadInImg.src = handShotFor(group.leadInProduct);
+          window.setSrc(leadInImg, handShotFor(group.leadInProduct));
           leadInImg.alt = group.leadInProduct.name + ' — hand model shot';
           leadInImg.loading = 'lazy';
           leadInWrap.appendChild(leadInImg);
@@ -6226,7 +6317,7 @@
           const photo = document.createElement('div');
           photo.className = 'product-photo';
           const img = document.createElement('img');
-          img.src = frames[0];
+          window.setSrc(img, frames[0]);
           img.alt = product.name;
           photo.appendChild(img);
           card.appendChild(photo);
@@ -6562,7 +6653,7 @@
     }
 
     function setPlayerFrame(index) {
-      playerImg.src = spreads[index];
+      window.setSrc(playerImg, spreads[index]);
       playerShadow.style.display = isFullSpread(index) ? '' : 'none';
       playerImg.classList.toggle('align-right', index === 0);
       playerImg.classList.toggle('align-left', index === spreads.length - 1);
@@ -6733,12 +6824,12 @@
           const wrap = document.createElement('div');
           wrap.className = 'wrc-spread';
           const img = document.createElement('img');
-          img.src = 'portfolio projects/WRC/book-1400/spread-' + String(n).padStart(3, '0') + '.jpg';
+          window.setSrc(img, 'portfolio projects/WRC/book-1400/spread-' + String(n).padStart(3, '0') + '.jpg');
           img.alt = 'WRC 2026 Mid-Season, ' + label.toLowerCase() + ' spread';
           img.loading = 'lazy';
           const shadow = document.createElement('img');
           shadow.className = 'shadow';
-          shadow.src = SHADOW_SRC;
+          window.setSrc(shadow, SHADOW_SRC);
           shadow.alt = '';
           shadow.setAttribute('aria-hidden', 'true');
           shadow.loading = 'lazy';
@@ -6791,15 +6882,19 @@
     // Every glyph is fetched and decoded once, up front; typing clones these
     // already-decoded images, so no keystroke waits on a decode.
     const glyphCache = {};
-    const glyphsReady = Promise.all('ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map((c) => {
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach((c) => {
       const img = new Image();
       img.className = 'tg';
       img.alt = '';
       img.decoding = 'sync';
-      img.src = glyphFile(c);
       glyphCache[c] = img;
-      return img.decode().catch(() => {});
-    }));
+    });
+    const glyphsReady = new Promise((ready) => window.afterCarousel(() => {
+      Promise.all(Object.keys(glyphCache).map((c) => {
+        glyphCache[c].src = glyphFile(c);
+        return glyphCache[c].decode().catch(() => {});
+      })).then(ready);
+    }, modal));
 
     // The line is edited one keystroke at a time (append or remove a single
     // glyph) instead of being rebuilt, so each tick touches one element.
@@ -6880,7 +6975,7 @@
     }
 
     if (reduceMotion) {
-      renderTyped('WORLD RALLY CHAMPIONSHIP', false);
+      glyphsReady.then(() => renderTyped('WORLD RALLY CHAMPIONSHIP', false));
     } else {
       renderTyped('', true);
       new IntersectionObserver((entries) => {
