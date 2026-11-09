@@ -7,3 +7,35 @@ portfolio projects/WRC/*copy.png
 
 # Reference screenshots for the redesign, not part of the site
 inspo/
+
+# Raw screen recordings (the site uses the compressed copy in WRC/web/).
+portfolio projects/WRC/*copy.mov
+
+# Source material and reference screenshots that stay on this computer.
+# The site only uses the web-sized copies (WRC/web, WRC/book-web, WRC/cover,
+# about/portrait.jpg, the book strips).
+About me /
+Logo-clearspace.png
+Screenshot *.png
+binding/
+examples of the header/
+female/
+*.png.png
+center teh book*.png
+dont like.png
+ew.png
+images larger*.png
+side be side.png
+spine is off*.png
+this.png
+title.png
+portfolio projects/SanDiego-Football-Club/recreate this*.png
+portfolio projects/WRC/best quality spreads yet/
+portfolio projects/WRC/new spreads/
+portfolio projects/WRC/spreads/
+portfolio projects/WRC/book sleeve opening/
+portfolio projects/WRC/custom typeface/
+portfolio projects/WRC/envelopes/
+portfolio projects/WRC/rally.tv posters/
+portfolio projects/WRC/wrc posters/
+portfolio projects/WRC/example layout*.pdf

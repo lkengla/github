@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>What do you need?</title>
+<title>Liam Kengla &mdash; Graphic Designer</title>
+<link rel="icon" type="image/png" href="Liam-Kengla-Logo-Assets/favicon.png">
+<link rel="apple-touch-icon" href="Liam-Kengla-Logo-Assets/apple-touch-icon.png">
 <meta name="description" content="Liam Jacob Kengla is a designer based in Los Angeles and Portland.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="What do you need?">
@@ -58,6 +60,33 @@
     box-sizing: border-box;
   }
 
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* Keyboard focus: one hairline in the ink color, held off the element. */
+  :focus-visible {
+    outline: 1px solid var(--ink);
+    outline-offset: 4px;
+  }
+
+  .gallery-scroll:focus-visible {
+    outline: none;
+  }
+
+  ::selection {
+    background: var(--ink);
+    color: var(--bg);
+  }
+
   html, body {
     margin: 0;
     padding: 0;
@@ -88,23 +117,30 @@
     z-index: 10;
   }
 
-  /* Anything that scrolls or moves under the header (a project page, the
-     contact page, a carousel card) goes out of focus instead of running
-     into the logo. Clear, no white wash, and on its own layer rather than
-     the header itself so the mask that fades its bottom edge out doesn't
-     also fade the logo. */
-  header::before {
-    content: "";
-    position: absolute;
-    inset: 0 0 -108px;
-    z-index: -1;
-    pointer-events: none;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    /* Full strength through the whole header (padding included) and 12px
-       past it, then a long, gradual fade over the 96px below that. */
-    mask-image: linear-gradient(to bottom, #000 calc(100% - 96px), transparent);
-    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 96px), transparent);
+  /* Nothing is drawn behind the header. Instead, every page that scrolls
+     under it (the project pages, About, Contact, the Playground) fades its
+     own content out at the top: fully gone behind the logo, dissolving
+     over the empty band just under the K, solid below. What shows through
+     is that page's own background, so there's no box, tint or blur to
+     notice. --fade-top: where content is fully gone (bottom of the K).
+     --fade-bottom: where it's fully visible (bottom of the header). */
+  /* A clean edge instead of a fade: content stops 16px under the K (K is
+     40-120px), the same as the gutter between project photos. */
+  :root {
+    --fade-top: 136px;
+    --fade-bottom: 136px;
+    /* The page margin every page hangs from: the K's left edge. */
+    --margin: 40px;
+    /* Larger text moments: titles and interjections. Neue Haas Grotesk
+       Display comes from Adobe Fonts (see the Typekit link in <head>);
+       Helvetica Neue stands in until that kit is connected. */
+    --display: "neue-haas-grotesk-display", "Neue Haas Grotesk Display Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  }
+
+  .gallery-scroll,
+  .playground {
+    mask-image: linear-gradient(to bottom, transparent var(--fade-top), #000 var(--fade-bottom));
+    -webkit-mask-image: linear-gradient(to bottom, transparent var(--fade-top), #000 var(--fade-bottom));
   }
 
   header a {
@@ -147,7 +183,7 @@
     line-height: 17px;
   }
 
-  header .info address {
+  header .info .pages {
     font-style: normal;
     display: flex;
     flex-direction: column;
@@ -177,20 +213,14 @@
   /* On a project page the header rides above the modal with only the K
      left; clicking it closes the project (see the home-link JS). The
      modal's own close button, Escape and backdrop click still work. */
-  /* The horizontal homepage carousel sits right under the header with
-     nothing scrolling past, so there the blur stays inside the header box
-     instead of reaching down onto the front card's top edge. */
-  body:not(.project-open):not(.contact-open):not(.carousel-vertical) header::before {
-    bottom: 0;
-    mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
-    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
-  }
-
   body.project-open header {
     z-index: 3020;
   }
 
-  body.project-open header .home {
+  /* The name hides (only the K stays) on project pages and the
+     Playground; the homepage and About keep the full lockup. */
+  body.project-open:not(.about-open) header .home,
+  body.playground-open header .home {
     width: var(--mark);
     overflow: hidden;
     pointer-events: auto;
@@ -200,20 +230,26 @@
      takes its place between them, centered on the K, 10px from the marks.
      It's the header's own X (the project's sits under the header's blur)
      and closes the project through the project's X, like the logo does. */
-  body.project-open header .info > :not(.corner):not(.close) {
-    visibility: hidden;
+  /* "What do you need?" is a statement, not a link. */
+  header .nav-ask {
+    cursor: default;
   }
 
+  /* On a project page the text stays and an X appears, centered (both
+     ways) in the empty band between the text's right edge and the corner
+     marks: that band runs from the marks' left edge (10px in) to the
+     padding edge (--mark * 157/126 + 10px in), so its middle is half
+     their sum from the right. */
   header .close {
     display: none;
     position: absolute;
     top: 50%;
-    right: calc(var(--mark) / 8 + 10px);
-    transform: translateY(-50%);
+    right: calc((var(--mark) * 157 / 126 + 20px) / 2);
+    transform: translate(50%, -50%);
     padding: 0;
     border: none;
     background: none;
-    color: #1a1a1a;
+    color: var(--ink);
     font: inherit;
     font-size: 32px;
     line-height: 1;
@@ -231,10 +267,6 @@
     visibility: visible;
   }
 
-  body.project-open .book-close {
-    display: none;
-  }
-
   /* While Contact is open the header rides above its modal, so the one
      nav link (Contact <-> Work, see #navToggle) stays put and swaps in
      place, standing in for the modal's own close button. */
@@ -248,7 +280,7 @@
     justify-content: center;
   }
 
-  body.contact-open header .info address {
+  body.contact-open header .info .pages {
     display: none;
   }
 
@@ -393,7 +425,7 @@
   }
 
   .card h3 {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 500;
     line-height: 1.2;
     margin: 18px 0 0;
@@ -401,9 +433,84 @@
 
   .card span {
     display: block;
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 400;
     color: var(--muted);
+  }
+
+
+  /* Kodak has no images yet: a flat grey stand-in. */
+  .thumb.placeholder {
+    background: #d9d8d4;
+  }
+
+  /* Playground: a full page of its own over the homepage (the carousel
+     keeps idling underneath, hidden), two projects across split down the
+     middle on the header's 40px margins. Still images only. It sits
+     under the header and under the project pages, which open on top of
+     it and close back to it. */
+  .playground {
+    position: fixed;
+    inset: 0;
+    z-index: 5;
+    overflow-y: auto;
+    background: var(--bg);
+    visibility: hidden;
+  }
+
+  body.playground-open .playground {
+    visibility: visible;
+  }
+
+  body.playground-open main,
+  body.playground-open .controls {
+    visibility: hidden;
+  }
+
+  .pg-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 40px;
+    row-gap: 64px;
+    padding: 160px 40px 80px;
+  }
+
+  .pg-thumb {
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: #d9d8d4;
+  }
+
+  .pg-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+  }
+
+  .pg-thumb[data-opens-book-2]:hover img,
+  .pg-thumb[data-opens-book-3]:hover img,
+  .pg-thumb[data-opens-book-4]:hover img {
+    transform: scale(1.02);
+  }
+
+  .pg-card h3 {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.2;
+    margin: 18px 0 0;
+  }
+
+  .pg-card span {
+    display: block;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+
+  #aboutClose {
+    display: none;
   }
 
   #loader {
@@ -467,9 +574,9 @@
     visibility: hidden;
     /* Mostly opaque with a heavy blur, so the homepage behind reads as a
        faint wash of color and the project page in front stays legible. */
-    background: rgba(246, 245, 241, 0.88);
-    backdrop-filter: blur(48px);
-    -webkit-backdrop-filter: blur(48px);
+    /* Flat light grey page color (no blurred homepage showing through),
+       so white edges like the WRC posters' borders still read. */
+    background: #f6f5f1;
     transition: opacity 0.35s ease, visibility 0.35s ease;
   }
 
@@ -491,7 +598,7 @@
   }
 
   .gallery-rows {
-    padding: 0 5% 32px;
+    padding: 0 var(--margin) 32px;
   }
 
   .gallery-row {
@@ -581,23 +688,39 @@
   }
 
   .book-description {
-    max-width: 680px;
-    margin: 0 auto;
-    padding: 14vh 24px 16px;
+    margin: 0;
+    padding: max(14vh, calc(var(--fade-bottom) + 16px)) var(--margin) 16px;
     color: #1a1a1a;
   }
 
+  /* Every project description hangs from the page margin (the K's left
+     edge) and keeps a readable measure. Contact and About lay out their
+     own blocks, so they're left out. */
+  .book-modal:not(#aboutModal):not(#contactModal) .book-description > * {
+    max-width: 680px;
+  }
+
+  /* Paragraphs stop at ~55 characters: a monospace line reads long, so
+     the measure sits at the short end of the usual 45-75. */
+  .book-modal:not(#aboutModal):not(#contactModal) .book-description > p {
+    max-width: 34em;
+  }
+
+  /* Project titles are a larger text moment: display face, sentence case. */
   .book-description h2 {
-    font-size: 28px;
-    font-weight: 700;
-    margin: 0 0 20px;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
+    font-family: var(--display);
+    font-size: clamp(28px, 2.6vw, 40px);
+    font-weight: 500;
+    line-height: 1.08;
+    margin: 0 0 24px;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
   }
 
   .book-description p {
     font-size: 15px;
-    line-height: 1.6;
+    line-height: 1.45;
+    text-wrap: pretty;
     margin: 0 0 32px;
   }
 
@@ -618,13 +741,14 @@
   .book-description dt {
     font-size: 13px;
     font-weight: 700;
+    line-height: 1.5;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
     white-space: nowrap;
   }
 
   .book-description dd {
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1.5;
     margin: 0;
     opacity: 0.85;
@@ -726,14 +850,16 @@
        the book's turning footprint plus 5vw clear on each side; the text
        column gives way first on narrower screens. */
     .book-intro {
-      --book-h: min(76vh, 760px, 56vw);
+      --book-h: min(calc(86vh - var(--fade-bottom)), 760px, 56vw);
       display: grid;
       grid-template-columns: minmax(0, 620px) minmax(calc(var(--book-h) * 0.75 + 10vw), 1fr);
       align-items: center;
       gap: 0;
       min-height: 100vh;
       box-sizing: border-box;
-      padding: 8vh var(--inset);
+      /* Starts where the header fade ends, so the turning book is never
+         dissolved; --book-h above is sized to the space that leaves. */
+      padding: var(--fade-bottom) var(--inset) 8vh;
     }
 
     #bookModal .book-intro .book-description {
@@ -747,8 +873,47 @@
        because .book-3d sets its own default. 56vw caps it on
        wide-but-short windows. */
     .book-intro .book-3d {
-      --book-h: min(76vh, 760px, 56vw);
+      --book-h: min(calc(86vh - var(--fade-bottom)), 760px, 56vw);
       padding: 0;
+    }
+  }
+
+  /* Our Work Is Never Done opening: the turning book fills the first
+     screen below the header, then the WRC-style headline block. */
+  .ow-intro {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .ow-book {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+    padding: var(--fade-bottom) var(--margin) 0;
+  }
+
+  .ow-book .book-3d {
+    --book-h: min(calc(82vh - var(--fade-bottom)), 700px);
+    padding: 0;
+  }
+
+  .ow-head .project-texts {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .ow-head .project-texts p + p {
+    margin-top: 1em;
+  }
+
+  .ow-head .project-texts h3:not(:first-child) {
+    margin-top: 16px;
+  }
+
+  @media (max-width: 900px) {
+    .ow-head .project-texts {
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 
@@ -758,7 +923,7 @@
      images and the player stay capped at 64vh (vs. the other books'
      78vh) so they don't overwhelm the page. */
   #bookModal {
-    --inset: 8%;
+    --inset: var(--margin);
   }
 
   #bookModal .book-description {
@@ -785,6 +950,11 @@
     max-height: 64vh;
   }
 
+  /* The occasional full-page spread: full margin width, no height cap. */
+  #bookModal .gallery-row.is-full .gallery-img-wrap:only-child {
+    max-height: none;
+  }
+
   #bookModal .book-embed-section {
     padding: 48px var(--inset) 80px;
   }
@@ -803,6 +973,81 @@
     margin-top: 24px;
   }
 
+  /* Bookbinding and San Diego Seahorses: the section's heading and text
+     sit beside its photos, vertically centered, never opening the section.
+     Same heading style as the project titles. */
+  .binding-rows {
+    margin-top: 0;
+  }
+
+  .section-text {
+    align-self: center;
+    min-width: 0;
+    color: #1a1a1a;
+  }
+
+  .section-text h2 {
+    font-family: var(--display);
+    font-size: clamp(28px, 2.6vw, 40px);
+    font-weight: 500;
+    line-height: 1.08;
+    margin: 0 0 24px;
+    letter-spacing: -0.015em;
+  }
+
+  .section-text p {
+    font-size: 15px;
+    line-height: 1.45;
+    margin: 0;
+    text-wrap: pretty;
+  }
+
+  /* Same flex as a portrait photo (no padding), so row two adds up
+     exactly like row one and every photo keeps the same height. */
+  .binding-row .section-text {
+    flex: 2.25 1 0;
+  }
+
+  /* San Diego Seahorses: photos first, then the text in the last cell.
+     Equal columns, so every photo is the same width. */
+  .split-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: center;
+    gap: 32px;
+    padding: 200px var(--margin) 0;
+  }
+
+  .split-grid img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .split-grid .section-text {
+    max-width: 26em;
+    padding-left: 32px;
+  }
+
+  @media (max-width: 640px) {
+    .binding-row.has-text {
+      flex-wrap: wrap;
+    }
+
+    .binding-row.has-text .section-text {
+      flex: 1 1 100%;
+    }
+
+    .split-grid {
+      grid-template-columns: 1fr;
+      padding-top: 120px;
+    }
+
+    .split-grid .section-text {
+      padding-left: 0;
+    }
+  }
+
   .binding-row img {
     display: block;
     min-width: 0;
@@ -819,9 +1064,922 @@
     aspect-ratio: 3 / 4;
   }
 
+  /* Project template (World Rally Championship first): a display-face
+     headline with the services and credits in columns to its right, the
+     work at full margin width, then the intro beside the brief. Centered
+     interjections in the display face introduce each part, with generous
+     space around them. Mono stays the reading face. 12-column grid on the
+     page margin (the K's left edge). */
+  .project-head {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 16px;
+    padding: 96px var(--margin) 0;
+    color: var(--ink);
+  }
+
+  /* One long headline in a single weight, then a hairline and the
+     credits in a row underneath. */
+  .project-title {
+    grid-column: 1 / -1;
+    margin: 0;
+    font-family: var(--display);
+    font-size: clamp(30px, 3.6vw, 60px);
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+  }
+
+  .project-meta {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 16px;
+    margin: 72px 0 0;
+    padding-top: 16px;
+    border-top: 1px solid var(--ink);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .project-meta dt,
+  .project-brief h3 {
+    margin: 0 0 4px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .project-meta dd {
+    margin: 0;
+  }
+
+  /* Description, challenge, and solution: three columns under the
+     credits. */
+  /* Everything about the project in one group under a hairline:
+     description, challenge, solution, then services and credits. */
+  .project-texts {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 16px;
+    margin-top: 72px;
+    padding-top: 16px;
+    border-top: 1px solid var(--ink);
+  }
+
+  .project-texts h3:not(:first-child) {
+    margin-top: 16px;
+  }
+
+  /* The description runs long, so it takes two of the four columns. */
+  .project-texts .pt-description {
+    grid-column: span 2;
+    max-width: 36em;
+  }
+
+  .project-texts > div {
+    max-width: 30em;
+    padding-right: 32px;
+  }
+
+  .project-texts h3 {
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .project-texts p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.45;
+    text-wrap: pretty;
+  }
+
+  .project-texts p + p {
+    margin-top: 1em;
+  }
+
+  @media (max-width: 900px) {
+    .project-texts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: 40px;
+    }
+
+    .project-title br {
+      display: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .project-texts {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .project-texts .pt-description {
+      grid-column: auto;
+    }
+  }
+
+  /* Challenge and solution in a text column beside an image, top-aligned. */
+  .project-brief-row {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 16px;
+    align-items: start;
+  }
+
+  .project-brief {
+    grid-column: 1 / span 4;
+    max-width: 30em;
+    padding-right: 16px;
+  }
+
+  .project-brief-row img {
+    grid-column: 5 / -1;
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .project-brief h3:not(:first-child) {
+    margin-top: 32px;
+  }
+
+  .project-brief p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.45;
+    text-wrap: pretty;
+  }
+
+  /* Sits closer to what follows (the laptop recording already has its
+     own empty space above the laptop). */
+  .interjection.is-tight {
+    padding-bottom: 32px;
+  }
+
+  /* Small mono credits tucked under a statement (e.g. the bookbinding:
+     printing and binding), before the photos it introduces. */
+  .interjection.has-credits {
+    padding-bottom: 24px;
+  }
+
+  .interjection-credits {
+    margin: 0 0 96px;
+    padding: 0 var(--margin);
+    font-size: 13px;
+    line-height: 1.45;
+    text-align: center;
+    color: var(--ink);
+  }
+
+  .interjection-credits span:not(.sep) {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-right: 0.5em;
+  }
+
+  .interjection-credits .sep {
+    display: inline-block;
+    width: 2.5em;
+  }
+
+  /* One line on desktop; wraps only where the screen is too narrow. */
+  .interjection {
+    max-width: none;
+    margin: 0 auto;
+    padding: 200px var(--margin) 96px;
+    font-family: var(--display);
+    font-size: clamp(26px, 2.6vw, 40px);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-align: center;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+
+  @media (min-width: 901px) {
+    .interjection {
+      white-space: nowrap;
+    }
+
+    .interjection.is-long {
+      white-space: normal;
+      max-width: 26em;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .project-title,
+    .project-brief,
+    .project-brief-row img {
+      grid-column: 1 / -1;
+    }
+
+    .project-meta {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: 24px;
+    }
+
+    .project-brief {
+      margin-bottom: 48px;
+    }
+  }
+
+  /* End of every project page: previous on the left, next on the right
+     with one preview image, in the order of the carousel (or of the
+     Playground, for Playground projects). */
+  .project-nav {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 32px;
+    margin: 200px var(--margin) 0;
+    padding-top: 24px;
+    border-top: 1px solid var(--ink);
+    color: var(--ink);
+  }
+
+  .project-nav a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .pn-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .pn-title {
+    display: block;
+    margin-top: 12px;
+    font-family: var(--display);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.08;
+  }
+
+  .project-nav + .book-contact {
+    margin-top: 96px;
+  }
+
+  .project-nav:last-child {
+    margin-bottom: 120px;
+  }
+
+  .pn-prev {
+    grid-column: 1 / span 4;
+    align-self: start;
+  }
+
+  .pn-prev .pn-title {
+    font-size: 22px;
+  }
+
+  .pn-next {
+    grid-column: 7 / span 6;
+  }
+
+  .pn-next .pn-title {
+    font-size: clamp(28px, 2.6vw, 40px);
+  }
+
+  .pn-next img {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: 24px;
+    transition: opacity 0.2s ease;
+  }
+
+  .project-nav a:hover .pn-title,
+  .project-nav a:hover img {
+    opacity: 0.6;
+  }
+
+  @media (max-width: 640px) {
+    .pn-prev,
+    .pn-next {
+      grid-column: 1 / -1;
+    }
+
+    .pn-next {
+      margin-top: 48px;
+    }
+  }
+
+  /* World Rally Championship. Nothing is cropped except the Estonia boom,
+     a deliberate zoom. 32px between things that belong together. */
+  /* Tight gutters, big work. */
+  #wrcModal {
+    --wrc-gap: 16px;
+  }
+
+  #wrcModal .wrc-section {
+    padding: 0 var(--margin);
+  }
+
+  #wrcModal .wrc-section img {
+    display: block;
+    min-width: 0;
+  }
+
+  /* Each image grows by its own aspect ratio (--ar): same height, full
+     frames, together exactly the margin width. */
+  #wrcModal .wrc-pair {
+    display: flex;
+    gap: var(--wrc-gap);
+  }
+
+  #wrcModal .wrc-pair img {
+    flex: var(--ar) 1 0;
+    width: 100%;
+    height: auto;
+  }
+
+  #wrcModal .wrc-hero {
+    padding-top: var(--fade-bottom);
+  }
+
+  #wrcModal .wrc-hero img {
+    width: 100%;
+    height: auto;
+  }
+
+  /* Stationery: WRC on the left, Rally.TV on the right; in each column
+     the envelope front over its back, then the business card front over
+     its back. */
+  #wrcModal .wrc-stationery {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--wrc-gap);
+  }
+
+  #wrcModal .st-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--wrc-gap);
+  }
+
+  #wrcModal .st-col img {
+    width: 100%;
+    height: auto;
+  }
+
+  /* Placeholders until the business card renders are in. 3.5 x 2 in. */
+  #wrcModal .card-placeholder {
+    width: 60%;
+    align-self: center;
+    aspect-ratio: 3.5 / 2;
+    background: #dcd9d2;
+  }
+
+  #wrcModal .st-col img + .card-placeholder {
+    margin-top: 64px;
+  }
+
+  /* Rally.TV interface videos: one wide, two below. 16:9 placeholders. */
+  #wrcModal .wrc-videos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--wrc-gap);
+  }
+
+  /* Screen recordings of the site are 3324x2122; placeholders match. */
+  #wrcModal .video-placeholder {
+    aspect-ratio: 3324 / 2122;
+    background: #dcd9d2;
+  }
+
+  /* The laptop never moves in the recording, so a page-colored cutout
+     (primary-scenario-cover.png, cut from its frames) sits on top and
+     covers the black studio background. A plain image rather than a CSS
+     mask, so it also works when the file is opened straight from disk.
+     Sized so the whole laptop fits below the header. */
+  #wrcModal .wrc-video-wrap {
+    position: relative;
+    justify-self: center;
+    width: min(100%, calc((100vh - var(--fade-bottom) - var(--margin)) * 3324 / 2122));
+    aspect-ratio: 3324 / 2122;
+  }
+
+  #wrcModal .wrc-video,
+  #wrcModal .wrc-video-cover {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  #wrcModal .wrc-video {
+    background: #f6f5f1;
+    object-fit: fill;
+  }
+
+  /* Overhangs the video by 2px so no edge pixel of the recording peeks
+     out from under it when both are scaled. */
+  #wrcModal .wrc-video-cover {
+    inset: -2px;
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    pointer-events: none;
+  }
+
+  #wrcModal .is-wide {
+    grid-column: 1 / -1;
+  }
+
+  @media (max-width: 640px) {
+    #wrcModal .wrc-stationery,
+    #wrcModal .wrc-videos {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* The custom typeface. Glyphs are black PNGs on transparency (inverted
+     to white on the black panel). Every glyph sits in the same square
+     box (the face is monospaced), so spacing is a fixed tracking. */
+  .tg {
+    display: block;
+    aspect-ratio: 1;
+    height: auto;
+  }
+
+  /* Typing: WORLD RALLY CHAMPIONSHIP, backspaced, then ENJOY. Black
+     panel, white glyphs; two lines tall so nothing shifts as it types. */
+  .type-stage {
+    /* CHAMPIONSHIP (12 glyphs + tracking + caret + padding) is ~16.6
+       glyphs wide, so it always fits on its line. */
+    --size: min(calc((100vw - 2 * var(--margin)) / 17), 96px);
+    display: flex;
+    align-items: center;
+    height: calc(var(--size) * 2 + var(--size) * 0.5 + 2 * var(--size) * 0.9);
+    padding: 0 calc(var(--size) * 0.6);
+    background: #111;
+    color: #fff;
+  }
+
+  .type-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    row-gap: calc(var(--size) * 0.5);
+    column-gap: calc(var(--size) * 0.55);
+  }
+
+  .type-word {
+    display: flex;
+    gap: calc(var(--size) * 0.22);
+  }
+
+  /* Glyph PNGs are black; inverted to white on the black panel. */
+  .type-line .tg {
+    width: var(--size);
+    filter: invert(1);
+  }
+
+  /* The caret is one stroke of the typeface wide. */
+  .type-caret {
+    width: calc(var(--size) * 0.075);
+    height: var(--size);
+    background: #fff;
+    border-radius: 99px;
+    animation: type-blink 1s steps(1) infinite;
+  }
+
+  @keyframes type-blink {
+    50% { opacity: 0; }
+  }
+
+  /* Specimen: A-Z, then 1-0 and the ampersand, in a hairline grid. */
+  .type-specimen {
+    display: grid;
+    grid-template-columns: repeat(13, minmax(0, 1fr));
+    margin-top: var(--wrc-gap, 16px);
+    border-top: 1px solid var(--ink);
+    border-left: 1px solid var(--ink);
+  }
+
+  .ts-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    border-right: 1px solid var(--ink);
+    border-bottom: 1px solid var(--ink);
+    color: var(--ink);
+  }
+
+  .ts-cell .tg {
+    width: 52%;
+  }
+
+  /* Hovering a character fills its cell with the WRC red (#ED2124, from
+     the posters) and turns the glyph white. */
+  .ts-cell:has(.tg):hover {
+    background: #ed2124;
+  }
+
+  .ts-cell:has(.tg):hover .tg {
+    filter: invert(1);
+  }
+
+  @media (max-width: 640px) {
+    .type-specimen {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+  }
+
+  /* Wayfinding: the statement at the top of the left column and the
+     Estonia boom at its foot, beside the Japan podium. */
+  #wrcModal .wrc-wayfinding {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--wrc-gap);
+    margin-top: 200px;
+  }
+
+  #wrcModal .wrc-way-side {
+    grid-column: 1 / span 4;
+    display: flex;
+    flex-direction: column;
+    gap: var(--wrc-gap);
+  }
+
+  /* The boom photo takes whatever height is left under the statement, so
+     its bottom always lands on the podium's bottom edge, whatever the
+     statement's length. */
+  #wrcModal .way-boom {
+    position: relative;
+    flex: 1 1 0;
+    min-height: 0;
+  }
+
+  #wrcModal .way-boom img {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 100%;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    object-position: left bottom;
+  }
+
+  #wrcModal .wrc-way-main {
+    grid-column: 5 / -1;
+    width: 100%;
+    height: auto;
+  }
+
+  .side-statement {
+    margin: 0;
+    font-family: var(--display);
+    font-size: clamp(26px, 2.6vw, 40px);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+
+  @media (max-width: 900px) {
+    #wrcModal .wrc-way-side,
+    #wrcModal .wrc-way-main {
+      grid-column: 1 / -1;
+    }
+
+    #wrcModal .wrc-way-main {
+      margin-top: var(--wrc-gap);
+    }
+
+    #wrcModal .way-boom {
+      flex: none;
+    }
+
+    #wrcModal .way-boom img {
+      position: static;
+      width: 100%;
+      height: auto;
+    }
+  }
+
+  #wrcModal .wrc-inset img {
+    width: calc(50% - var(--wrc-gap) / 2);
+    height: auto;
+    margin: 0 auto;
+  }
+
+  #wrcModal .wrc-wide {
+    margin-top: var(--wrc-gap);
+  }
+
+  #wrcModal .wrc-wide img {
+    width: 100%;
+    height: auto;
+  }
+
+  #wrcModal .wrc-posters {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: start;
+    gap: var(--wrc-gap);
+  }
+
+  /* Every poster file is exported at exactly 1400x2100 (2:3), so all
+     eight are the same size and nothing is cropped. */
+  #wrcModal .wrc-posters img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2 / 3;
+  }
+
+  /* Cut-out print pieces on the page color, two per row at one scale. */
+  #wrcModal .wrc-objects {
+    display: flex;
+    justify-content: center;
+    gap: var(--wrc-gap);
+  }
+
+  /* Hidden detail: hovering the open sleeve slides the book back in. The
+     book's top (above the sleeve's edge, 298/1800 = 16.55% down) is its
+     own clipped layer that slides down under that edge; the sleeve body
+     cross-fades from open to closed so the windows show the book moving
+     too. Same box size as the closed sleeve beside it. Tap toggles on
+     touch screens. */
+  #wrcModal .sleeve-swap {
+    position: relative;
+    height: min(74vh, 760px);
+    aspect-ratio: 1199 / 1800;
+    max-width: calc(50% - var(--wrc-gap) / 2);
+    cursor: pointer;
+  }
+
+  #wrcModal .sleeve-swap img {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: auto;
+  }
+
+  #wrcModal .ss-body {
+    clip-path: inset(16.55% 0 0 0);
+    transition: opacity 0.7s cubic-bezier(0.45, 0.05, 0.25, 1);
+  }
+
+  #wrcModal .ss-top {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 16.55%;
+    overflow: hidden;
+  }
+
+  #wrcModal .ss-top img {
+    transition: transform 0.7s cubic-bezier(0.45, 0.05, 0.25, 1);
+  }
+
+  #wrcModal .sleeve-swap:hover .ss-body,
+  #wrcModal .sleeve-swap.is-closed .ss-body {
+    opacity: 0;
+  }
+
+  /* 284/1800 of the image: from the open book's top edge down to where
+     it's fully under the sleeve. */
+  #wrcModal .sleeve-swap:hover .ss-top img,
+  #wrcModal .sleeve-swap.is-closed .ss-top img {
+    transform: translateY(16.2%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #wrcModal .ss-body,
+    #wrcModal .ss-top img {
+      transition: none;
+    }
+  }
+
+  #wrcModal .wrc-objects > img {
+    height: min(74vh, 760px);
+    width: auto;
+    max-width: calc(50% - var(--wrc-gap) / 2);
+    object-fit: contain;
+  }
+
+  /* The mid-season book's specs, between the sleeve and the player: a
+     hairline, then label/value pairs across the page margin. */
+  #wrcModal .book-specs {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    column-gap: 16px;
+    margin: 96px var(--margin) 0;
+    padding: 16px 0 0;
+    border-top: 1px solid var(--ink);
+    color: var(--ink);
+  }
+
+  #wrcModal .book-specs dt {
+    margin: 0 0 4px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  #wrcModal .book-specs dd {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  @media (max-width: 900px) {
+    #wrcModal .book-specs {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      row-gap: 24px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    #wrcModal .book-specs {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  /* The mid-season book: 486x648 pages (3/4), 972x648 spreads (3/2). The
+     cover scans are 504x666, a hair larger than the pages, like a real
+     hardcover's overhang. */
+  #wrcModal .book-embed-section {
+    padding: 120px var(--margin) 0;
+  }
+
+  /* Same height as Our Work Is Never Done's player (64vh), so the book
+     and its progress bar fit on one screen under the header. */
+  #wrcModal .spread-player,
+  #wrcModal .player-progress {
+    width: min(100%, calc(64vh * 3 / 2));
+  }
+
+  #wrcModal .spread-player {
+    aspect-ratio: 3 / 2;
+  }
+
+  #wrcModal .cover-flip-front,
+  #wrcModal .cover-flip-back {
+    aspect-ratio: 504 / 666;
+  }
+
+  /* shadow2.png was drawn for Our Work Is Never Done's 1200/970 spreads;
+     stretched to this box it still lands on the gutter. */
+  #wrcModal img.shadow {
+    object-fit: fill;
+  }
+
+  /* Touch Bar-style strip (see updateStrip in the WRC script): 18px
+     tall, a full thumbnail is 27x18. Each sliver crops the middle of its
+     thumbnail; the sprite is drawn at half its 864x324 size. Scrubbable. */
+  .player-strip {
+    overflow: hidden;
+    cursor: ew-resize;
+  }
+
+  .strip-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+    will-change: transform;
+  }
+
+  .strip-sliver {
+    position: relative;
+    flex: 0 0 auto;
+    height: 100%;
+    overflow: hidden;
+    transition: width 0.3s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.3s ease;
+  }
+
+  .strip-sliver.is-ahead {
+    opacity: 0.35;
+  }
+
+  .strip-sliver span {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: var(--fw);
+    height: var(--fh);
+    margin-left: calc(var(--fw) / -2);
+    background-image: var(--strip-sprite);
+    background-size: var(--strip-size);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .strip-sliver,
+    .strip-track {
+      transition: none;
+    }
+  }
+
+  #spreadPlayerImgWrc {
+    top: 0;
+    bottom: auto;
+    left: 0;
+    right: auto;
+    width: 100%;
+  }
+
+  #spreadPlayerImgWrc.align-right {
+    width: auto;
+    right: 0;
+    left: auto;
+  }
+
+  #spreadPlayerImgWrc.align-left {
+    width: auto;
+    left: 0;
+    right: auto;
+  }
+
+  /* Book highlights: pairs of spreads, each pair captioned underneath. */
+  #wrcModal .wrc-spreads {
+    display: flex;
+    flex-direction: column;
+    gap: 72px;
+    padding: 0 var(--margin);
+  }
+
+  #wrcModal .wrc-spread-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px var(--wrc-gap);
+    margin: 0;
+  }
+
+  /* Second row of a group: one gutter under the row above it. */
+  #wrcModal .wrc-spread-row.continues {
+    margin-top: calc(var(--wrc-gap) - 72px);
+  }
+
+  #wrcModal .wrc-spread {
+    position: relative;
+    aspect-ratio: 3 / 2;
+  }
+
+  #wrcModal .wrc-spread img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  #wrcModal .wrc-spread-row figcaption {
+    grid-column: 1 / -1;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+
+
+  @media (max-width: 640px) {
+    #wrcModal {
+      --wrc-gap: 16px;
+    }
+
+    .interjection {
+      padding-top: 120px;
+      padding-bottom: 64px;
+    }
+
+    #wrcModal .wrc-pair {
+      flex-direction: column;
+    }
+
+    #wrcModal .wrc-posters {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #wrcModal .wrc-spread-row {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    #wrcModal .wrc-objects > img,
+    #wrcModal .sleeve-swap {
+      height: auto;
+    }
+  }
+
   @media (max-width: 640px) {
     #bookModal {
-      --inset: 24px;
+      --inset: var(--margin);
     }
   }
 
@@ -866,13 +2024,13 @@
   }
 
   .contact-note {
-    font-size: 16px;
+    font-size: 15px;
     color: var(--muted);
     margin: 12px 0 0;
   }
 
   .contact-option {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 400;
     text-decoration: none;
     color: inherit;
@@ -901,7 +2059,15 @@
      ratio instead of the viewport. */
   .product-hero {
     width: 100%;
-    aspect-ratio: 2 / 1;
+    margin-top: var(--fade-bottom);
+    height: calc(100vh - var(--fade-bottom));
+  }
+
+  @media (max-width: 640px) {
+    .product-hero {
+      height: auto;
+      aspect-ratio: 3 / 2;
+    }
   }
 
   .product-hero img {
@@ -918,7 +2084,7 @@
      (below) supplies equal spacing top and bottom, so the gap in is the
      same as the gap out. */
   .product-lead-in {
-    padding: 0 5%;
+    padding: 0 var(--margin);
   }
 
   .product-lead-in img {
@@ -940,7 +2106,7 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 48px 32px;
-    padding: 100px 5%;
+    padding: 100px var(--margin);
   }
 
   /* Penne Rigate's grid — the one group with only a single card (see
@@ -976,11 +2142,10 @@
   }
 
   .product-card h4 {
-    font-size: 16px;
+    font-size: 15px;
     font-weight: 500;
     line-height: 1.2;
     margin: 24px 0 0;
-    text-align: center;
   }
 
   .book-embed-section {
@@ -992,7 +2157,136 @@
        large single-image gallery rows in width — vertical padding is
        unchanged, deliberately more generous than the tighter gaps between
        ordinary gallery rows. */
-    padding: 60px 5% 96px;
+    padding: 60px var(--margin) 96px;
+  }
+
+
+  /* About: the Playground's grid (two halves split down the middle on
+     the header's 40px margins, starting 40px under the K). Statement and
+     contact on the left, top-aligned with the portrait, which fills the
+     right half down to a 40px bottom margin. Details below the fold on
+     the same grid. Stacks below 1100px. */
+  #aboutModal {
+    --about-margin: var(--margin);
+  }
+
+  .about-intro {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--about-margin);
+    padding: 160px var(--about-margin) var(--about-margin);
+    color: #1a1a1a;
+  }
+
+  .about-text {
+    max-width: 600px;
+  }
+
+  .about-text p {
+    font-size: 15px;
+    line-height: 1.45;
+    margin: 0 0 24px;
+  }
+
+  /* The bio's column runs the portrait's full height; the contact block
+     sits at its foot, so "What do you need?" lines up with the bottom of
+     the photo. The question is set like the interjections; the three
+     links are underlined mono. */
+  .about-text {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .about-contact {
+    margin-top: auto;
+    padding-top: 48px;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  /* The W's top tip touches the margin but its strokes slant inward
+     (about 5px in at mid-height), so the word reads indented. Hanging it
+     0.05em left lines its visual edge up with the mono text below. */
+  .about-text .about-ask {
+    margin: 0 0 20px -0.05em;
+    font-family: var(--display);
+    font-size: clamp(32px, 3.6vw, 60px);
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -0.025em;
+    color: var(--ink);
+  }
+
+  .about-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+  }
+
+  .about-text .about-links a {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* Mail -> Liam: on hover each letter slides to its mirrored place (the
+     word reversed), and the M and l swap case halfway, so Mail becomes
+     Liam. Letters stay inline (relative left, not transforms) so they keep
+     the link's own underline. One character of this mono face is 1ch. */
+  .mail-flip span {
+    position: relative;
+    left: 0;
+    transition: left 0.35s cubic-bezier(0.45, 0.05, 0.25, 1);
+  }
+
+  .mail-flip.is-flipped span:nth-child(1) { left: 3ch; }
+  .mail-flip.is-flipped span:nth-child(2) { left: 1ch; }
+  .mail-flip.is-flipped span:nth-child(3) { left: -1ch; }
+  .mail-flip.is-flipped span:nth-child(4) { left: -3ch; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mail-flip span {
+      transition: none;
+    }
+  }
+
+  .about-text .about-location {
+    margin: 24px 0 0;
+    font-size: 13px;
+  }
+
+  .about-portrait {
+    margin: 0;
+    height: calc(100vh - 160px - var(--about-margin));
+    min-height: 560px;
+  }
+
+  .about-portrait img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 30%;
+  }
+
+  @media (max-width: 1100px) {
+    .about-intro {
+      grid-template-columns: 1fr;
+      row-gap: 48px;
+    }
+
+    .about-portrait {
+      height: 80vh;
+    }
+  }
+
+  .about-text a {
+    color: inherit;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .about-text a:hover {
+    opacity: 0.6;
   }
 
   .book-contact {
@@ -1003,7 +2297,7 @@
     color: #1a1a1a;
     font-size: 13px;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
     opacity: 0.7;
   }
 
@@ -1023,7 +2317,7 @@
     flex-wrap: wrap;
     gap: 32px;
     margin: 0 auto 32px;
-    padding: 0 5%;
+    padding: 0 var(--margin);
   }
 
   .brand-gallery-row.size-lg {
@@ -1255,7 +2549,7 @@
     color: #fff;
     font-size: 13px;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.06em;
   }
 
   @media (max-width: 640px) {
@@ -1282,27 +2576,13 @@
     }
   }
 
+  /* Each page's own X is never shown: the header's X (and the logo) is
+     the visible way out. They stay in the markup because the close logic
+     clicks them (see the header click handler), so every page runs its
+     own cleanup. Hiding them only while a page was open let them flash
+     during the fade-out after closing. */
   .book-close {
-    position: fixed;
-    top: 32px;
-    right: 40px;
-    width: 40px;
-    height: 40px;
-    border: none;
-    background: none;
-    color: #1a1a1a;
-    font-size: 32px;
-    line-height: 1;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.2s ease;
-    z-index: 3010;
-  }
-
-  .book-close:hover {
-    opacity: 0.6;
+    display: none;
   }
 
   /* A page-by-page flip was too slow to load through for an 800-page
@@ -1630,14 +2910,21 @@
     transform: translateY(-50%);
     z-index: 21;
     max-width: 38%;
-    font-size: 15px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #1a1a1a;
-    opacity: 0.9;
+    /* Same voice as the interjections: display face, sentence case. */
+    font-family: var(--display);
+    font-size: clamp(15px, 2.6vw, 40px);
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--ink);
     transition: opacity 0.3s ease;
     pointer-events: none;
+  }
+
+  @media (max-width: 640px) {
+    .player-hint {
+      font-size: 15px;
+    }
   }
 
   /* Persistent (not fading out after the first click, unlike .player-hint
@@ -1646,17 +2933,57 @@
      nudge. Sits below the player itself, in normal flow as a sibling of
      .spread-player, since once opened the player is full of the actual
      book with no empty margin left to sit in beside it. */
+  /* One cue per control: a bold label naming what you touch (Book,
+     Strip), then what it does, in plain mono. */
   .player-hint-playing {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px 32px;
     margin-top: 20px;
     text-align: center;
     font-size: 13px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    font-weight: 400;
     color: #1a1a1a;
     opacity: 0;
     transition: opacity 0.3s ease;
     pointer-events: none;
+  }
+
+  /* WRC: the book's instructions sit in the margin to the right of the
+     open book, vertically centered; the line under the strip is only
+     about the strip. Below 1200px there's no room beside the book, so the
+     book's line moves back under the strip. */
+  .player-side-hint {
+    position: absolute;
+    top: 50%;
+    left: calc(100% + 32px);
+    width: 180px;
+    transform: translateY(-50%);
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--ink);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .spread-player.started .player-side-hint {
+    opacity: 0.8;
+  }
+
+  .hint-narrow {
+    display: none;
+  }
+
+  @media (max-width: 1200px) {
+    .player-side-hint {
+      display: none;
+    }
+
+    .hint-narrow {
+      display: inline;
+    }
   }
 
   .player-hint-playing.visible {
@@ -1709,8 +3036,8 @@
   .player-page {
     min-height: 1.2em;
     line-height: 1.2;
-    font-size: 28px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 700;
     font-variant-numeric: tabular-nums;
   }
 
@@ -1723,17 +3050,58 @@
     align-self: center;
     margin: 0;
     font-size: 15px;
-    line-height: 1.6;
+    line-height: 1.45;
     color: #1a1a1a;
+  }
+
+  /* Caption under a captioned gallery row (Our Work Is Never Done's
+     single-column and chapter-system rows). */
+  .row-caption {
+    margin: 12px 0 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+
+  .row-caption + .gallery-row {
+    margin-top: 56px;
+  }
+
+  /* Column labels over a captioned grid, one per column, sized like the
+     spreads below them. */
+  .gallery-row.column-labels p {
+    flex: 1 1 0;
+    min-width: 0;
+    margin: 0;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink);
+  }
+
+  .gallery-row.column-labels + .gallery-row {
+    margin-top: 12px;
   }
 
   .gallery-text strong {
     font-weight: 700;
   }
 
+  .gallery-row.has-text {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .gallery-row.has-text .gallery-text {
+    max-width: 26em;
+  }
+
   @media (max-width: 640px) {
     .gallery-row.has-text {
-      flex-direction: column;
+      grid-auto-flow: row;
     }
   }
 
@@ -1753,6 +3121,10 @@
        shrinking to fit narrower ones. */
     :root {
       --phone-mark: min(47px, calc((100vw - 66px) / 6.884));
+      /* Phone header: K is 24px from the top, so the fade follows it. */
+      --fade-top: calc(40px + var(--phone-mark));
+      --fade-bottom: calc(40px + var(--phone-mark));
+      --margin: 24px;
     }
 
     header {
@@ -1764,7 +3136,7 @@
       padding-right: 24px;
     }
 
-    header .info address {
+    header .info .pages {
       display: none;
     }
 
@@ -1787,8 +3159,15 @@
       display: block;
     }
 
+    /* Phones show only the question, so on a project page the X takes
+       its place, against the corner marks. */
     header .close {
       right: calc(var(--mark) / 6 + 6px);
+      transform: translateY(-50%);
+    }
+
+    body.project-open header .nav-ask {
+      visibility: hidden;
     }
 
     header .corner {
@@ -1845,11 +3224,11 @@
 <header>
   <a class="home" href="#" id="homeLink" aria-label="Home"><img class="logo" src="Liam-Kengla-Logo-Assets/full-lockup.png" alt="Liam Kengla, Graphic Designer"></a>
   <div class="info">
-    <a href="#" id="navToggle"><span>What do</span> <span>you need?</span></a>
-    <address>
-      <a href="mailto:kenglaliam@gmail.com">kenglaliam@gmail.com</a>
-      <a href="sms:5037030544">[503] 703 0544</a>
-    </address>
+    <span id="navToggle" class="nav-ask"><span>What do</span> <span>you need?</span></span>
+    <nav class="pages">
+      <a href="#" id="aboutLink">About</a>
+      <a href="#" id="playgroundLink">Playground</a>
+    </nav>
     <button class="close" id="headerClose" aria-label="Close">&times;</button>
     <img class="corner top" src="Liam-Kengla-Logo-Assets/detail-mark.png" alt="">
     <img class="corner bottom" src="Liam-Kengla-Logo-Assets/detail-mark.png" alt="">
@@ -1857,87 +3236,23 @@
 </header>
 
 <main>
+  <h1 class="visually-hidden">Liam Kengla, Graphic Designer</h1>
   <section class="work" id="work">
     <div class="carousel" id="carousel">
       <div class="card">
-        <div class="thumb is-photo fit-contain" data-opens-products="true" data-images='[
-          "portfolio projects/OrganicoBello/OB-hero-red_bg.jpg?v=2",
-
-          "portfolio projects/OrganicoBello/hand models/OB-penne_rigate-front-hand_model.png",
-          "portfolio projects/OrganicoBello/hand models/OB-penne_rigate-right-hand_model.png",
-
-          "portfolio projects/OrganicoBello/hand models/OB-tomato_bouillon-front-hand_model.png",
-          "portfolio projects/OrganicoBello/hand models/OB-italian_oregano-front-hand_model.png",
-
-          "portfolio projects/OrganicoBello/hand models/OB-tomato_paste-front-hand_model.png",
-          "portfolio projects/OrganicoBello/hand models/OB-vodka_sauce-front-hand_model.png",
-          "portfolio projects/OrganicoBello/hand models/OB-tomato_sauce-front-hand_model.png",
-          "portfolio projects/OrganicoBello/hand models/OB-tomato_sauce-right-hand_model.png",
-          "portfolio projects/OrganicoBello/hand models/OB-bruschetta_spread-front-hand_model.png"
+        <div class="thumb is-photo" data-opens-wrc="true" data-images='[
+          "portfolio projects/WRC/web/wrc-acropolis.jpg",
+          "portfolio projects/WRC/web/wrc-podium.jpg"
         ]'>
-          <img src="portfolio projects/OrganicoBello/OB-hero-red_bg.jpg?v=2" alt="Organico Bello &mdash; packaging lineup on red background">
+          <img src="portfolio projects/WRC/web/wrc-acropolis.jpg" alt="World Rally Championship &mdash; Acropolis Rally Greece podium">
         </div>
-        <h3>Organico Bello</h3>
-        <span>Food Packaging</span>
-      </div>
-      <div class="card">
-        <div class="thumb is-photo" data-images='[
-          "portfolio projects/ArtDivision/artdivison-freeway_signage-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-quadfold_front-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-quadfold_back-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-bus_stop_poster1-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-bus_stop_poster2-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-bus_stop_poster3-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-instagram-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-planner-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-tablecard-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-totebag-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-instagram_stories-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-pen-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-stationary-mockup.jpg",
-          "portfolio projects/ArtDivision/artdivison-a_frame-mockup.jpg"
-        ]'>
-          <img src="portfolio projects/ArtDivision/artdivison-freeway_signage-mockup.jpg" alt="Art Division &mdash; freeway signage mockup">
-        </div>
-        <h3>ArtDivision [COMING SOON]</h3>
-        <span>Branding, UI Design [Web]</span>
-      </div>
-      <div class="card">
-        <div class="thumb is-photo" data-images='[
-          "portfolio projects/WRC/wrc-estonia-wayfinding.jpg",
-          "portfolio projects/WRC/wrc-acropolis-podium-wayfinding.jpg",
-          "portfolio projects/WRC/wrc-monte-carlo-wayfinding.jpg",
-          "portfolio projects/WRC/wrc-podium-wayfinding.jpg"
-        ]'>
-          <img src="portfolio projects/WRC/wrc-estonia-wayfinding.jpg" alt="World Rally Championship &mdash; event wayfinding mockup">
-        </div>
-        <h3>World Rally Championship [COMING SOON]</h3>
+        <h3>World Rally Championship</h3>
         <span>Logo Design, Event Branding, UI [Web], Book Design, Typeface Design</span>
-      </div>
-      <div class="card">
-        <div class="thumb is-photo" data-opens-book-2="true" data-images='[
-          "portfolio projects/OldNewMensClub/gallery-web.jpg",
-          "portfolio projects/OldNewMensClub/carousel_preview/spread-112.jpg",
-          "portfolio projects/OldNewMensClub/carousel_preview/spread-096.jpg",
-          "portfolio projects/OldNewMensClub/carousel_preview/spread-086.jpg",
-          "portfolio projects/OldNewMensClub/carousel_preview/spread-070.jpg",
-          "portfolio projects/OldNewMensClub/carousel_preview/spread-114.jpg",
-          "portfolio projects/OldNewMensClub/carousel_preview/spread-080.jpg"
-        ]'>
-          <img src="portfolio projects/OldNewMensClub/gallery-web.jpg" alt="Old New Mens Club &mdash; signage installation">
-        </div>
-        <h3>Old New Mens Club</h3>
-        <span>Book Design</span>
       </div>
       <div class="card">
         <div class="thumb is-photo" data-opens-book="true" data-images='[
           "portfolio projects/OurWorkIsNeverDone/cover-spine-back-thumb.webp",
-          "portfolio projects/OurWorkIsNeverDone/carousel_preview/spread-129.jpg",
-          "portfolio projects/OurWorkIsNeverDone/carousel_preview/spread-072.jpg",
-          "portfolio projects/OurWorkIsNeverDone/carousel_preview/spread-178.jpg",
-          "portfolio projects/OurWorkIsNeverDone/carousel_preview/spread-094.jpg",
-          "portfolio projects/OurWorkIsNeverDone/carousel_preview/spread-162.jpg",
-          "portfolio projects/OurWorkIsNeverDone/carousel_preview/spread-165.jpg"
+          "portfolio projects/OurWorkIsNeverDone/carousel_preview/spread-162.jpg"
         ]'>
           <img src="portfolio projects/OurWorkIsNeverDone/cover-spine-back-thumb.webp" alt="Our Work Is Never Done &mdash; front cover, spine, and back cover">
         </div>
@@ -1945,35 +3260,59 @@
         <span>Book Design, Bookbinding, Curation</span>
       </div>
       <div class="card">
-        <div class="thumb is-photo" data-opens-book-3="true" data-images='[
-          "portfolio projects/StylesMakeFights/carousel_preview/spread-029.jpg",
-          "portfolio projects/StylesMakeFights/carousel_preview/spread-015.jpg",
-          "portfolio projects/StylesMakeFights/carousel_preview/spread-041.jpg",
-          "portfolio projects/StylesMakeFights/carousel_preview/spread-065.jpg",
-          "portfolio projects/StylesMakeFights/carousel_preview/spread-010.jpg",
-          "portfolio projects/StylesMakeFights/carousel_preview/spread-070.jpg"
-        ]'>
-          <img src="portfolio projects/StylesMakeFights/carousel_preview/spread-029.jpg" alt="Styles Make Fights &mdash; interior spread">
-        </div>
-        <h3>Styles Make Fights</h3>
-        <span>Book Design</span>
+        <div class="thumb placeholder" aria-label="Kodak &mdash; images coming soon"></div>
+        <h3>Kodak [COMING SOON]</h3>
+        <span>UI Design, Curation</span>
       </div>
       <div class="card">
-        <div class="thumb is-photo" data-opens-book-4="true" data-images='[
-          "portfolio projects/SanDiego-Football-Club/web/travel-bus.jpg",
-          "portfolio projects/SanDiego-Football-Club/web/staff-badge.jpg",
-          "portfolio projects/SanDiego-Football-Club/web/flag-mock.jpg",
-          "portfolio projects/SanDiego-Football-Club/web/instagram.jpg",
-          "portfolio projects/SanDiego-Football-Club/web/stories.jpg"
+        <div class="thumb is-photo fit-contain" data-opens-products="true" data-images='[
+          "portfolio projects/OrganicoBello/OB-hero-red_bg.jpg?v=2",
+          "portfolio projects/OrganicoBello/hand models/OB-penne_rigate-front-hand_model.png"
         ]'>
-          <img src="portfolio projects/SanDiego-Football-Club/web/travel-bus.jpg" alt="San Diego Football Club &mdash; bus wrap mockup">
+          <img src="portfolio projects/OrganicoBello/OB-hero-red_bg.jpg?v=2" alt="Organico Bello &mdash; full product lineup">
         </div>
-        <h3>San Diego Football Club</h3>
-        <span>Branding, Motion, Campaign</span>
+        <h3>Organico Bello</h3>
+        <span>Food Packaging</span>
       </div>
     </div>
   </section>
 </main>
+
+<!-- Playground: everything that isn't on the homepage carousel, as a
+     still two-across grid. Each image opens its project page exactly like
+     its old carousel card did (same data-opens-* hooks). -->
+<section class="playground" id="playground" aria-hidden="true">
+  <div class="pg-grid">
+    <div class="pg-card">
+      <div class="pg-thumb" data-opens-book-2="true">
+        <img src="portfolio projects/OldNewMensClub/gallery-web.jpg" alt="Old New Mens Club &mdash; signage installation">
+      </div>
+      <h3>Old New Mens Club</h3>
+      <span>Book Design</span>
+    </div>
+    <div class="pg-card">
+      <div class="pg-thumb" data-opens-book-3="true">
+        <img src="portfolio projects/StylesMakeFights/carousel_preview/spread-029.jpg" alt="Styles Make Fights &mdash; interior spread">
+      </div>
+      <h3>Styles Make Fights</h3>
+      <span>Book Design</span>
+    </div>
+    <div class="pg-card">
+      <div class="pg-thumb" data-opens-book-4="true">
+        <img src="portfolio projects/SanDiego-Football-Club/web/travel-bus.jpg" alt="San Diego Football Club &mdash; bus wrap mockup">
+      </div>
+      <h3>San Diego Football Club</h3>
+      <span>Branding, Motion, Campaign</span>
+    </div>
+    <div class="pg-card">
+      <div class="pg-thumb">
+        <img src="portfolio projects/ArtDivision/artdivison-freeway_signage-mockup.jpg" alt="Art Division &mdash; freeway signage mockup">
+      </div>
+      <h3>ArtDivision [COMING SOON]</h3>
+      <span>Branding, UI Design [Web]</span>
+    </div>
+  </div>
+</section>
 
 <div class="controls">
   <button id="prev" aria-label="Previous">&#8592;</button>
@@ -1983,25 +3322,10 @@
 <div class="book-modal" id="bookModal" aria-hidden="true">
   <button class="book-close" id="bookClose" aria-label="Close">&times;</button>
   <div class="gallery-scroll" id="galleryScroll">
-    <div class="book-intro">
-      <div class="book-description">
-        <h2>Our Work Is Never Done</h2>
-        <p>Our Work is Never Done, an 800-page book on Mexican-American immigration, features case studies of non-violent protests, community injustices, and stories of labor from the 1930s&ndash;1970s, offering a powerful narrative of Mexican resilience and community.</p>
-        <p>Designed as an intimate read, the book uses a one-column format, long image sequences, and personal stories. Its small trim size evokes a field journal, while its unusual length creates a bible-like presence in the hand. Created in reaction to the current administration&rsquo;s views and actions on immigration, the book is a passionate, content-rich record of Mexican-American history.</p>
-        <dl>
-          <div class="dl-col">
-            <div><dt>Design</dt><dd>L.J. Kengla</dd></div>
-            <div><dt>Oversight</dt><dd>River Jukes Hudson<br>Co-Partner at ELLA</dd></div>
-            <div><dt>Trim Size</dt><dd>4.25 x 6.875</dd></div>
-            <div><dt>Typefaces</dt><dd>Aktivest Grotesk<br>Aglet Slab VF</dd></div>
-          </div>
-          <div class="dl-col">
-            <div><dt>Print/Bind</dt><dd>L.J. Kengla</dd></div>
-            <div><dt>Page Count</dt><dd>800</dd></div>
-            <div><dt>Texts by</dt><dd>Selden Menefee, Orin Cassmore, John Webb, R. Matt Abigail, Jazmin Le&oacute;n, Tafolla Carmen, Ronald L. Mize, Alicia C.S. Swords, Ronald A. Garcia, Jacques Levy, Colin Gunckel, and Matt Garcia</dd></div>
-          </div>
-        </dl>
-      </div>
+    <!-- Opening: the turning book fills the first screen, then the
+         headline, description, and credits (same block as WRC's). -->
+    <div class="ow-intro" id="owIntro">
+      <div class="ow-book">
       <div class="book-3d" aria-label="Our Work Is Never Done, rotating 3D mockup" role="img">
         <div class="book-3d-spin">
           <div class="book-3d-face book-3d-front"></div>
@@ -2012,13 +3336,41 @@
           <div class="book-3d-face book-3d-bottom"></div>
         </div>
       </div>
+      </div>
+      <div class="project-head ow-head">
+        <h2 class="project-title">Our Work Is Never Done,<br> an 800-page book on Mexican&#8209;American<br> labor and protest, 1930s&ndash;1970s.</h2>
+        <div class="project-texts">
+          <div class="pt-description">
+            <h3>Project Description</h3>
+            <p style="max-width: 50ch">Our Work Is Never Done, an 800&#8209;page book on Mexican&#8209;American immigration, features case studies of non&#8209;violent protests, community injustices, and stories of labor from the 1930s&ndash;1970s, offering a powerful narrative of Mexican resilience and community.</p>
+            <p style="max-width: 54ch">Designed as an intimate read, the book uses a one&#8209;column format, long image sequences, and personal stories. Its small trim size evokes a field journal, while its unusual length creates a bible&#8209;like presence in the hand. Created in reaction to the current administration&rsquo;s views and actions on immigration, the book is a passionate, content&#8209;rich record of Mexican&#8209;American history.</p>
+          </div>
+          <div>
+            <h3>Design</h3><p>L.J. Kengla</p>
+            <h3>Oversight</h3><p>River Jukes Hudson<br>Co&#8209;Partner at ELLA</p>
+            <h3>Trim Size</h3><p>4.25 x 6.875</p>
+            <h3>Typefaces</h3><p>Aktivest Grotesk<br>Aglet Slab VF</p>
+          </div>
+          <div>
+            <h3>Print/Bind</h3><p>L.J. Kengla</p>
+            <h3>Page Count</h3><p>800</p>
+            <h3>Texts by</h3><p>Selden Menefee, Orin Cassmore, John Webb, R. Matt Abigail, Jazmin Le&oacute;n, Tafolla Carmen, Ronald L. Mize, Alicia C.S. Swords, Ronald A. Garcia, Jacques Levy, Colin Gunckel, and Matt Garcia</p>
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="gallery-rows" id="galleryRowsBefore">
-      <p class="gallery-text" id="noteIndividuals"><strong>Under-recognized individuals.</strong> Highlighting the stories of people history tends to leave out, like the women who made up much of San Antonio&rsquo;s pecan-shelling workforce, Emma Tenayuca, a central organizer of their 1938 strike, and others.</p>
-    </div>
-    <div class="gallery-rows" id="galleryRowsSequence">
-      <p class="gallery-text" id="noteSequences"><strong>Long image sequences.</strong> Given the current political focus on immigration, the project became a response to the current administration&rsquo;s comments surrounding the future of immigrant policies and communities, which meant representing the subject matter and the gravity of historical events in a way that encourages thoughtful introspection while remaining appropriate and respectful. The Bracero Program chapter follows workers in long runs of photographs, from recruitment in M&eacute;xico to processing centers, the border, and the fields of California, letting the images carry the weight.</p>
-    </div>
+    <p class="interjection is-long">In response to the current tension surrounding Mexican immigration in the U.S., this book was designed to highlight under&#8209;recognized people, organizations, and stories of nonviolent protest.</p>
+    <div class="gallery-rows" id="galleryRowsBefore"></div>
+    <p class="interjection is-long">A single&#8209;column format designed for an intimate read, like a bible or a field guide.</p>
+    <div class="gallery-rows" id="galleryRowsColumn"></div>
+    <p class="interjection is-long">Examples of the opening table of contents and the contents pages that open each chapter.</p>
+    <div class="gallery-rows" id="galleryRowsContents"></div>
+    <p class="interjection is-long">Every chapter opens with the years its story spans, a resonant quote, and a biblical verse reflecting the presence of Catholicism in the community at the time.</p>
+    <div class="gallery-rows" id="galleryRowsSystem"></div>
+    <p class="interjection is-long">Highlighting the women who organized, from the garment workers of the Tex&#8209;Son strike to Dolores Huerta and the United Farm Workers.</p>
+    <div class="gallery-rows" id="galleryRowsAfter"></div>
+    <p class="interjection is-long">Long image sequences highlighting the immigrant journey under the Bracero Program, their working and living conditions, and the experiments they were subjected to by the U.S. government.</p>
+    <div class="gallery-rows" id="galleryRowsSequence"></div>
     <div class="book-embed-section">
       <div class="spread-player" id="spreadPlayer">
         <img id="spreadPlayerImg" src="" alt="Book spread" draggable="false">
@@ -2032,23 +3384,18 @@
           <div class="cover-face-back" aria-hidden="true"></div>
         </div>
         <div class="player-hint" id="playerHint">Click to open</div>
+        <div class="player-side-hint">Hover over the book to pause, click left or right to turn the page</div>
       </div>
       <div class="player-progress">
-        <div class="player-progress-bar"><div class="player-progress-fill" id="playerProgressFill"></div></div>
+        <div class="player-strip" id="playerStrip" aria-hidden="true"></div>
         <div class="player-progress-label">
           <span class="player-page" id="playerPageLeft"></span>
-          <span class="player-hint-playing" id="playerHintPlaying">Hover to stop, click to change page</span>
+          <span class="player-hint-playing" id="playerHintPlaying"><span class="hint-narrow">Hover over the book to pause, click left or right to turn the page</span><span>Glide across to preview faster</span></span>
           <span class="player-page" id="playerPageRight"></span>
         </div>
       </div>
     </div>
-    <div class="gallery-rows" id="galleryRowsAfter">
-      <p class="gallery-text" id="noteActivists"><strong>Female activist groups.</strong> Giving space to the women who organized, from the International Ladies&rsquo; Garment Workers&rsquo; Union locals in Laredo and San Antonio, including the 1959&ndash;1963 Tex-Son strike, to Dolores Huerta&rsquo;s work with the United Farm Workers.</p>
-    </div>
-    <div class="book-description book-binding">
-      <h2>Bookbinding</h2>
-      <p>Printed on Neenah Cream text paper, cut down by hand from parent sheets, then bound with Japanese bookbinding thread. Every signature in the book is sewn by hand with a French link stitch, with the thread colors chosen from the Mexican flag.</p>
-    </div>
+    <p class="interjection is-long">Printed on cream Neenah recycled uncoated text&#8209;weight paper and sewn by hand into a French link binding that resembles a chain&#8209;link fence, with the three colors of the Mexican flag stitched into the spine.</p>
     <div class="gallery-rows binding-rows">
       <div class="binding-row">
         <img class="landscape" src="portfolio projects/OurWorkIsNeverDone/binding/binding-2345.jpg" alt="Printed signatures on Neenah Cream text paper" loading="lazy">
@@ -2073,7 +3420,7 @@
   <div class="gallery-scroll" id="galleryScroll2">
     <div class="book-description">
       <h2>Old New Mens Club</h2>
-      <p>A journey through post-war Japan&rsquo;s fascination with American workwear and Ivy League style, and how it blossomed into a shared denim culture between the two nations. Highlighting Japanese and American artisan-designers, including Toru Nogami, Eric Steffen, Masayuki Kanatani, Andrew Chen &amp; Johan Lam, Tohru Hamamoto, and Christopher Loiron, who carry this tradition forward with craftsmanship, authenticity, and reinvention today.</p>
+      <p style="max-width: 47ch">A journey through post&#8209;war Japan&rsquo;s fascination with American workwear and Ivy League style, and how it blossomed into a shared denim culture between the two nations. Highlighting Japanese and American artisan&#8209;designers, including Toru Nogami, Eric Steffen, Masayuki Kanatani, Andrew Chen &amp; Johan Lam, Tohru Hamamoto, and Christopher Loiron, who carry this tradition forward with craftsmanship, authenticity, and reinvention today.</p>
       <dl>
         <div class="dl-col">
           <div><dt>Design</dt><dd>L.J. Kengla</dd></div>
@@ -2103,7 +3450,7 @@
         </div>
         <div class="player-hint" id="playerHint2">Click to open</div>
       </div>
-      <div class="player-hint-playing" id="playerHintPlaying2">Hover to stop, click to change page</div>
+      <div class="player-hint-playing" id="playerHintPlaying2"><span>Hover over the book to pause, click left or right to turn the page</span></div>
     </div>
     <div class="gallery-rows" id="galleryRowsAfter2"></div>
     <div class="book-contact">
@@ -2117,8 +3464,8 @@
   <div class="gallery-scroll" id="galleryScroll3">
     <div class="book-description">
       <h2>Styles Make Fights</h2>
-      <p>As martial arts become increasingly politicized and reduced to ideas of national or cultural ownership, Styles Make Fights responds by showing combat sports as a global exchange of techniques, traditions, and cultures. Rather than focusing on one style or region, the book explores how these disciplines have evolved, influenced one another, and continue to shape modern combat sports.</p>
-      <p>By tracing these connections, the book aims to destigmatize combat sports and present them as an art form rooted in community. Through graphics, stories, and interviews, it explores the people, traditions, and shared influences that connect fighting styles across regions and continents, revealing combat sports as a global culture.</p>
+      <p style="max-width: 53ch">As martial arts become increasingly politicized and reduced to ideas of national or cultural ownership, Styles Make Fights responds by showing combat sports as a global exchange of techniques, traditions, and cultures. Rather than focusing on one style or region, the book explores how these disciplines have evolved, influenced one another, and continue to shape modern combat sports.</p>
+      <p style="max-width: 52ch">By tracing these connections, the book aims to destigmatize combat sports and present them as an art form rooted in community. Through graphics, stories, and interviews, it explores the people, traditions, and shared influences that connect fighting styles across regions and continents, revealing combat sports as a global culture.</p>
       <dl>
         <div class="dl-col">
           <div><dt>Design</dt><dd>L.J. Kengla</dd></div>
@@ -2148,7 +3495,7 @@
         </div>
         <div class="player-hint" id="playerHint3">Click to open</div>
       </div>
-      <div class="player-hint-playing" id="playerHintPlaying3">Hover to stop, click to change page</div>
+      <div class="player-hint-playing" id="playerHintPlaying3"><span>Hover over the book to pause, click left or right to turn the page</span></div>
     </div>
     <div class="gallery-rows" id="galleryRowsAfter3"></div>
     <div class="book-contact">
@@ -2162,8 +3509,8 @@
   <div class="gallery-scroll" id="galleryScroll4">
     <div class="book-description">
       <h2>San Diego Football Club</h2>
-      <p>This proposed rebrand of San Diego FC was developed for the club&rsquo;s inaugural season, building a bold, cinematic identity rooted in the character and history of San Diego. The crest combines mission-inspired arches, a shield-shaped outline, and a custom anchor, all designed to symbolize the city&rsquo;s architecture, proximity to the Pacific coastline, naval heritage, and military community.</p>
-      <p>The visual and promotional language is built around fan engagement and positive mantras and slogans such as &ldquo;The City&rsquo;s Anchor,&rdquo; &ldquo;Our Strength, Our Anchor,&rdquo; and &ldquo;Making Waves That Matter.&rdquo; The rebrand embraces the energy of the team and its supporters, intentionally moving away from the increasingly corporate design and language of modern sports in favor of something bold, local, and community-driven.</p>
+      <p style="max-width: 54ch">This proposed rebrand of San Diego FC was developed for the club&rsquo;s inaugural season, building a bold, cinematic identity rooted in the character and history of San Diego. The crest combines mission&#8209;inspired arches, a shield&#8209;shaped outline, and a custom anchor, all designed to symbolize the city&rsquo;s architecture, proximity to the Pacific coastline, naval heritage, and military community.</p>
+      <p style="max-width: 50ch">The visual and promotional language is built around fan engagement and positive mantras and slogans such as &ldquo;The City&rsquo;s Anchor,&rdquo; &ldquo;Our Strength, Our Anchor,&rdquo; and &ldquo;Making Waves That Matter.&rdquo; The rebrand embraces the energy of the team and its supporters, intentionally moving away from the increasingly corporate design and language of modern sports in favor of something bold, local, and community&#8209;driven.</p>
       <dl>
         <div class="dl-col">
           <div><dt>Oversight</dt><dd>Pamela Olecki<br>Associate Professor, ArtCenter College of Design</dd></div>
@@ -2200,11 +3547,146 @@
     </div>
     <div class="brand-gallery" id="brandGalleryClothing4"></div>
     <div class="brand-gallery" id="brandGalleryAfter4"></div>
-    <div class="book-description">
-      <h2>San Diego Seahorses</h2>
-      <p>A proposed youth extension of San Diego FC, the San Diego Seahorses is a U-14 soccer team sponsored by SDFC and designed with a complementary visual identity. The program creates a professional, branded environment for young players to develop their skills while providing SDFC with a meaningful opportunity to engage with and invest in the youth of the San Diego community, working alongside a generation that can grow with the club.</p>
+    <div class="split-grid">
+      <img src="portfolio projects/SanDiego-Football-Club/web/campaign/bus-stop.jpg" alt="San Diego Seahorses &mdash; bus stop" loading="lazy">
+      <img src="portfolio projects/SanDiego-Football-Club/web/campaign/billboard.jpg" alt="San Diego Seahorses &mdash; billboard" loading="lazy">
+      <img src="portfolio projects/SanDiego-Football-Club/web/campaign/updated-signs.jpg" alt="San Diego Seahorses &mdash; field signage" loading="lazy">
+      <div class="section-text">
+        <h2>San Diego Seahorses</h2>
+        <p>A proposed youth extension of San Diego FC, the San Diego Seahorses is a U&#8209;14 soccer team sponsored by SDFC and designed with a complementary visual identity. The program creates a professional, branded environment for young players to develop their skills while providing SDFC with a meaningful opportunity to engage with and invest in the youth of the San Diego community, working alongside a generation that can grow with the club.</p>
+      </div>
     </div>
-    <div class="brand-gallery" id="brandGalleryCampaign4"></div>
+    <div class="book-contact">
+      <span>&copy; Liam Jacob Kengla</span>
+    </div>
+  </div>
+</div>
+
+<div class="book-modal" id="wrcModal" aria-hidden="true">
+  <button class="book-close" id="wrcClose" aria-label="Close">&times;</button>
+  <div class="gallery-scroll" id="wrcScroll">
+    <div class="wrc-section wrc-hero">
+      <img src="portfolio projects/WRC/web/wrc-monte-carlo-wide.jpg" alt="Rallye Monte-Carlo season launch stage with every team">
+    </div>
+    <div class="project-head">
+      <h2 class="project-title">A proposed rebrand for the<br> World Rally Championship and<br> its streaming service, Rally.TV.</h2>
+      <div class="project-texts">
+        <div class="pt-description">
+          <h3>Project Description</h3>
+          <p style="max-width: 50ch">This proposed rebrand of the World Rally Championship and its streaming service, Rally.TV, is designed to attract new viewers, building on the recent rise in Formula&nbsp;1 viewership under the same governing body, the FIA.</p>
+          <p style="max-width: 48ch">A visual system inspired by important details of rally racing, referencing the physical forms that appear in racing, through the weight reduction concept and a typeface inspired by the shape language of track iconography, as well as the spirited, enthusiast side of motorsport, through posters and layouts inspired by vintage automotive advertisements.</p>
+          <p style="max-width: 51ch">Promotional materials are aimed at building interest in the sport and teaching fans more about it as they enjoy it, alongside user interface design that prioritizes live streaming.</p>
+        </div>
+        <div>
+          <h3>Design</h3><p>L.J. Kengla</p>
+          <h3>Oversight</h3><p>Sherlan Abesamis<br>ArtCenter College of Design</p>
+          <h3>Content</h3><p>Red Bull Content Pool</p>
+        </div>
+      </div>
+    </div>
+    <p class="interjection is-long">A custom display typeface for WRC and Rally.TV, designed to resemble the linework of rally stage segments and racing iconography.</p>
+    <div class="wrc-section">
+      <div class="type-stage" id="typeStage" aria-label="World Rally Championship, typed in the custom typeface" role="img">
+        <div class="type-line" id="typeLine"></div>
+      </div>
+      <div class="type-specimen">
+        <div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/A.png" alt="A"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/B.png" alt="B"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/C.png" alt="C"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/D.png" alt="D"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/E.png" alt="E"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/F.png" alt="F"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/G.png" alt="G"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/H.png" alt="H"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/I.png" alt="I"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/J.png" alt="J"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/K.png" alt="K"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/L.png" alt="L"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/M.png" alt="M"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/N.png" alt="N"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/O.png" alt="O"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/P.png" alt="P"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/Q.png" alt="Q"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/R.png" alt="R"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/S.png" alt="S"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/T.png" alt="T"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/U.png" alt="U"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/V.png" alt="V"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/W.png" alt="W"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/X.png" alt="X"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/Y.png" alt="Y"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/Z.png" alt="Z"></div>
+        <div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/1.png" alt="1"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/2.png" alt="2"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/3.png" alt="3"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/4.png" alt="4"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/5.png" alt="5"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/6.png" alt="6"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/7.png" alt="7"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/8.png" alt="8"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/9.png" alt="9"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/0.png" alt="0"></div><div class="ts-cell"><img class="tg" src="portfolio projects/WRC/web/type/amp.png" alt="ampersand"></div>
+      </div>
+    </div>
+    <div class="wrc-section wrc-wayfinding">
+      <div class="wrc-way-side">
+        <p class="side-statement">Wayfinding and podiums for each event.</p>
+        <div class="way-boom"><img src="portfolio projects/WRC/web/wrc-estonia-boom.jpg" alt="Rally Estonia service park wayfinding on a boom above the crowd" loading="lazy"></div>
+      </div>
+      <img class="wrc-way-main" src="portfolio projects/WRC/web/wrc-podium.jpg" alt="Rally Japan podium with the new WRC and Rally.TV marks" loading="lazy">
+    </div>
+    <div class="wrc-section wrc-wide">
+      <img src="portfolio projects/WRC/web/wrc-acropolis.jpg" alt="Acropolis Rally Greece, Rally of Gods podium backdrop" loading="lazy">
+    </div>
+    <p class="interjection is-long">Collectible posters commemorating WRC anniversary events, designed to resemble vintage automotive advertisements.</p>
+    <div class="wrc-section wrc-posters">
+      <img src="portfolio projects/WRC/web/wrc-poster-monte-carlo.jpg" alt="Rallye Monte-Carlo event poster" loading="lazy">
+      <img src="portfolio projects/WRC/web/wrc-poster-greece.jpg" alt="Rally Greece Acropolis event poster" loading="lazy">
+      <img src="portfolio projects/WRC/web/wrc-poster-spain.jpg" alt="Rally Islas Canarias Spain event poster" loading="lazy">
+      <img src="portfolio projects/WRC/web/wrc-poster-teams.jpg" alt="2026 manufacturer teams and cars reference poster" loading="lazy">
+    </div>
+    <p class="interjection is-long">Bold street posters designed to grab attention, with one call to action: stream on Rally.TV.</p>
+    <div class="wrc-section wrc-posters">
+      <img src="portfolio projects/WRC/web/rtv-poster-binge-rally.jpg" alt="Rally.TV poster, Binge Rally" loading="lazy">
+      <img src="portfolio projects/WRC/web/rtv-poster-chase-speed.jpg" alt="Rally.TV poster, Chase Speed" loading="lazy">
+      <img src="portfolio projects/WRC/web/rtv-poster-rally-tv-car.jpg" alt="Rally.TV poster, Stream Rally.TV" loading="lazy">
+      <img src="portfolio projects/WRC/web/rtv-poster-laser-focus.jpg" alt="Rally.TV poster, Laser Focus" loading="lazy">
+    </div>
+    <p class="interjection">Stationery for WRC and Rally.TV.</p>
+    <div class="wrc-section">
+      <div class="wrc-stationery">
+        <div class="st-col">
+          <img src="portfolio projects/WRC/web/envelope-wrc-front.webp" alt="WRC envelope, front" loading="lazy">
+          <img src="portfolio projects/WRC/web/envelope-wrc-back.webp" alt="WRC envelope, back" loading="lazy">
+          <div class="card-placeholder" role="img" aria-label="WRC business card, front (coming soon)"></div>
+          <div class="card-placeholder" role="img" aria-label="WRC business card, back (coming soon)"></div>
+        </div>
+        <div class="st-col">
+          <img src="portfolio projects/WRC/web/envelope-rtv-back.webp" alt="Rally.TV envelope, back" loading="lazy">
+          <img src="portfolio projects/WRC/web/envelope-rtv-front.webp" alt="Rally.TV envelope, front" loading="lazy">
+          <div class="card-placeholder" role="img" aria-label="Rally.TV business card, front (coming soon)"></div>
+          <div class="card-placeholder" role="img" aria-label="Rally.TV business card, back (coming soon)"></div>
+        </div>
+      </div>
+    </div>
+    <p class="interjection">A weight&#8209;reduced cover sleeve for the mid&#8209;season book.</p>
+    <div class="wrc-section wrc-objects">
+      <img src="portfolio projects/WRC/web/sleeve-closed.webp" alt="2026 mid-season book in its sleeve" loading="lazy">
+      <div class="sleeve-swap" aria-label="2026 mid-season book sliding out of its sleeve" role="img">
+        <img class="ss-closed" src="portfolio projects/WRC/web/sleeve-closed.webp" alt="" loading="lazy">
+        <img class="ss-body" src="portfolio projects/WRC/web/sleeve-open.webp" alt="" loading="lazy">
+        <div class="ss-top"><img src="portfolio projects/WRC/web/sleeve-open.webp" alt="" loading="lazy"></div>
+      </div>
+    </div>
+    <dl class="wrc-section book-specs">
+      <div><dt>Design</dt><dd>L.J. Kengla</dd></div>
+      <div><dt>Texts by</dt><dd>L.J. Kengla</dd></div>
+      <div><dt>Oversight</dt><dd>Sherlan Abesamis</dd></div>
+      <div><dt>Trim Size</dt><dd>6.75 x 9</dd></div>
+      <div><dt>Page Count</dt><dd>256</dd></div>
+      <div><dt>Print</dt><dd>Chris Saw</dd></div>
+      <div><dt>Typefaces</dt><dd>Basier Square Mono<br>Aktiv Grotesk</dd></div>
+    </dl>
+    <p class="interjection is-long">Designed to teach new fans the stages of a rally weekend, the scoring system, the teams and manufacturers, vehicle specifications, and season standings.</p>
+    <div class="book-embed-section">
+      <div class="spread-player" id="spreadPlayerWrc">
+        <img id="spreadPlayerImgWrc" src="portfolio projects/WRC/book-web/spread-001.jpg" alt="WRC 2026 Mid-Season &mdash; half-title page" draggable="false">
+        <img class="shadow" id="spreadPlayerShadowWrc" src="portfolio projects/OurWorkIsNeverDone/shadow2.png" alt="" aria-hidden="true">
+        <div class="cover-flip cover-flip-front" id="coverFlipFrontWrc">
+          <img src="portfolio projects/WRC/cover/front.jpg" alt="WRC 2026 Mid-Season &mdash; front cover" draggable="false">
+          <div class="cover-face-back" aria-hidden="true"></div>
+        </div>
+        <div class="cover-flip cover-flip-back" id="coverFlipBackWrc">
+          <img src="portfolio projects/WRC/cover/back.jpg" alt="WRC 2026 Mid-Season &mdash; back cover" draggable="false">
+          <div class="cover-face-back" aria-hidden="true"></div>
+        </div>
+        <div class="player-hint" id="playerHintWrc">Click to open</div>
+        <div class="player-side-hint">Hover over the book to pause, click left or right to turn the page</div>
+      </div>
+      <div class="player-progress">
+        <div class="player-strip" id="playerStripWrc" aria-hidden="true"></div>
+        <div class="player-progress-label">
+          <span class="player-page" id="playerPageLeftWrc"></span>
+          <span class="player-hint-playing" id="playerHintPlayingWrc"><span class="hint-narrow">Hover over the book to pause, click left or right to turn the page</span><span>Glide across to preview faster</span></span>
+          <span class="player-page" id="playerPageRightWrc"></span>
+        </div>
+      </div>
+    </div>
+    <p class="interjection is-long">Highlighted spreads showing the team rosters, vehicle specifications, race winners, and mid&#8209;season standings from the book.</p>
+    <div class="wrc-spreads" id="wrcSpreads"></div>
+    <p class="interjection is-long is-tight">A web interface for Rally.TV that prioritizes live streaming. The live feed is designed to stay in view while you browse the teams, car specs, and standings.</p>
+    <div class="wrc-section wrc-videos">
+      <div class="wrc-video-wrap is-wide">
+        <video class="wrc-video" src="portfolio projects/WRC/web/primary-scenario.mp4" muted loop playsinline preload="none" aria-label="Scrolling through the Rally.TV website"></video>
+        <img class="wrc-video-cover" src="portfolio projects/WRC/web/primary-scenario-cover.png" alt="" aria-hidden="true">
+      </div>
+    </div>
     <div class="book-contact">
       <span>&copy; Liam Jacob Kengla</span>
     </div>
@@ -2219,9 +3701,9 @@
     </div>
     <div class="book-description">
       <h2>Organico Bello</h2>
-      <p>This proposed rebrand of Organico Bello centers the packaging around the quality and simplicity of its ingredients. Instead of following other brands that place the tomato front and center, the design leaves it off the label, allowing the product itself to stand out.</p>
-      <p>Made from recycled Birch paper that matches the natural color of fresh pasta, the packaging becomes a canvas for the ingredients themselves. The colors of the tomato-based ingredients visually coat the pasta-colored packaging, creating a direct connection between the food and its container. Cutouts keep the food visible, while the glass jars preserve the ingredients while, most importantly, keeping them visible from every angle. The custom label wraps frame the product rather than conceal it like a standard label.</p>
-      <p>Rooted in Naples&rsquo; tradition of wholesome, ingredient-first cooking, the packaging follows the same philosophy as the food itself: let the ingredients speak for themselves.</p>
+      <p style="max-width: 56ch">This proposed rebrand of Organico Bello centers the packaging around the quality and simplicity of its ingredients. Instead of following other brands that place the tomato front and center, the design leaves it off the label, allowing the product itself to stand out.</p>
+      <p style="max-width: 48ch">Made from recycled Birch paper that matches the natural color of fresh pasta, the packaging becomes a canvas for the ingredients themselves. The colors of the tomato&#8209;based ingredients visually coat the pasta&#8209;colored packaging, creating a direct connection between the food and its container. Cutouts keep the food visible, while the glass jars preserve the ingredients while, most importantly, keeping them visible from every angle. The custom label wraps frame the product rather than conceal it like a standard label.</p>
+      <p style="max-width: 51ch">Rooted in Naples&rsquo; tradition of wholesome, ingredient&#8209;first cooking, the packaging follows the same philosophy as the food itself: let the ingredients speak for themselves.</p>
       <dl>
         <div class="dl-col">
           <div><dt>Oversight</dt><dd>Ania Borysiewicz<br>Founder of Ladder Design</dd></div>
@@ -2229,6 +3711,35 @@
       </dl>
     </div>
     <div class="product-groups" id="productGroups"></div>
+  </div>
+</div>
+
+<div class="book-modal" id="aboutModal" aria-hidden="true">
+  <button class="book-close" id="aboutClose" aria-label="Close">&times;</button>
+  <div class="gallery-scroll" id="aboutScroll">
+    <div class="about-intro">
+      <div class="about-text">
+        <p>I am half my father.</p>
+        <p>He was William. I am Liam. I inherited his curiosity, charisma, and ambition. As a boy, he let me experiment with Adobe on his computer. I created wallpapers of my favorite video game characters and became obsessed. Teaching myself a skill that brought my imagination to life gave me a sense of purpose and made me feel whole.</p>
+        <p>Today, I am inspired by craftsmanship in all its forms. I ride vintage motorcycles for the raw feeling of movement and the chance to fix them, and collect mid&#8209;century furniture and artisanal clothing to learn from their attention to detail. What began as curiosity became a life spent learning, creating, and finding meaning in the things we keep.</p>
+        <p>Let&rsquo;s bring ideas to life and create work that endures.</p>
+        <div class="about-contact">
+          <p class="about-ask">What do you need?</p>
+          <div class="about-links">
+            <a href="mailto:kenglaliam@gmail.com" class="mail-flip" aria-label="Email Liam"><span aria-hidden="true">M</span><span aria-hidden="true">a</span><span aria-hidden="true">i</span><span aria-hidden="true">l</span></a>
+            <a href="https://www.linkedin.com/in/liam-kengla-0637b2316" target="_blank" rel="noopener">LinkedIn</a>
+            <a href="#" class="resume-link">Resume</a>
+          </div>
+          <p class="about-location">Based in Los Angeles, CA. Born in and frequents Portland, OR.</p>
+        </div>
+      </div>
+      <figure class="about-portrait">
+        <img src="about/portrait.jpg" alt="Liam Kengla">
+      </figure>
+    </div>
+    <div class="book-contact">
+      <span>&copy; Liam Jacob Kengla</span>
+    </div>
   </div>
 </div>
 
@@ -2703,6 +4214,9 @@
 
     function startIdleDrift() {
       if (idleDriftRaf) return;
+      // Never while another page is up (see syncAway below).
+      if (document.querySelector('.book-modal.open') ||
+          document.body.classList.contains('playground-open')) return;
       idleDriftRaf = requestAnimationFrame(idleDriftStep);
     }
 
@@ -2740,8 +4254,38 @@
       touchActive = false;
       stopMomentum();
       clearHover();
-      startIdleDrift();
+      stopIdleDrift();
     };
+
+    // While any other page is up (a project, About, Contact, the
+    // Playground) the carousel is frozen exactly where it was: no idle
+    // drift, and no wheel input reaches it, wherever the cursor is
+    // (over the header, the Playground grid, anything). When you come
+    // back it picks up from that same spot. Trackpad inertia from
+    // scrolling the page you just left keeps sending wheel events for a
+    // moment after it closes, so those are ignored for a short grace
+    // period instead of flinging the carousel.
+    const RETURN_GRACE_MS = 600;
+    let away = false;
+    let returnedAt = -Infinity;
+    const isAway = () =>
+      !!document.querySelector('.book-modal.open') ||
+      document.body.classList.contains('playground-open');
+    function syncAway() {
+      const now = isAway();
+      if (now === away) return;
+      away = now;
+      if (away) {
+        window.pauseCarouselForModal();
+      } else {
+        returnedAt = performance.now();
+        startIdleDrift();
+      }
+    }
+    const awayObserver = new MutationObserver(syncAway);
+    document.querySelectorAll('.book-modal').forEach((m) =>
+      awayObserver.observe(m, { attributes: true, attributeFilter: ['class'] }));
+    awayObserver.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
     track.addEventListener('mousemove', (e) => {
       mouseX = e.clientX;
@@ -2794,7 +4338,11 @@
     // the page — except over an open book modal, which has its own
     // scrolling gallery and should keep native scroll behavior.
     window.addEventListener('wheel', (e) => {
-      if (e.target.closest('.book-modal.open')) return;
+      if (away || isAway()) return;
+      if (performance.now() - returnedAt < RETURN_GRACE_MS) {
+        e.preventDefault();
+        return;
+      }
       stopIdleDrift();
       e.preventDefault();
       const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
@@ -2952,6 +4500,178 @@
     });
   })();
 
+  // Touch Bar-style progress strip shared by the book players (WRC, Our
+  // Work Is Never Done): one sliver per spread cut from a single sprite
+  // of thumbnails, the current spread shown whole and its neighbors
+  // stepping down to hairlines; spreads already passed full strength, the
+  // rest dimmed. Gliding across it scrubs: the target is the sliver under
+  // the cursor in the current fisheye layout (the wide slivers around the
+  // current spread give fine control), and the strip walks toward it in
+  // big steps when far, single spreads when close. The player supplies
+  // onScrub(i) (show spread i) and onScrubbing(bool) (hold its slideshow).
+  // With `base` set (px), every sliver outside the focus keeps that width
+  // and the row can be longer than the strip; it then slides (centered on
+  // the current spread, clamped at the ends) so only part of the book is
+  // in view at a time. Without it the whole book fits the strip's width.
+  window.createBookStrip = function (opts) {
+    const { el, count, sprite, cols, frameW, frameH, focus, gap, base, onScrub, onScrubbing } = opts;
+    el.style.setProperty('--fw', frameW + 'px');
+    el.style.setProperty('--fh', frameH + 'px');
+    el.style.height = frameH + 'px';
+    el.style.setProperty('--strip-sprite', "url('" + sprite + "')");
+    el.style.setProperty('--strip-size', (cols * frameW) + 'px ' + (Math.ceil(count / cols) * frameH) + 'px');
+    const track = document.createElement('div');
+    track.className = 'strip-track';
+    track.style.gap = gap + 'px';
+    el.appendChild(track);
+    const slivers = [];
+    for (let i = 0; i < count; i++) {
+      const sliver = document.createElement('span');
+      sliver.className = 'strip-sliver';
+      const thumb = document.createElement('span');
+      thumb.style.backgroundPosition = (-(i % cols) * frameW) + 'px ' + (-Math.floor(i / cols) * frameH) + 'px';
+      sliver.appendChild(thumb);
+      track.appendChild(sliver);
+      slivers.push(sliver);
+    }
+    let index = -1;
+    // While scrubbing, the row keeps the current spread under the cursor
+    // (anchorX); otherwise it centers it.
+    let anchorX = null;
+
+    // Sliver widths and the row's scroll offset with `at` in focus.
+    function layout(at) {
+      const view = el.clientWidth;
+      let rest = base;
+      if (!base) {
+        let focusTotal = 0;
+        let focusCount = 0;
+        if (at >= 0) {
+          for (let i = 0; i < count; i++) {
+            const d = Math.abs(i - at);
+            if (d < focus.length) { focusTotal += focus[d]; focusCount += 1; }
+          }
+        }
+        rest = Math.max(0.5, (view - gap * (count - 1) - focusTotal) / (count - focusCount));
+      }
+      const w = slivers.map((_, i) => {
+        const d = at >= 0 ? Math.abs(i - at) : Infinity;
+        return d < focus.length ? focus[d] : rest;
+      });
+      let scroll = 0;
+      const total = w.reduce((t, x) => t + x, 0) + gap * (count - 1);
+      if (base && total > view) {
+        let start = 0;
+        for (let i = 0; i < Math.max(at, 0); i++) start += w[i] + gap;
+        const center = at >= 0 ? start + w[at] / 2 : 0;
+        if (anchorX !== null && at >= 0) scroll = center - anchorX;
+        else scroll = at >= 0 ? center - view / 2 : 0;
+        scroll = Math.min(Math.max(scroll, 0), total - view);
+      }
+      return { w, scroll };
+    }
+
+    function update(at) {
+      index = at;
+      if (el.clientWidth <= 0) return;
+      const { w, scroll } = layout(at);
+      slivers.forEach((sliver, i) => {
+        sliver.style.width = w[i] + 'px';
+        sliver.classList.toggle('is-ahead', at < 0 || i > at);
+      });
+      track.style.transform = 'translateX(' + (-scroll) + 'px)';
+    }
+
+    function sliverAt(x) {
+      const { w, scroll } = layout(index);
+      let edge = 0;
+      x += scroll;
+      for (let i = 0; i < count; i++) {
+        edge += w[i] + gap;
+        if (x < edge) return i;
+      }
+      return count - 1;
+    }
+
+    // Scrubbing: the row always slides so the current spread sits under
+    // the cursor (anchorX). Moving fast picks whatever sliver is drawn
+    // under the cursor right now, so pointing at a thumbnail shows it;
+    // moving slowly works like a gear, every PX_PER_SPREAD of travel
+    // turning exactly one spread, for fine control. Resting within EDGE px
+    // of either end creeps one spread at a time in that direction.
+    const PX_PER_SPREAD = 16;
+    const FAST_PX_PER_MS = 0.5;
+    let lastT = 0;
+    function renderedSliverAt(clientX) {
+      for (let i = 0; i < count; i++) {
+        const r = slivers[i].getBoundingClientRect();
+        if (clientX >= r.left && clientX < r.right + gap) return i;
+      }
+      return clientX < el.getBoundingClientRect().left + el.clientWidth / 2 ? 0 : count - 1;
+    }
+    const EDGE = 28;
+    const EDGE_STEP_MS = 160;
+    let lastX = null;
+    let travel = 0;
+    let edgeTimer = null;
+    function go(next) {
+      next = Math.min(count - 1, Math.max(0, next));
+      if (next !== index) onScrub(next);
+      else update(index);
+    }
+    function edgeCreep() {
+      edgeTimer = null;
+      if (lastX === null || index < 0) return;
+      const dir = lastX < EDGE ? -1 : lastX > el.clientWidth - EDGE ? 1 : 0;
+      if (!dir || (dir < 0 && index === 0) || (dir > 0 && index === count - 1)) return;
+      go(index + dir);
+      edgeTimer = setTimeout(edgeCreep, EDGE_STEP_MS);
+    }
+    el.addEventListener('mouseenter', (e) => {
+      onScrubbing(true);
+      lastX = e.clientX - el.getBoundingClientRect().left;
+      lastT = e.timeStamp;
+      travel = 0;
+      const target = renderedSliverAt(e.clientX);
+      anchorX = lastX;
+      go(target);
+    });
+    el.addEventListener('mousemove', (e) => {
+      onScrubbing(true);
+      const x = e.clientX - el.getBoundingClientRect().left;
+      if (lastX === null) { lastX = x; lastT = e.timeStamp; }
+      const dx = x - lastX;
+      const speed = Math.abs(dx) / Math.max(1, e.timeStamp - lastT);
+      lastX = x;
+      lastT = e.timeStamp;
+      anchorX = x;
+      if (speed > FAST_PX_PER_MS) {
+        travel = 0;
+        go(renderedSliverAt(e.clientX));
+      } else {
+        travel += dx;
+        let next = index;
+        while (Math.abs(travel) >= PX_PER_SPREAD) {
+          next += Math.sign(travel);
+          travel -= Math.sign(travel) * PX_PER_SPREAD;
+        }
+        if (next <= 0 || next >= count - 1) travel = 0;
+        go(next);
+      }
+      if (!edgeTimer) edgeCreep();
+    });
+    el.addEventListener('mouseleave', () => {
+      onScrubbing(false);
+      lastX = null;
+      anchorX = null;
+      clearTimeout(edgeTimer);
+      edgeTimer = null;
+      update(index);
+    });
+    window.addEventListener('resize', () => update(index));
+    return { update };
+  };
+
   (function () {
     const PROJECT_DIR = 'portfolio projects/OurWorkIsNeverDone/';
     const BOOK_DIR = PROJECT_DIR + 'spreads_web/';
@@ -2974,7 +4694,7 @@
     const coverFlipBack = document.getElementById('coverFlipBack');
     const playerHint = document.getElementById('playerHint');
     const playerHintPlaying = document.getElementById('playerHintPlaying');
-    const playerProgressFill = document.getElementById('playerProgressFill');
+    const playerStrip = document.getElementById('playerStrip');
     const playerPageLeft = document.getElementById('playerPageLeft');
     const playerPageRight = document.getElementById('playerPageRight');
 
@@ -3010,9 +4730,9 @@
           right = String(last);
         }
       }
-      playerProgressFill.style.transform = 'scaleX(' + (last / TOTAL_PAGES) + ')';
       playerPageLeft.textContent = left;
       playerPageRight.textContent = right;
+      strip.update(coverFlipFront.classList.contains('open') ? shownIndex : -1);
     }
 
     // A page-by-page flip was too slow to load through for an 800-page
@@ -3222,7 +4942,7 @@
       playerHintPlaying.classList.add('visible');
       if (timer) clearInterval(timer);
       timer = setInterval(() => {
-        if (paused) return;
+        if (paused || scrubbing) return;
         advanceOnce();
       }, FRAME_MS);
     }
@@ -3238,6 +4958,46 @@
     // slideshow once that flip has finished; ignored while already open or
     // mid-playthrough (including during the closing bookend, since started
     // only flips back to false once that finishes).
+    // Progress strip (see createBookStrip). 401 spreads won't fit at a
+    // usable size, so slivers match WRC's size and the strip slides to
+    // keep the current spread in view; a whole thumbnail is 27x22.
+    let scrubbing = false;
+    function scrubTo(i) {
+      if (!started) {
+        clearPendingTimers();
+        snapCover(coverFlipBack, 'shut', false);
+        snapCover(coverFlipBack, 'fade-out', false);
+        coverFlipBack.classList.remove('active');
+        playerHint.classList.add('hidden');
+        snapCover(coverFlipFront, 'open', true);
+        started = true;
+        player.classList.add('started');
+        playerHintPlaying.classList.add('visible');
+        if (timer) clearInterval(timer);
+        timer = setInterval(() => {
+          if (paused || scrubbing) return;
+          advanceOnce();
+        }, FRAME_MS);
+      }
+      coverFlipFront.classList.toggle('settled', i >= 1);
+      setPlayerFrame(i);
+      preload(spreads[i + 1]);
+      frameIndex = i + 1;
+    }
+    const strip = window.createBookStrip({
+      el: playerStrip,
+      count: spreads.length,
+      sprite: PROJECT_DIR + 'book-strip.jpg',
+      cols: 20,
+      frameW: 27,
+      frameH: 22,
+      focus: [27, 18, 12, 9],
+      gap: 1,
+      base: 7,
+      onScrub: (i) => scrubTo(i),
+      onScrubbing: (on) => { scrubbing = on; },
+    });
+
     function openCoverAndPlay() {
       if (started || coverFlipFront.classList.contains('open')) return;
       playerHint.classList.add('hidden');
@@ -3303,15 +5063,29 @@
       // work, then Emma Tenayuca in jail (1937), the strike's "Unfair"
       // umbrella, and her 1939 return to San Antonio. Opens on a triple,
       // then pairs, so the start reads as deliberate.
-      { id: 'galleryRowsBefore', rows: [[35, 51, 23], ['noteIndividuals', 84], [40, 82]] },
+      { id: 'galleryRowsBefore', rows: [[35, 51, 23], [84, 40, 82]] },
       // The Bracero Program chapter in order: México City and Monterrey
       // recruitment, the processing centers, the Hidalgo, Texas border
       // bridge, then the bus, camp, and fields in California.
-      { id: 'galleryRowsSequence', rows: [[122, 126], [133, 137, 144], ['noteSequences', 152], [156], [162, 165, 176]] },
+      // Recruitment, processing and documentation, DDT spraying and X-rays
+      // at the Hidalgo processing center, the border bridge, the bus and a
+      // paystub, camp life, then the fields.
+      { id: 'galleryRowsSequence', rows: [[122, 126], [133, 137, 144], { spreads: [103], full: true }, [102, 104], [152, 156], [162, 169], [166, 171, 173], [176, 178, 180]] },
       // Tex-Son strikers and women picketing from the Juan de la Cruz
       // funeral chapter, the Laredo ILGWU meeting, then Dolores Huerta's
       // quote beside her photo.
-      { id: 'galleryRowsAfter', rows: [[195, 228, 386], ['noteActivists', 226], [262, 266]] },
+      { id: 'galleryRowsAfter', rows: [{ spreads: [228], full: true }, [195, 226, 386], [262, 266]] },
+      // Single-column text: Emma Tenayuca's chapter and the Bracero
+      // introduction, then the column with a figure (the Texas map) and
+      // with photographs (Dolores Huerta).
+      { id: 'galleryRowsColumn', rows: [{ spreads: [76, 97], caption: 'Single-column text' }, { spreads: [33, 242], caption: 'With figures and photographs' }] },
+      // The book's table of contents, then two chapters' contents pages
+      // (the chapter title with the list of texts it holds).
+      { id: 'galleryRowsContents', columns: ['Table of contents', 'Pecan Shellers of San Antonio', 'The Bracero Program'], rows: [[3, 7, 90]] },
+      // Each chapter opens on three red spreads in the same order, read
+      // left to right: one row per chapter, one column per page type
+      // (labeled once, above the grid).
+      { id: 'galleryRowsSystem', columns: ['Chapter dividers', 'Quote pages', 'Biblical verses'], rows: [{ spreads: [4, 5, 6], caption: 'Pecan Shellers of San Antonio' }, { spreads: [87, 88, 89], caption: 'The Bracero Program' }, { spreads: [183, 184, 185], caption: 'The Tex-Son Strike' }] },
     ];
     let galleryBuilt = false;
 
@@ -3320,7 +5094,7 @@
       wrap.className = 'gallery-img-wrap';
       const img = document.createElement('img');
       img.src = src;
-      img.alt = '';
+      img.alt = 'Our Work Is Never Done — interior spread';
       img.loading = 'lazy';
       wrap.appendChild(img);
       if (withShadow) {
@@ -3336,10 +5110,13 @@
     }
 
     function buildGallery() {
+      // A row is an array of spread numbers, or { spreads, caption } for a
+      // captioned row (caption set underneath, like the WRC highlights).
       function fillRows(container, rows) {
-        rows.forEach((items) => {
+        rows.forEach((rowDef) => {
+          const items = Array.isArray(rowDef) ? rowDef : rowDef.spreads;
           const row = document.createElement('div');
-          row.className = 'gallery-row';
+          row.className = 'gallery-row' + (rowDef.full ? ' is-full' : '');
           items.forEach((item) => {
             if (typeof item === 'string') {
               row.classList.add('has-text');
@@ -3349,6 +5126,12 @@
             }
           });
           container.appendChild(row);
+          if (rowDef.caption) {
+            const cap = document.createElement('p');
+            cap.className = 'row-caption';
+            cap.textContent = rowDef.caption;
+            container.appendChild(cap);
+          }
         });
       }
 
@@ -3365,7 +5148,20 @@
       heroRow.appendChild(heroWrap);
       document.getElementById('galleryRowsBinding').appendChild(heroRow);
 
-      GALLERY_SECTIONS.forEach((s) => fillRows(document.getElementById(s.id), s.rows));
+      GALLERY_SECTIONS.forEach((s) => {
+        const container = document.getElementById(s.id);
+        if (s.columns) {
+          const labels = document.createElement('div');
+          labels.className = 'gallery-row column-labels';
+          s.columns.forEach((text) => {
+            const label = document.createElement('p');
+            label.textContent = text;
+            labels.appendChild(label);
+          });
+          container.appendChild(labels);
+        }
+        fillRows(container, s.rows);
+      });
       galleryBuilt = true;
     }
 
@@ -3413,7 +5209,7 @@
     // space), not a piece of actual content — an image, the slideshow
     // player, text — nested inside one.
     galleryScroll.addEventListener('click', (e) => {
-      const wrapper = e.target.closest('.book-intro, .book-description, .book-3d, .gallery-rows, .gallery-row, .book-embed-section, .book-contact');
+      const wrapper = e.target.closest('.book-intro, .ow-intro, .ow-book, .project-head, .book-description, .book-3d, .gallery-rows, .gallery-row, .book-embed-section, .book-contact');
       if (wrapper === e.target) closeBook();
     });
 
@@ -3690,7 +5486,7 @@
       wrap.className = 'gallery-img-wrap';
       const img = document.createElement('img');
       img.src = src;
-      img.alt = '';
+      img.alt = 'Old New Mens Club — interior spread';
       img.loading = 'lazy';
       wrap.appendChild(img);
       if (withShadow) {
@@ -3781,7 +5577,7 @@
     closeBtn.addEventListener('click', closeBook);
 
     galleryScroll.addEventListener('click', (e) => {
-      const wrapper = e.target.closest('.book-intro, .book-description, .book-3d, .gallery-rows, .gallery-row, .book-embed-section, .book-contact');
+      const wrapper = e.target.closest('.book-intro, .ow-intro, .ow-book, .project-head, .book-description, .book-3d, .gallery-rows, .gallery-row, .book-embed-section, .book-contact');
       if (wrapper === e.target) closeBook();
     });
 
@@ -4038,7 +5834,7 @@
       wrap.className = 'gallery-img-wrap';
       const img = document.createElement('img');
       img.src = src;
-      img.alt = '';
+      img.alt = 'Styles Make Fights — interior spread';
       img.loading = 'lazy';
       wrap.appendChild(img);
       if (withShadow) {
@@ -4114,7 +5910,7 @@
     closeBtn.addEventListener('click', closeBook);
 
     galleryScroll.addEventListener('click', (e) => {
-      const wrapper = e.target.closest('.book-intro, .book-description, .book-3d, .gallery-rows, .gallery-row, .book-embed-section, .book-contact');
+      const wrapper = e.target.closest('.book-intro, .ow-intro, .ow-book, .project-head, .book-description, .book-3d, .gallery-rows, .gallery-row, .book-embed-section, .book-contact');
       if (wrapper === e.target) closeBook();
     });
 
@@ -4172,16 +5968,14 @@
     const AFTER_ROWS = [
       { size: 'lg', items: ['travel-bus.jpg'] },
     ];
-    const CAMPAIGN_ROWS = [
-      { size: 'lg', items: ['campaign/bus-stop.jpg', 'campaign/billboard.jpg', 'campaign/updated-signs.jpg'] },
-    ];
+    // The Seahorses campaign is static HTML (.split-grid).
 
     function makeItem(filename) {
       const wrap = document.createElement('div');
       wrap.className = 'brand-item';
       const img = document.createElement('img');
       img.loading = 'lazy';
-      img.alt = '';
+      img.alt = 'San Diego Football Club — ' + filename.replace(/^.*\//, '').replace(/\.[a-z]+$/, '').replace(/[-_]/g, ' ');
       img.src = PROJECT_DIR + filename;
       wrap.appendChild(img);
       return wrap;
@@ -4202,7 +5996,6 @@
       buildRows(document.getElementById('brandGalleryBefore4'), BEFORE_ROWS);
       buildRows(document.getElementById('brandGalleryClothing4'), CLOTHING_ROWS);
       buildRows(document.getElementById('brandGalleryAfter4'), AFTER_ROWS);
-      buildRows(document.getElementById('brandGalleryCampaign4'), CAMPAIGN_ROWS);
       galleryBuilt = true;
     }
 
@@ -4252,7 +6045,7 @@
     closeBtn.addEventListener('click', closeBook);
 
     galleryScroll.addEventListener('click', (e) => {
-      const wrapper = e.target.closest('.book-description, .brand-gallery, .brand-gallery-row, .crest-breakdown-figure, .book-embed-section, .book-contact');
+      const wrapper = e.target.closest('.book-description, .brand-gallery, .brand-gallery-row, .crest-breakdown-figure, .book-embed-section, .split-grid, .book-contact');
       if (wrapper === e.target) closeBook();
     });
 
@@ -4461,16 +6254,8 @@
       if (carouselControls) carouselControls.style.visibility = '';
     }
 
-    // The header's single link: Contact on the homepage, Work while the
-    // contact page is open, each taking the other's place.
-    navToggle.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (modal.classList.contains('open')) {
-        closeContact();
-      } else {
-        openContact();
-      }
-    });
+    // "What do you need?" is plain text now; the contact page isn't
+    // opened from the header.
 
     closeBtn.addEventListener('click', closeContact);
 
@@ -4485,6 +6270,724 @@
     });
   })();
 
+
+  // About (placeholder for now) and Playground, the two header links that
+  // replaced the email and phone number. About opens like a project page
+  // (header shrinks to the K + X, see .project-open below). Playground
+  // swaps the carousel for the grid; its link reads Work while it's open
+  // and takes you back, and so does the logo.
+  (function () {
+    const about = document.getElementById('aboutModal');
+    const aboutLink = document.getElementById('aboutLink');
+    const aboutClose = document.getElementById('aboutClose');
+    const aboutScroll = document.getElementById('aboutScroll');
+    const carouselControls = document.querySelector('.controls');
+
+    function openAbout() {
+      about.classList.add('open');
+      about.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      aboutScroll.scrollTop = 0;
+      if (carouselControls) carouselControls.style.visibility = 'hidden';
+      if (window.pauseCarouselForModal) window.pauseCarouselForModal();
+    }
+
+    function closeAbout() {
+      about.classList.remove('open');
+      about.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (carouselControls) carouselControls.style.visibility = '';
+    }
+
+    // About and Playground stay in the header on project pages; from there
+    // they close the project first (through its own X, so it cleans up).
+    function closeOpenProject() {
+      const open = document.querySelector('.book-modal.open');
+      if (open && open !== about) open.querySelector('.book-close').click();
+    }
+
+    aboutLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeOpenProject();
+      openAbout();
+    });
+    aboutClose.addEventListener('click', closeAbout);
+
+    // Mail -> Liam (see .mail-flip): slide the letters, swap the case of
+    // the first and last halfway through the move.
+    const mailFlip = about.querySelector('.mail-flip');
+    if (mailFlip) {
+      const [m, , , l] = mailFlip.children;
+      let caseTimer = null;
+      const flip = (on) => {
+        mailFlip.classList.toggle('is-flipped', on);
+        clearTimeout(caseTimer);
+        caseTimer = setTimeout(() => {
+          m.textContent = on ? 'm' : 'M';
+          l.textContent = on ? 'L' : 'l';
+        }, 175);
+      };
+      mailFlip.addEventListener('mouseenter', () => flip(true));
+      mailFlip.addEventListener('mouseleave', () => flip(false));
+      mailFlip.addEventListener('focus', () => flip(true));
+      mailFlip.addEventListener('blur', () => flip(false));
+    }
+    aboutScroll.addEventListener('click', (e) => {
+      const wrapper = e.target.closest('.about-intro, .about-text, .about-contact, .book-description, .book-contact');
+      if (wrapper === e.target) closeAbout();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (about.classList.contains('open') && e.key === 'Escape') closeAbout();
+    });
+
+    const playground = document.getElementById('playground');
+    const playgroundLink = document.getElementById('playgroundLink');
+
+    window.openPlayground = function () {
+      document.body.classList.add('playground-open');
+      playground.setAttribute('aria-hidden', 'false');
+      playground.scrollTop = 0;
+      playgroundLink.textContent = 'Work';
+      if (window.pauseCarouselForModal) window.pauseCarouselForModal();
+    };
+
+    window.closePlayground = function () {
+      document.body.classList.remove('playground-open');
+      playground.setAttribute('aria-hidden', 'true');
+      playgroundLink.textContent = 'Playground';
+    };
+
+    playgroundLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeOpenProject();
+      if (about.classList.contains('open')) closeAbout();
+      if (document.body.classList.contains('playground-open')) window.closePlayground();
+      else window.openPlayground();
+    });
+  })();
+
+  // World Rally Championship — the mid-season book plays exactly like
+  // the other books (see Our Work Is Never Done's IIFE for how each piece
+  // works): click to swing the cover open, the interior runs as a
+  // slideshow, hover pauses, clicking the left/right half pages back and
+  // forward, and the back cover swings shut at the end. Progress bar and
+  // page numbers as in Our Work Is Never Done.
+  (function () {
+    // Web copies of "best quality spreads yet" (2025px exports, resized
+    // to 1800px): spread-001 is the half-title (page 1), 002-128 are the
+    // spreads, 129 is the last page (copyright).
+    const BOOK_DIR = 'portfolio projects/WRC/book-web/';
+    const SPREAD_COUNT = 129;
+    const bookFile = (n) => BOOK_DIR + 'spread-' + String(n).padStart(3, '0') + '.jpg';
+    const spreads = [];
+    for (let i = 1; i <= SPREAD_COUNT; i++) {
+      spreads.push(bookFile(i));
+    }
+
+    const modal = document.getElementById('wrcModal');
+    const closeBtn = document.getElementById('wrcClose');
+    const carouselControls = document.querySelector('.controls');
+    const galleryScroll = document.getElementById('wrcScroll');
+    const player = document.getElementById('spreadPlayerWrc');
+    const playerImg = document.getElementById('spreadPlayerImgWrc');
+    const playerShadow = document.getElementById('spreadPlayerShadowWrc');
+    const coverFlipFront = document.getElementById('coverFlipFrontWrc');
+    const coverFlipBack = document.getElementById('coverFlipBackWrc');
+    const playerHint = document.getElementById('playerHintWrc');
+    const playerHintPlaying = document.getElementById('playerHintPlayingWrc');
+    const playerStrip = document.getElementById('playerStripWrc');
+    const playerPageLeft = document.getElementById('playerPageLeftWrc');
+    const playerPageRight = document.getElementById('playerPageRightWrc');
+
+    const isFullSpread = (index) => index !== 0 && index !== spreads.length - 1;
+
+    const TOTAL_PAGES = 1 + (spreads.length - 2) * 2 + 1;
+    let shownIndex = 0;
+
+    // Page numbers follow the printed folios, not a count from the cover:
+    // the book's numbering starts on the "What is WRC?" spread (spread 12
+    // = pages 1-2), so spread n (index n - 1) is pages 2n - 23 and 2n - 22.
+    // Everything before it is front matter and reads "Intro".
+    const FIRST_NUMBERED_INDEX = 11;
+    function updateProgress() {
+      let left = '';
+      let right = '';
+      if (coverFlipFront.classList.contains('open')) {
+        if (shownIndex < FIRST_NUMBERED_INDEX) {
+          left = 'Intro';
+        } else {
+          const l = 2 * shownIndex - 21;
+          left = String(l).padStart(3, '0');
+          if (shownIndex < spreads.length - 1) right = String(l + 1).padStart(3, '0');
+        }
+      }
+      playerPageLeft.textContent = left;
+      playerPageRight.textContent = right;
+      strip.update(coverFlipFront.classList.contains('open') ? shownIndex : -1);
+    }
+
+    const strip = window.createBookStrip({
+      el: playerStrip,
+      count: spreads.length,
+      sprite: 'portfolio projects/WRC/web/book-strip.jpg',
+      cols: 16,
+      frameW: 33,
+      frameH: 22,
+      focus: [33, 18, 12, 9],
+      gap: 1,
+      base: 7,
+      onScrub: (i) => scrubTo(i),
+      onScrubbing: (on) => { scrubbing = on; },
+    });
+
+    const FRAME_MS = 500;
+    const FLIP_MS = 900;
+    const END_HOLD_MS = 500;
+    const SHUT_HOLD_MS = 3000;
+    const FADE_MS = 700;
+    let frameIndex = 0;
+    let timer = null;
+    let paused = false;
+    let started = false;
+    let pendingTimers = [];
+
+    function after(ms, fn) {
+      const id = setTimeout(() => {
+        pendingTimers = pendingTimers.filter((t) => t !== id);
+        fn();
+      }, ms);
+      pendingTimers.push(id);
+      return id;
+    }
+
+    function clearPendingTimers() {
+      pendingTimers.forEach(clearTimeout);
+      pendingTimers = [];
+    }
+
+    function snapCover(el, className, on) {
+      el.classList.add('no-transition');
+      el.classList.toggle(className, on);
+      void el.offsetWidth;
+      el.classList.remove('no-transition');
+    }
+
+    function preload(src) {
+      if (!src) return;
+      const img = new Image();
+      img.src = src;
+    }
+
+    function setPlayerFrame(index) {
+      playerImg.src = spreads[index];
+      playerShadow.style.display = isFullSpread(index) ? '' : 'none';
+      playerImg.classList.toggle('align-right', index === 0);
+      playerImg.classList.toggle('align-left', index === spreads.length - 1);
+      shownIndex = index;
+      updateProgress();
+    }
+
+    function showFrame() {
+      setPlayerFrame(frameIndex);
+      preload(spreads[frameIndex + 1]);
+      frameIndex += 1;
+    }
+
+    function resetPlayer() {
+      clearPendingTimers();
+      frameIndex = 0;
+      setPlayerFrame(0);
+      player.classList.remove('started');
+      snapCover(coverFlipFront, 'open', false);
+      coverFlipFront.classList.remove('settled');
+      snapCover(coverFlipBack, 'shut', false);
+      snapCover(coverFlipBack, 'fade-out', false);
+      coverFlipBack.classList.remove('active');
+      playerHint.classList.remove('hidden');
+      playerHintPlaying.classList.remove('visible');
+      updateProgress();
+    }
+
+    function playEnding() {
+      after(END_HOLD_MS, () => {
+        coverFlipBack.classList.add('active');
+        void coverFlipBack.offsetWidth;
+        coverFlipBack.classList.add('shut');
+        after(FLIP_MS + SHUT_HOLD_MS, () => {
+          frameIndex = 0;
+          setPlayerFrame(0);
+          snapCover(coverFlipFront, 'open', false);
+          coverFlipFront.classList.remove('settled');
+          updateProgress();
+          playerHint.classList.remove('hidden');
+          playerHintPlaying.classList.remove('visible');
+          coverFlipBack.classList.add('fade-out');
+          after(FADE_MS, () => {
+            snapCover(coverFlipBack, 'shut', false);
+            snapCover(coverFlipBack, 'fade-out', false);
+            coverFlipBack.classList.remove('active');
+            player.classList.remove('started');
+            started = false;
+          });
+        });
+      });
+    }
+
+    function advanceOnce() {
+      if (frameIndex === spreads.length - 1) {
+        setPlayerFrame(frameIndex);
+        clearInterval(timer);
+        timer = null;
+        playEnding();
+        return;
+      }
+      if (frameIndex === 1) {
+        coverFlipFront.classList.add('settled');
+      }
+      showFrame();
+    }
+
+    function retreatOnce() {
+      const current = frameIndex - 1;
+      if (current <= 0) {
+        if (current === 0) closeCoverAndReset();
+        return;
+      }
+      const target = current - 1;
+      setPlayerFrame(target);
+      frameIndex = target + 1;
+      if (target === 0) {
+        coverFlipFront.classList.remove('settled');
+      }
+    }
+
+    function closeCoverAndReset() {
+      clearInterval(timer);
+      timer = null;
+      clearPendingTimers();
+      playerHint.classList.remove('hidden');
+      playerHintPlaying.classList.remove('visible');
+      coverFlipFront.classList.remove('open');
+      updateProgress();
+      after(FLIP_MS, () => {
+        frameIndex = 0;
+        player.classList.remove('started');
+        started = false;
+      });
+    }
+
+    function startSlideshow() {
+      if (started) return;
+      started = true;
+      frameIndex = 1;
+      player.classList.add('started');
+      playerHintPlaying.classList.add('visible');
+      if (timer) clearInterval(timer);
+      timer = setInterval(() => {
+        if (paused || scrubbing) return;
+        advanceOnce();
+      }, FRAME_MS);
+    }
+
+    function stopSlideshow() {
+      started = false;
+      if (timer) clearInterval(timer);
+      timer = null;
+      clearPendingTimers();
+    }
+
+    function openCoverAndPlay() {
+      if (started || coverFlipFront.classList.contains('open')) return;
+      playerHint.classList.add('hidden');
+      coverFlipFront.classList.add('open');
+      updateProgress();
+      preload(spreads[1]);
+      after(FLIP_MS, startSlideshow);
+    }
+
+    player.addEventListener('click', openCoverAndPlay);
+    player.addEventListener('mousemove', (e) => {
+      const rect = playerImg.getBoundingClientRect();
+      paused = e.clientX >= rect.left && e.clientX <= rect.right &&
+        e.clientY >= rect.top && e.clientY <= rect.bottom;
+    });
+    player.addEventListener('mouseleave', () => { paused = false; });
+    playerImg.addEventListener('click', (e) => {
+      if (!started || timer === null) return;
+      const rect = playerImg.getBoundingClientRect();
+      const ratio = (e.clientX - rect.left) / rect.width;
+      if (ratio < 0.5) {
+        retreatOnce();
+      } else {
+        advanceOnce();
+      }
+    });
+
+    // Highlights from the book, after the player: four pairs of spreads,
+    // each with a short caption underneath. Numbers are the spreadsN.jpg
+    // files; swap picks by editing these rows.
+    // A row marked `continues` sits tight under the row before it (same
+    // group); each group's caption goes under its last row.
+    const HIGHLIGHT_ROWS = [
+      { caption: 'Chapter dividers', spreads: [55, 64] },
+      { spreads: [69, 90] },
+      { caption: 'From the gallery', spreads: [102, 124], continues: true },
+      { caption: 'The teams', spreads: [40, 44] },
+      { caption: 'Rally1 vehicles', spreads: [51, 52] },
+      { spreads: [63, 126] },
+      { caption: 'Race winners', spreads: [84, 103], continues: true },
+    ];
+    const SHADOW_SRC = 'portfolio projects/OurWorkIsNeverDone/shadow2.png';
+    let highlightsBuilt = false;
+
+    function buildHighlights() {
+      const container = document.getElementById('wrcSpreads');
+      HIGHLIGHT_ROWS.forEach((rowData) => {
+        const figure = document.createElement('figure');
+        figure.className = 'wrc-spread-row' + (rowData.continues ? ' continues' : '');
+        const label = rowData.caption || 'gallery';
+        rowData.spreads.forEach((n) => {
+          const wrap = document.createElement('div');
+          wrap.className = 'wrc-spread';
+          const img = document.createElement('img');
+          img.src = bookFile(n);
+          img.alt = 'WRC 2026 Mid-Season, ' + label.toLowerCase() + ' spread';
+          img.loading = 'lazy';
+          const shadow = document.createElement('img');
+          shadow.className = 'shadow';
+          shadow.src = SHADOW_SRC;
+          shadow.alt = '';
+          shadow.setAttribute('aria-hidden', 'true');
+          shadow.loading = 'lazy';
+          wrap.append(img, shadow);
+          figure.appendChild(wrap);
+        });
+        if (rowData.caption) {
+          const cap = document.createElement('figcaption');
+          cap.textContent = rowData.caption;
+          figure.appendChild(cap);
+        }
+        container.appendChild(figure);
+      });
+      highlightsBuilt = true;
+    }
+
+    // Sleeve detail: hover handles it on desktop; a tap toggles it on touch.
+    const sleeveSwap = modal.querySelector('.sleeve-swap');
+    if (sleeveSwap) {
+      sleeveSwap.addEventListener('click', () => sleeveSwap.classList.toggle('is-closed'));
+    }
+
+    // Site recordings play muted on a loop, only while they're on screen
+    // (nothing downloads until they're scrolled to).
+    const videos = [...modal.querySelectorAll('.wrc-video')];
+    const videoObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && modal.classList.contains('open')) entry.target.play().catch(() => {});
+        else entry.target.pause();
+      });
+    }, { root: galleryScroll, threshold: 0.25 });
+    videos.forEach((v) => videoObserver.observe(v));
+
+    // The custom typeface, typing: WORLD RALLY CHAMPIONSHIP, backspaced,
+    // then ENJOY, on a loop while the panel is on screen. Each glyph is a
+    // glyph image (see .tg), words never split across lines, and the caret
+    // follows the last letter. Reduced motion: the full name, standing.
+    const TYPE_DIR = 'portfolio projects/WRC/web/type/';
+    const typeStage = document.getElementById('typeStage');
+    const typeLine = document.getElementById('typeLine');
+    const TYPE_SCRIPT = [
+      { type: 'WORLD RALLY CHAMPIONSHIP' }, { hold: 1800 }, { erase: true }, { hold: 500 },
+      { type: 'ENJOY' }, { hold: 2200 }, { erase: true }, { hold: 700 },
+    ];
+    const TYPE_MS = 85;
+    const ERASE_MS = 38;
+    const glyphFile = (c) => TYPE_DIR + (c === '&' ? 'amp' : c) + '.png';
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach((c) => { new Image().src = glyphFile(c); });
+
+    function renderTyped(text, withCaret) {
+      typeLine.textContent = '';
+      const words = text.split(' ');
+      words.forEach((word, i) => {
+        const group = document.createElement('div');
+        group.className = 'type-word';
+        word.split('').forEach((c) => {
+          const g = document.createElement('img');
+          g.className = 'tg';
+          g.src = glyphFile(c);
+          g.alt = '';
+          group.appendChild(g);
+        });
+        if (withCaret && i === words.length - 1) {
+          const caret = document.createElement('span');
+          caret.className = 'type-caret';
+          group.appendChild(caret);
+        }
+        typeLine.appendChild(group);
+      });
+    }
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let typeTimer = null;
+    let typeRunning = false;
+    let typeStep = 0;
+    let typed = '';
+
+    function typeTick() {
+      if (!typeRunning) return;
+      const step = TYPE_SCRIPT[typeStep];
+      let delay = 0;
+      if (step.type !== undefined) {
+        if (typed.length < step.type.length) {
+          typed = step.type.slice(0, typed.length + 1);
+          renderTyped(typed, true);
+          delay = typed.endsWith(' ') ? TYPE_MS * 2 : TYPE_MS;
+        } else {
+          typeStep = (typeStep + 1) % TYPE_SCRIPT.length;
+        }
+      } else if (step.erase) {
+        if (typed.length) {
+          typed = typed.slice(0, -1);
+          renderTyped(typed, true);
+          delay = ERASE_MS;
+        } else {
+          typeStep = (typeStep + 1) % TYPE_SCRIPT.length;
+        }
+      } else {
+        delay = step.hold;
+        typeStep = (typeStep + 1) % TYPE_SCRIPT.length;
+      }
+      typeTimer = setTimeout(typeTick, delay);
+    }
+
+    function startTyping() {
+      if (typeRunning || reduceMotion) return;
+      typeRunning = true;
+      typeTick();
+    }
+
+    function stopTyping() {
+      typeRunning = false;
+      clearTimeout(typeTimer);
+    }
+
+    if (reduceMotion) {
+      renderTyped('WORLD RALLY CHAMPIONSHIP', false);
+    } else {
+      renderTyped('', true);
+      new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && modal.classList.contains('open')) startTyping();
+          else stopTyping();
+        });
+      }, { root: galleryScroll, threshold: 0.4 }).observe(typeStage);
+    }
+
+    // Scrubbing (see createBookStrip): shows spread i and holds the
+    // slideshow; leaving the strip picks back up from there. A closed
+    // book opens instantly on the first scrub.
+    let scrubbing = false;
+    function scrubTo(i) {
+      if (!started) {
+        clearPendingTimers();
+        snapCover(coverFlipBack, 'shut', false);
+        snapCover(coverFlipBack, 'fade-out', false);
+        coverFlipBack.classList.remove('active');
+        playerHint.classList.add('hidden');
+        snapCover(coverFlipFront, 'open', true);
+        started = true;
+        player.classList.add('started');
+        playerHintPlaying.classList.add('visible');
+        if (timer) clearInterval(timer);
+        timer = setInterval(() => {
+          if (paused || scrubbing) return;
+          advanceOnce();
+        }, FRAME_MS);
+      }
+      coverFlipFront.classList.toggle('settled', i >= 1);
+      setPlayerFrame(i);
+      preload(spreads[i + 1]);
+      frameIndex = i + 1;
+    }
+
+
+    function openWrc() {
+      if (!highlightsBuilt) buildHighlights();
+      stopSlideshow();
+      resetPlayer();
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      galleryScroll.scrollTop = 0;
+      if (carouselControls) carouselControls.style.visibility = 'hidden';
+      if (window.pauseCarouselForModal) window.pauseCarouselForModal();
+    }
+
+    function closeWrc() {
+      videos.forEach((v) => v.pause());
+      stopTyping();
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (carouselControls) carouselControls.style.visibility = '';
+      stopSlideshow();
+    }
+
+    document.querySelectorAll('[data-opens-wrc]').forEach((el) => {
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', openWrc);
+    });
+
+    closeBtn.addEventListener('click', closeWrc);
+
+    galleryScroll.addEventListener('click', (e) => {
+      if (e.target === galleryScroll || e.target.matches('.wrc-section, .wrc-spreads, .wrc-spread-row, .project-head, .project-intro, .interjection, .book-description, .book-embed-section, .book-contact')) closeWrc();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (modal.classList.contains('open') && e.key === 'Escape') closeWrc();
+    });
+  })();
+
+  // Previous/next at the end of every project page. Carousel projects
+  // follow the carousel's order, Playground projects the Playground's,
+  // each wrapping around. Titles and preview images come from the cards
+  // themselves, so renaming a card renames its link.
+  (function () {
+    const SEQUENCES = [
+      [['wrcModal', '[data-opens-wrc]'], ['bookModal', '[data-opens-book]'], ['productModal', '[data-opens-products]']],
+      [['bookModal2', '[data-opens-book-2]'], ['bookModal3', '[data-opens-book-3]'], ['bookModal4', '[data-opens-book-4]']],
+    ];
+    const arrowLeft = '\u2190';
+    const arrowRight = '\u2192';
+
+    function cardInfo(opener) {
+      const card = opener.closest('.card, .pg-card');
+      return {
+        title: card.querySelector('h3').textContent.trim(),
+        img: opener.querySelector('img'),
+      };
+    }
+
+    function go(fromModal, opener) {
+      const close = fromModal.querySelector('.book-close');
+      if (close) close.click();
+      setTimeout(() => opener.click(), 60);
+    }
+
+    SEQUENCES.forEach((seq) => {
+      seq.forEach(([id], i) => {
+        const modal = document.getElementById(id);
+        const scroll = modal && modal.querySelector('.gallery-scroll');
+        if (!scroll) return;
+        const prevOpener = document.querySelector(seq[(i - 1 + seq.length) % seq.length][1]);
+        const nextOpener = document.querySelector(seq[(i + 1) % seq.length][1]);
+        const prev = cardInfo(prevOpener);
+        const next = cardInfo(nextOpener);
+
+        const nav = document.createElement('nav');
+        nav.className = 'project-nav';
+        nav.setAttribute('aria-label', 'More projects');
+
+        const prevLink = document.createElement('a');
+        prevLink.href = '#';
+        prevLink.className = 'pn-prev';
+        prevLink.innerHTML = '<span class="pn-label"></span><span class="pn-title"></span>';
+        prevLink.querySelector('.pn-label').textContent = arrowLeft + ' Previous';
+        prevLink.querySelector('.pn-title').textContent = prev.title;
+        prevLink.addEventListener('click', (e) => { e.preventDefault(); go(modal, prevOpener); });
+
+        const nextLink = document.createElement('a');
+        nextLink.href = '#';
+        nextLink.className = 'pn-next';
+        nextLink.innerHTML = '<span class="pn-label"></span><span class="pn-title"></span>';
+        nextLink.querySelector('.pn-label').textContent = 'Next ' + arrowRight;
+        nextLink.querySelector('.pn-title').textContent = next.title;
+        if (next.img) {
+          const img = document.createElement('img');
+          img.src = next.img.getAttribute('src');
+          img.alt = '';
+          img.loading = 'lazy';
+          nextLink.appendChild(img);
+        }
+        nextLink.addEventListener('click', (e) => { e.preventDefault(); go(modal, nextOpener); });
+
+        nav.append(prevLink, nextLink);
+        const footer = scroll.querySelector('.book-contact');
+        if (footer) scroll.insertBefore(nav, footer);
+        else scroll.appendChild(nav);
+      });
+    });
+  })();
+
+  // Keyboard and screen-reader access, shared by every page. Anything that
+  // opens a project becomes a focusable button named after its card; every
+  // .book-modal is announced as a dialog, takes focus when it opens (its
+  // scroll area, so arrow keys scroll it), keeps Tab inside itself and the
+  // header, and hands focus back to whatever opened it when it closes.
+  (function () {
+    const OPENERS = '[data-opens-products], [data-opens-wrc], [data-opens-book], [data-opens-book-2], [data-opens-book-3], [data-opens-book-4]';
+    document.querySelectorAll(OPENERS).forEach((el) => {
+      const card = el.closest('.card, .pg-card');
+      const title = card && card.querySelector('h3');
+      el.setAttribute('tabindex', '0');
+      el.setAttribute('role', 'button');
+      if (title) el.setAttribute('aria-label', 'Open ' + title.textContent.trim());
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          el.click();
+        }
+      });
+    });
+
+    const header = document.querySelector('header');
+    let opener = null;
+    const modals = [...document.querySelectorAll('.book-modal')];
+    modals.forEach((m) => {
+      const h2 = m.querySelector('h2');
+      m.setAttribute('role', 'dialog');
+      m.setAttribute('aria-modal', 'true');
+      m.setAttribute('aria-label', h2 ? h2.textContent.trim() : (m.id === 'aboutModal' ? 'About' : 'What do you need?'));
+      const scroll = m.querySelector('.gallery-scroll');
+      if (scroll) scroll.setAttribute('tabindex', '-1');
+      let wasOpen = false;
+      new MutationObserver(() => {
+        const isOpen = m.classList.contains('open');
+        if (isOpen && !wasOpen) {
+          if (!modals.some((o) => o !== m && o.contains(document.activeElement))) opener = document.activeElement;
+          // After the open transition has made it visible; hidden elements
+          // can't take focus.
+          if (scroll) setTimeout(() => scroll.focus({ preventScroll: true }), 50);
+        } else if (!isOpen && wasOpen && !document.querySelector('.book-modal.open')) {
+          if (opener && document.contains(opener)) opener.focus({ preventScroll: true });
+          opener = null;
+        }
+        wasOpen = isOpen;
+      }).observe(m, { attributes: true, attributeFilter: ['class'] });
+    });
+
+    const FOCUSABLE = 'a[href], button, [tabindex]:not([tabindex="-1"]), video[controls]';
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab') return;
+      const open = document.querySelector('.book-modal.open');
+      if (!open) return;
+      const items = [...header.querySelectorAll(FOCUSABLE), ...open.querySelectorAll(FOCUSABLE)]
+        .filter((el) => el.offsetParent !== null || el === document.activeElement);
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const inside = items.includes(document.activeElement);
+      if (e.shiftKey && (document.activeElement === first || !inside)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (document.activeElement === last || !inside)) {
+        e.preventDefault();
+        first.focus();
+      }
+    });
+  })();
+
   // Project pages: while any project modal (every .book-modal except
   // Contact) is open, body gets .project-open, which shrinks the header to
   // just the K. Watching the modals' classes keeps this in one place
@@ -4493,21 +6996,29 @@
   // runs the same cleanup (slideshows, carousel resume) as the X.
   (function () {
     const projects = [...document.querySelectorAll('.book-modal:not(#contactModal)')];
-    const sync = () => document.body.classList.toggle(
-      'project-open', projects.some((m) => m.classList.contains('open')));
+    const aboutModal = document.getElementById('aboutModal');
+    const sync = () => {
+      document.body.classList.toggle('project-open', projects.some((m) => m.classList.contains('open')));
+      document.body.classList.toggle('about-open', aboutModal.classList.contains('open'));
+    };
     const observer = new MutationObserver(sync);
     projects.forEach((m) => observer.observe(m, { attributes: true, attributeFilter: ['class'] }));
 
-    // On a project or the contact page, a click anywhere on the header
-    // (logo, X, empty space) closes it and returns home. On the homepage
-    // only What do you need? does anything.
-    // What do you need?/Work toggles the contact page itself, so it's
-    // left to its own handler.
+    // On a project page, a click on the header (logo, X, empty space)
+    // closes it and returns home. About and Playground have their own
+    // handlers.
     document.querySelector('header').addEventListener('click', (e) => {
       if (e.target.closest('#navToggle')) return;
       if (e.target.closest('#homeLink, #headerClose')) e.preventDefault();
+      if (e.target.closest('#aboutLink, #playgroundLink')) return;
       const open = document.querySelector('.book-modal.open');
-      if (!open) return;
+      if (!open) {
+        // On the Playground the logo is the way back to the carousel.
+        if (e.target.closest('#homeLink') && document.body.classList.contains('playground-open')) {
+          window.closePlayground();
+        }
+        return;
+      }
       e.preventDefault();
       open.querySelector('.book-close').click();
     });
