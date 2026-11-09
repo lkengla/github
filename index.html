@@ -3890,8 +3890,17 @@
       const next = document.getElementById('next');
       prev.innerHTML = vertical ? '&#8593;' : '&#8592;';
       next.innerHTML = vertical ? '&#8595;' : '&#8594;';
+      // Height of the title + keywords under each thumb (tallest card).
+      // render() centers the image and its text together, not the image
+      // alone, so the whole card sits optically in the middle of the page.
+      textHeight = 0;
+      track.querySelectorAll('.card').forEach((c) => {
+        const t = c.querySelector('.thumb');
+        textHeight = Math.max(textHeight, c.offsetHeight - t.offsetHeight);
+      });
       return w;
     }
+    let textHeight = 0;
     let thumbWidth = sizeThumbs();
 
     // One clone on each side isn't enough buffer for a seamless loop: with
@@ -4026,7 +4035,7 @@
         const fade = dist <= 1.8 ? 1 : Math.max(0, 1 - (dist - 1.8) / 0.9);
         card.style.transform = vertical
           ? `translate(-50%, -50%) translateY(${x}px) translateZ(${z}px) rotateX(${-rotateY}deg)`
-          : `translate(-50%, ${-thumbHeight / 2}px) translateX(${x}px) translateZ(${z}px) rotateY(${rotateY}deg)`;
+          : `translate(-50%, ${-(thumbHeight + textHeight) / 2}px) translateX(${x}px) translateZ(${z}px) rotateY(${rotateY}deg)`;
         card.style.opacity = String(fade);
         card.style.zIndex = String(1000 - Math.round(dist * 10));
         card.style.pointerEvents = dist > 2.3 ? 'none' : '';
