@@ -583,56 +583,45 @@
     display: none;
   }
 
-  #loader {
-    position: fixed;
-    inset: 0;
-    background: var(--bg);
-    z-index: 100;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.5s ease, visibility 0.5s ease;
-  }
-
-  #loader.hide {
+  /* Intro (see playIntro in headerMark): only the header lockup shows.
+     The closed K is a text cursor; it types "What do you need?", deletes
+     it, and opens, sliding the name out. Then the rest of the page fades
+     up. The page is built and loading underneath the whole time. */
+  html.intro header .info,
+  html.intro main,
+  html.intro .controls {
     opacity: 0;
-    visibility: hidden;
     pointer-events: none;
   }
 
-  .raffle {
-    display: flex;
-    gap: 0;
-    /* Scales with viewport so a longer phrase (17 reels) still fits on one
-       line at any screen size; 96px is the same size the 4-letter version
-       used on desktop. */
-    font-size: clamp(22px, 8vw, 96px);
+  html.intro-out header .info,
+  html.intro-out main,
+  html.intro-out .controls {
+    transition: opacity 0.7s ease;
   }
 
-  .reel {
-    /* Basier Square Mono's fixed character advance is exactly 0.619em, so
-       the reel is sized to that (not an arbitrary box + gap) — letters sit
-       exactly as they would in real monospaced text, no gap needed. Em-based
-       so it scales with .raffle's responsive font-size. */
-    width: 0.619em;
-    height: 1.479em;
-    overflow: hidden;
-    position: relative;
+  /* The name waits inside the K (as on project pages) until it opens. */
+  html.intro header .logo {
+    transform: translateX(calc(var(--mark) * -5));
   }
 
-  .reel-strip {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    will-change: transform;
-  }
-
-  .reel-strip span {
-    height: 1.479em;
-    line-height: 1.479em;
-    font-size: 1em;
+  /* The typed question, set in the name's face so nothing swaps. Sized to
+     the name's capitals (scaled down by the JS if it would not fit), with
+     its baseline 62/80 down the K so the closed K reads as a block cursor
+     from just above the capitals to below the descenders. */
+  header .intro-typed {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: var(--mark);
+    line-height: var(--mark);
+    font-family: var(--display);
+    font-size: calc(var(--mark) * 67 / 80);
     font-weight: 400;
-    text-align: center;
+    letter-spacing: -0.03em;
+    white-space: pre;
+    color: var(--ink);
+    pointer-events: none;
   }
 
   /* Book viewer */
@@ -3285,93 +3274,14 @@
 </head>
 <body>
 
-<div id="loader" aria-hidden="true">
-  <div class="raffle">
-    <div class="reel"></div>
-    <div class="reel"></div>
-    <div class="reel"></div>
-    <div class="reel"></div>
-    <div class="reel"></div>
-    <div class="reel"></div>
-    <div class="reel"></div>
-    <div class="reel"></div>
-    <div class="reel"></div>
-    <div class="reel"></div>
-    <div class="reel"></div>
-    <div class="reel"></div>
-    <div class="reel"></div>
-    <div class="reel"></div>
-    <div class="reel"></div>
-    <div class="reel"></div>
-    <div class="reel"></div>
-  </div>
-</div>
 <script>
-  (function () {
-    const loader = document.getElementById('loader');
-    const reels = Array.from(document.querySelectorAll('.reel'));
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const targets = 'WHAT DO YOU NEED?'.split('');
-    const spinCount = 26;
-    // Staggered per-reel durations so reels settle left-to-right rather than
-    // all at once; spread across however many reels the target text needs.
-    const BASE_DURATION = 700;
-    const STAGGER = (1500 - BASE_DURATION) / (targets.length - 1);
-    const durations = targets.map((_, i) => BASE_DURATION + i * STAGGER);
-
+  // The intro (playIntro, after the header) plays on every load unless the
+  // visitor prefers reduced motion. Flagged here, before the header is
+  // drawn, so the page never flashes in first.
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.documentElement.classList.add('intro');
     document.body.style.overflow = 'hidden';
-
-    function spin() {
-    reels.forEach((reel, i) => {
-      const strip = document.createElement('div');
-      strip.className = 'reel-strip';
-      // Target first, then the spin letters below it — combined with
-      // starting the strip pulled up and animating down to rest, the reel
-      // falls top-to-bottom onto the target like a real machine, instead of
-      // climbing up to it.
-      const finalSpan = document.createElement('span');
-      finalSpan.textContent = targets[i];
-      strip.appendChild(finalSpan);
-      for (let j = 0; j < spinCount; j++) {
-        const span = document.createElement('span');
-        span.textContent = letters[Math.floor(Math.random() * letters.length)];
-        strip.appendChild(span);
-      }
-      reel.appendChild(strip);
-
-      // The reel's height is responsive (em-based), so measure it live
-      // rather than assuming a fixed px value.
-      const letterHeight = reel.getBoundingClientRect().height;
-      strip.style.transform = `translateY(-${spinCount * letterHeight}px)`;
-      // Force layout now so the browser commits this starting position
-      // before the transition below is applied — a rAF-based delay for this
-      // is timing-dependent and was the likely source of the unevenness
-      // near the end of the fall.
-      void strip.offsetHeight;
-      strip.style.transition = `transform ${durations[i]}ms cubic-bezier(0.16, 1, 0.3, 1)`;
-      strip.style.transform = 'translateY(0px)';
-    });
-
-    // Lifts once the spin has landed and the page beneath is built.
-    const landed = new Promise((done) => setTimeout(done, Math.max(...durations) + 350));
-    const built = document.readyState === 'loading'
-      ? new Promise((done) => document.addEventListener('DOMContentLoaded', done, { once: true }))
-      : Promise.resolve();
-    Promise.all([landed, built]).then(() => {
-      loader.classList.add('hide');
-      document.body.style.overflow = '';
-    });
-    }
-
-    // Runs as soon as the loader's markup arrives, not after the whole page,
-    // and waits (briefly) for the mono face so the letters don't swap fonts
-    // mid-spin. Two frames' grace lets the browser paint before it starts.
-    const fontReady = document.fonts && document.fonts.load
-      ? document.fonts.load('400 1em "Basier Square Mono"') : Promise.resolve();
-    Promise.race([fontReady, new Promise((done) => setTimeout(done, 1200))])
-      .then(() => requestAnimationFrame(() => requestAnimationFrame(spin)));
-  })();
-
+  }
 </script>
 
 <header>
@@ -3564,6 +3474,110 @@
       document.body.classList.toggle('name-hidden', hidden);
       kick();
     }
+
+    // Intro. Typed like a person: uneven gaps between keys, a beat longer
+    // around spaces; a pause with the cursor blinking; then one backspace
+    // at a time, a little quicker. Back home, the triangle comes apart and
+    // the name and "Graphic Designer" slide out with it.
+    function playIntro() {
+      const root = document.documentElement;
+      if (!root.classList.contains('intro')) return;
+      const Q = 'What do you need?';
+      const markPx = svg.getBoundingClientRect().width || 80;
+      const typed = document.createElement('span');
+      typed.className = 'intro-typed';
+      typed.setAttribute('aria-hidden', 'true');
+      home.appendChild(typed);
+      name.style.transform = `translateX(${-5 * markPx}px)`;
+      tri.setAttribute('transform', 'translate(-77 0)');
+
+      // Fit: the question plus the cursor has to fit inside the margins.
+      const gap = markPx * 3 / 80;
+      const room = window.innerWidth - 2 * home.getBoundingClientRect().left;
+      typed.textContent = Q;
+      const full = typed.getBoundingClientRect().width + gap + markPx / 2;
+      if (full > room) {
+        typed.style.fontSize = `${parseFloat(getComputedStyle(typed).fontSize) * room / full}px`;
+      }
+      // Baseline 62/80 down the K.
+      typed.textContent = 'H';
+      const probe = document.createElement('span');
+      probe.style.cssText = 'display:inline-block;width:0;height:0;vertical-align:baseline';
+      typed.appendChild(probe);
+      typed.style.transform = `translateY(${markPx * 62 / 80 - probe.offsetTop}px)`;
+      // Where the cursor goes after each number of letters.
+      const at = [0];
+      for (let n = 1; n <= Q.length; n++) {
+        typed.textContent = Q.slice(0, n);
+        at.push(typed.getBoundingClientRect().width + gap);
+      }
+      typed.textContent = '';
+
+      const keys = [];
+      let k = 1150; // two blinks first
+      for (let i = 0; i < Q.length; i++) {
+        keys.push(k);
+        k += 75 + Math.random() * 75 + (Q[i] === ' ' ? 60 : 0) + (Q[i + 1] === ' ' ? 30 : 0);
+      }
+      const typedAt = keys[keys.length - 1];
+      const back = [];
+      k = typedAt + 1250;
+      for (let i = 0; i < Q.length; i++) {
+        back.push(k);
+        k += 55 + Math.random() * 45;
+      }
+      const homeAt = back[back.length - 1];
+      const open = homeAt + 420;
+      const pageAt = open + 650;
+      const end = open + 900;
+
+      const t0 = performance.now();
+      let shown = -1, paged = false;
+      function frame() {
+        const t = performance.now() - t0;
+        let n = 0;
+        keys.forEach((x) => { if (t >= x) n++; });
+        back.forEach((x) => { if (t >= x) n--; });
+        if (n !== shown) {
+          typed.textContent = Q.slice(0, n);
+          svg.style.left = at[n] + 'px';
+          shown = n;
+        }
+        const waiting = t < keys[0] || (t > typedAt + 350 && t < back[0]) || (t > homeAt + 120 && t < open);
+        const since = t < keys[0] ? t : t > homeAt ? t - homeAt : t - typedAt;
+        svg.style.opacity = waiting && Math.floor(since / 530) % 2 === 1 ? 0 : 1;
+        const u = io((t - open) / 650);
+        tri.setAttribute('transform', u >= 1 ? '' : `translate(${-77 * (1 - u)} 0)`);
+        name.style.transform = `translateX(${-5 * markPx * (1 - io((t - open) / 900))}px)`;
+        svg.classList.toggle('seal', u < 1); // closed or opening: hide the seams
+        if (!paged && t >= pageAt) {
+          paged = true;
+          root.classList.add('intro-out');
+          root.classList.remove('intro');
+          document.body.style.overflow = '';
+          setTimeout(() => root.classList.remove('intro-out'), 800);
+        }
+        if (t < end) { requestAnimationFrame(frame); return; }
+        typed.remove();
+        svg.style.left = '';
+        svg.style.opacity = '';
+        svg.classList.remove('seal');
+        tri.setAttribute('transform', '');
+        name.style.transform = '';
+      }
+      requestAnimationFrame(frame);
+    }
+
+    // Closed from the first frame, so it never shows open before the intro.
+    if (document.documentElement.classList.contains('intro')) {
+      tri.setAttribute('transform', 'translate(-77 0)');
+      svg.classList.add('seal');
+    }
+
+    // Waits (briefly) for the display face so the question doesn't change
+    // font partway through.
+    const faceReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+    Promise.race([faceReady, new Promise((done) => setTimeout(done, 800))]).then(playIntro);
 
     return { step, setHidden };
   })();
@@ -4471,8 +4485,11 @@
     const prevBtn = document.getElementById('prev');
     nextBtn.appendChild(window.makeClicker(nextBtn, 1));
     prevBtn.appendChild(window.makeClicker(prevBtn, -1));
-    nextBtn.addEventListener('click', () => goTo(index + 1, true));
-    prevBtn.addEventListener('click', () => goTo(index - 1, true));
+    // After an arrow click the carousel holds still on the new project for
+    // a moment (see holdDrift), long enough to click again or move over to
+    // the preview before it starts drifting.
+    nextBtn.addEventListener('click', () => { holdDrift(); goTo(index + 1, true); });
+    prevBtn.addEventListener('click', () => { holdDrift(); goTo(index - 1, true); });
 
     // Keeps the infinite loop illusion: once we scroll past a clone, jump by
     // exactly one full lap (count card-units) so it lines up with the real
@@ -4633,6 +4650,26 @@
     const IDLE_DRIFT_SPEED = 0.0006; // card-units per frame — deliberately tiny
     let idleDriftRaf = null;
 
+    // Arrow clicks hold the drift off for ARROW_PAUSE after the slide
+    // lands. Every start request in that window (the slide finishing, the
+    // cursor crossing empty carousel on its way to a card, leaving the
+    // carousel) waits for the hold to end instead, and then only starts if
+    // the cursor isn't resting on a card. Each click restarts the hold.
+    const ARROW_PAUSE = 2500;
+    let driftHoldUntil = 0;
+    let driftHoldTimer = null;
+    // An arrow click also disarms the edge-hover scroll (below): the
+    // arrows sit bottom right, so heading from them to a card crosses the
+    // right edge zone, which used to read as "scroll right" and carry the
+    // card away. It re-arms once the cursor reaches the middle of the
+    // carousel, so pushing back out to an edge after that scrolls as
+    // usual. Wheel, trackpad and drag are never affected.
+    let edgeArmed = true;
+    function holdDrift() {
+      driftHoldUntil = performance.now() + 250 + ARROW_PAUSE; // 250 = the slide
+      edgeArmed = false;
+    }
+
     function idleDriftStep() {
       offset += IDLE_DRIFT_SPEED;
       wrapOffset();
@@ -4642,6 +4679,14 @@
 
     function startIdleDrift() {
       if (idleDriftRaf) return;
+      const wait = driftHoldUntil - performance.now();
+      if (wait > 0) {
+        clearTimeout(driftHoldTimer);
+        driftHoldTimer = setTimeout(() => {
+          if (!track.querySelector('.card:hover')) startIdleDrift();
+        }, wait);
+        return;
+      }
       // Never while another page is up (see syncAway below).
       if (document.querySelector('.book-modal.open') ||
           document.body.classList.contains('playground-open')) return;
@@ -4722,7 +4767,14 @@
 
       const rect = track.getBoundingClientRect();
       const ratio = (e.clientX - rect.left) / rect.width;
-      if (ratio < EDGE_ZONE) {
+      const inEdge = ratio < EDGE_ZONE || ratio > 1 - EDGE_ZONE;
+      if (!inEdge) edgeArmed = true;
+      if (inEdge && !edgeArmed) {
+        if (hoverDir !== 0) {
+          hoverDir = 0;
+          stopAutoScroll();
+        }
+      } else if (ratio < EDGE_ZONE) {
         hoverDir = -1;
         hoverSpeed = MAX_SPEED * (1 - ratio / EDGE_ZONE);
         startAutoScroll();
