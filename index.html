@@ -3335,6 +3335,12 @@
       return { outer, g };
     };
 
+    // One step: the carousel's slide to the next card and the clicker's
+    // step run on this same timing so they move together. The CSS curve is
+    // the cubic ease-out the carousel computes in JS (1 - (1 - t)^3).
+    window.STEP_MS = 250;
+    window.STEP_EASE = 'cubic-bezier(0.33, 1, 0.68, 1)';
+
     // Clicker: `host` is whatever is hovered and clicked (a button, or a
     // link that contains the arrow); dir -1 = previous, 1 = next.
     window.makeClicker = function (host, dir) {
@@ -3344,14 +3350,30 @@
       svg.setAttribute('aria-hidden', 'true');
       const { g } = window.addLogoStripes(svg);
       let pos = -77, hover = 0;
-      const set = (ms) => {
-        g.style.transition = `transform ${ms}ms cubic-bezier(0.65, 0, 0.35, 1)`;
+      const set = (ms, ease = 'cubic-bezier(0.65, 0, 0.35, 1)') => {
+        g.style.transition = `transform ${ms}ms ${ease}`;
         g.style.transform = `translateX(${pos - hover}px)`;
       };
       set(0);
       host.addEventListener('mouseenter', () => { hover = 77; set(380); });
       host.addEventListener('mouseleave', () => { hover = 0; set(380); });
-      host.addEventListener('click', () => { pos -= 154; set(620); });
+      // The step is driven frame by frame with the carousel's own curve
+      // and start time (a CSS transition would only start a frame later).
+      let stepRaf = null;
+      host.addEventListener('click', () => {
+        const from = new DOMMatrix(getComputedStyle(g).transform).e;
+        pos -= 154;
+        const to = pos - hover;
+        const t0 = performance.now();
+        g.style.transition = 'none';
+        cancelAnimationFrame(stepRaf);
+        (function frame(now) {
+          const u = Math.min(1, ((now || performance.now()) - t0) / window.STEP_MS);
+          g.style.transform = `translateX(${from + (pos - hover - from) * (1 - Math.pow(1 - u, 3))}px)`;
+          if (u < 1) stepRaf = requestAnimationFrame(frame);
+          else if (pos < -77 - 154 * 4) { pos += 154 * 4; set(0); }
+        })();
+      });
       // A whole period looks identical, so wind the number back now and
       // then to keep it inside the drawn bands.
       g.addEventListener('transitionend', () => {
@@ -4471,7 +4493,7 @@
       stopIdleDrift();
       index = i;
       if (smooth) {
-        animateOffsetTo(i, 250);
+        animateOffsetTo(i, window.STEP_MS);
       } else {
         offset = i;
         wrapOffset();
@@ -4666,7 +4688,7 @@
     // usual. Wheel, trackpad and drag are never affected.
     let edgeArmed = true;
     function holdDrift() {
-      driftHoldUntil = performance.now() + 250 + ARROW_PAUSE; // 250 = the slide
+      driftHoldUntil = performance.now() + window.STEP_MS + ARROW_PAUSE; // after the slide
       edgeArmed = false;
     }
 
