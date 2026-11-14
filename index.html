@@ -160,14 +160,50 @@
      its top-left corner lands on the header's padding (40px from the top
      and left). The descenders of "Graphic Designer" hang 9px (native)
      below the K, inside the bottom margin. */
-  header .logo {
+  /* The K is drawn as SVG over that spot (see headerMark in the JS) so it
+     can move; the PNG supplies only the name, through .name-clip, a window
+     that starts at the K's right edge (x 172) and runs to the image's end.
+     The name hides by sliding left out of that window, so it looks like it
+     goes in behind the K. The window is the image's full height so the
+     descenders still hang below the K. */
+  header .home .mark {
+    position: absolute;
+    left: 0;
+    top: 0;
     display: block;
+    width: var(--mark);
+    height: var(--mark);
+    overflow: visible;
+  }
+
+  header .home .mark polygon {
+    fill: var(--ink);
+  }
+
+  /* While pieces move, a hairline stroke covers the antialiased seams
+     where they meet; it comes off at rest so the K is exact. */
+  header .home .mark.seal polygon {
+    stroke: var(--ink);
+    stroke-width: 1.2;
+    stroke-linejoin: miter;
+  }
+
+  header .name-clip {
+    position: absolute;
+    left: var(--mark);
+    top: calc(var(--mark) * -16 / 154);
+    width: calc(var(--mark) * (848 - 172) / 154);
     height: calc(var(--mark) * 188 / 154);
+    overflow: hidden;
+  }
+
+  header .logo {
+    position: absolute;
+    top: 0;
+    left: calc(var(--mark) * -172 / 154);
+    display: block;
+    height: 100%;
     width: auto;
-    margin:
-      calc(var(--mark) * -16 / 154) 0
-      calc(var(--mark) * -18 / 154)
-      calc(var(--mark) * -18 / 154);
   }
 
   /* The letterhead leaves 157px between the end of the longest contact
@@ -206,9 +242,13 @@
   /* The logo is the way home. On a project page its box narrows to just
      the K (square, --mark wide) and clips the rest of the lockup; it only
      clips there so the descenders of "Graphic Designer" can hang below. */
+  /* Box = the K's square plus the name (848 - 18 native px wide at a
+     154px K). */
   header .home {
+    position: relative;
     display: block;
-    width: max-content;
+    width: calc(var(--mark) * 830 / 154);
+    height: var(--mark);
   }
 
   /* On a project page the header rides above the modal with only the K
@@ -219,12 +259,16 @@
   }
 
   /* The name hides (only the K stays) on project pages and the
-     Playground; the homepage and About keep the full lockup. */
-  body.project-open:not(.about-open) header .home,
-  body.playground-open header .home {
+     Playground; the homepage and About keep the full lockup. headerMark
+     animates the name away (belt for carousel projects, drawer for the
+     Playground); here the link just narrows to the K so the empty space
+     where the name was isn't clickable. */
+  body.name-hidden header .home {
     width: var(--mark);
-    overflow: hidden;
-    pointer-events: auto;
+  }
+
+  body.name-hidden header .name-clip {
+    pointer-events: none;
   }
 
   /* On a project page the text goes but the corner marks stay, and an X
@@ -342,8 +386,33 @@
     transition: opacity 0.2s ease;
   }
 
-  .controls button:hover {
-    opacity: 0.6;
+  /* Every arrow on the site is a clicker (see makeClicker in the JS): a
+     square window onto the logo's chevron stripes, set half a step off so
+     it shows one solid chevron, which is the L from the logo's negative
+     space. Hover slides half a step and the full K appears; each click
+     runs one more full step. Next is the same thing mirrored. */
+  .clicker {
+    display: block;
+    width: 24px;
+    height: 24px;
+    overflow: hidden;
+  }
+
+  .clicker polygon {
+    fill: currentColor;
+  }
+
+  .clicker.next {
+    transform: scaleX(-1);
+  }
+
+  /* Upright touch screens scroll the carousel vertically: up and down. */
+  body.carousel-vertical .controls .clicker {
+    transform: rotate(90deg);
+  }
+
+  body.carousel-vertical .controls .clicker.next {
+    transform: rotate(90deg) scaleX(-1);
   }
 
   .carousel {
@@ -1323,6 +1392,18 @@
     text-transform: uppercase;
     letter-spacing: 0.06em;
   }
+
+  /* The label's clicker is cap height, sitting on the baseline with a
+     word space to the text. */
+  .pn-label .clicker {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    vertical-align: -0.5px;
+  }
+
+  .pn-prev .clicker { margin-right: 8px; }
+  .pn-next .clicker { margin-left: 8px; }
 
   .pn-title {
     display: block;
@@ -3294,7 +3375,7 @@
 </script>
 
 <header>
-  <a class="home" href="#" id="homeLink" aria-label="Home"><img class="logo" src="Liam-Kengla-Logo-Assets/full-lockup.png" alt="Liam Kengla, Graphic Designer"></a>
+  <a class="home" href="#" id="homeLink" aria-label="Liam Kengla, Graphic Designer. Home"><span class="name-clip"><img class="logo" src="Liam-Kengla-Logo-Assets/full-lockup.png" alt=""></span></a>
   <div class="info">
     <span id="navToggle" class="nav-ask"><span>What do</span> <span>you need?</span></span>
     <nav class="pages">
@@ -3306,6 +3387,187 @@
     <img class="corner bottom" src="Liam-Kengla-Logo-Assets/detail-mark.png" alt="">
   </div>
 </header>
+
+<script>
+  // The logo in motion. Two facts about the mark drive all of it:
+  //  - The K is one frame of an endless row of chevron stripes, period 154
+  //    (the K's width in its own units), half black and half white. Offset
+  //    0 shows the K; half a period shows a single solid chevron, which is
+  //    the L from the K's negative space.
+  //  - The triangle is the piece cut from the notch in the left block.
+  // Shared helpers for building that stripe window.
+  (function () {
+    const NS = 'http://www.w3.org/2000/svg';
+    let uid = 0;
+    window.addLogoStripes = function (svg) {
+      const id = 'logo-stripes-' + uid++;
+      const defs = document.createElementNS(NS, 'defs');
+      const clip = document.createElementNS(NS, 'clipPath');
+      clip.id = id;
+      const rect = document.createElementNS(NS, 'rect');
+      rect.setAttribute('width', 154);
+      rect.setAttribute('height', 154);
+      clip.appendChild(rect);
+      defs.appendChild(clip);
+      svg.appendChild(defs);
+      const outer = document.createElementNS(NS, 'g');
+      outer.setAttribute('clip-path', `url(#${id})`);
+      const g = document.createElementNS(NS, 'g');
+      for (let k = -8; k <= 8; k++) {
+        const a = -77 + 154 * k;
+        const band = document.createElementNS(NS, 'polygon');
+        band.setAttribute('points',
+          `${a + 77},0 ${a},77 ${a + 77},154 ${a + 154},154 ${a + 77},77 ${a + 154},0`);
+        g.appendChild(band);
+      }
+      outer.appendChild(g);
+      svg.appendChild(outer);
+      return { outer, g };
+    };
+
+    // Clicker: `host` is whatever is hovered and clicked (a button, or a
+    // link that contains the arrow); dir -1 = previous, 1 = next.
+    window.makeClicker = function (host, dir) {
+      const svg = document.createElementNS(NS, 'svg');
+      svg.setAttribute('viewBox', '0 0 154 154');
+      svg.setAttribute('class', 'clicker' + (dir > 0 ? ' next' : ''));
+      svg.setAttribute('aria-hidden', 'true');
+      const { g } = window.addLogoStripes(svg);
+      let pos = -77, hover = 0;
+      const set = (ms) => {
+        g.style.transition = `transform ${ms}ms cubic-bezier(0.65, 0, 0.35, 1)`;
+        g.style.transform = `translateX(${pos - hover}px)`;
+      };
+      set(0);
+      host.addEventListener('mouseenter', () => { hover = 77; set(380); });
+      host.addEventListener('mouseleave', () => { hover = 0; set(380); });
+      host.addEventListener('click', () => { pos -= 154; set(620); });
+      // A whole period looks identical, so wind the number back now and
+      // then to keep it inside the drawn bands.
+      g.addEventListener('transitionend', () => {
+        if (pos < -77 - 154 * 4) { pos += 154 * 4; set(0); }
+      });
+      return svg;
+    };
+  })();
+
+  // The header K. Drawn twice in one SVG, identical at rest: as the two
+  // polygons (for the drawer's nudge) and as the stripe window (for
+  // treadmill steps and the belt); only one shows at a time.
+  //  - step(dir): the stripes run one period that way; quick calls queue
+  //    up. Not wired to anything right now (Liam tried it on the carousel
+  //    arrows and preferred the header still).
+  //  - The name hides on project pages and the Playground. Carousel
+  //    projects use the belt: the stripes run left five periods and the
+  //    name rides along at the same speed into the K. The Playground uses
+  //    the drawer: the name slides in behind the K, which gives a small
+  //    push as it arrives.
+  window.headerMark = (function () {
+    const NS = 'http://www.w3.org/2000/svg';
+    const home = document.getElementById('homeLink');
+    const name = home.querySelector('.logo');
+    const svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 154 154');
+    svg.setAttribute('class', 'mark');
+    svg.setAttribute('aria-hidden', 'true');
+    const poly = document.createElementNS(NS, 'g');
+    const left = document.createElementNS(NS, 'polygon');
+    left.setAttribute('points', '0,0 77,0 0,77 77,154 0,154');
+    const tri = document.createElementNS(NS, 'polygon');
+    tri.setAttribute('points', '154,0 77,77 154,154');
+    poly.append(left, tri);
+    svg.appendChild(poly);
+    const stripes = window.addLogoStripes(svg);
+    stripes.outer.style.display = 'none';
+    home.prepend(svg);
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const P = 154;
+    const BELT = 5; // periods; 5 K-widths clears the whole name
+    const clamp = (u) => Math.min(1, Math.max(0, u));
+    const io = (u) => (u = clamp(u), u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2);
+    const out = (u) => 1 - Math.pow(1 - clamp(u), 3);
+    const mod = (x, m) => ((x % m) + m) % m;
+
+    const tread = { from: 0, to: 0, start: -1e9, dur: 620, ease: io };
+    const treadAt = (t) => tread.from + (tread.to - tread.from) * tread.ease((t - tread.start) / tread.dur);
+
+    // hide.u: 0 = name shown, 1 = hidden.
+    const hide = { hidden: false, mode: 'belt', from: 0, to: 0, start: -1e9 };
+    const nudge = (u) => (u > 0 && u < 1 ? -16 * Math.sin(Math.PI * u) : 0);
+    function hideAt(t) {
+      const e = t - hide.start;
+      const r = { u: hide.to, belt: 0, nudge: 0, active: false };
+      if (hide.mode === 'belt') {
+        const k = io(e / 1100);
+        r.u = hide.from + (hide.to - hide.from) * k;
+        r.belt = -BELT * P * r.u;
+        r.active = e < 1100;
+      } else {
+        const hiding = hide.to > hide.from;
+        const k = hiding ? io(e / 600) : io((e - 180) / 650);
+        r.u = hide.from + (hide.to - hide.from) * k;
+        r.nudge = hiding ? nudge((e - 430) / 380) : nudge(e / 380);
+        r.active = e < 900;
+      }
+      return r;
+    }
+
+    let raf = 0;
+    function render() {
+      raf = 0;
+      const t = performance.now();
+      const h = hideAt(t);
+      const treading = t - tread.start < tread.dur;
+      const stripesOn = treading || (h.active && hide.mode === 'belt');
+      poly.style.display = stripesOn ? 'none' : '';
+      stripes.outer.style.display = stripesOn ? '' : 'none';
+      stripes.g.setAttribute('transform', `translate(${mod(treadAt(t) + h.belt, P)} 0)`);
+      tri.setAttribute('transform', h.nudge ? `translate(${h.nudge} 0)` : '');
+      svg.classList.toggle('seal', stripesOn || h.nudge !== 0);
+      const markPx = svg.getBoundingClientRect().width || 80;
+      name.style.transform = h.u ? `translateX(${-BELT * markPx * h.u}px)` : '';
+      if (treading || h.active) raf = requestAnimationFrame(render);
+    }
+    const kick = () => { if (!raf) raf = requestAnimationFrame(render); };
+
+    function step(dir) {
+      if (reduce.matches) return;
+      const t = performance.now();
+      const moving = t - tread.start < tread.dur;
+      tread.from = treadAt(t);
+      tread.to += dir * P;
+      // Keep the numbers small; whole periods look identical.
+      const wind = Math.round(tread.to / P) * P;
+      tread.from -= wind; tread.to -= wind;
+      tread.start = t;
+      tread.ease = moving ? out : io;
+      kick();
+    }
+
+    // Comes back out the way it went in (closing the Playground drawers
+    // it out even though the Playground class is already gone). While
+    // hidden at rest, a change of context (project -> Playground) updates
+    // which way it will come out.
+    function setHidden(hidden, mode) {
+      const t = performance.now();
+      if (hidden === hide.hidden) {
+        if (hidden && !hideAt(t).active) hide.mode = mode;
+        return;
+      }
+      const current = hideAt(t).u;
+      hide.hidden = hidden;
+      if (hidden) hide.mode = mode;
+      hide.from = reduce.matches ? (hidden ? 1 : 0) : current;
+      hide.to = hidden ? 1 : 0;
+      hide.start = t;
+      document.body.classList.toggle('name-hidden', hidden);
+      kick();
+    }
+
+    return { step, setHidden };
+  })();
+</script>
 
 <main>
   <h1 class="visually-hidden">Liam Kengla, Graphic Designer</h1>
@@ -3387,8 +3649,8 @@
 </section>
 
 <div class="controls">
-  <button id="prev" aria-label="Previous">&#8592;</button>
-  <button id="next" aria-label="Next">&#8594;</button>
+  <button id="prev" aria-label="Previous"></button>
+  <button id="next" aria-label="Next"></button>
 </div>
 
 <div class="book-modal" id="bookModal" aria-hidden="true">
@@ -4007,10 +4269,6 @@
       track.querySelectorAll('.card').forEach((c) => {
         c.style.width = vertical ? w + 'px' : '';
       });
-      const prev = document.getElementById('prev');
-      const next = document.getElementById('next');
-      prev.innerHTML = vertical ? '&#8593;' : '&#8592;';
-      next.innerHTML = vertical ? '&#8595;' : '&#8594;';
       // Height of the title + keywords under each thumb (tallest card).
       // render() centers the image and its text together, not the image
       // alone, so the whole card sits optically in the middle of the page.
@@ -4209,8 +4467,12 @@
 
     render();
 
-    document.getElementById('next').addEventListener('click', () => goTo(index + 1, true));
-    document.getElementById('prev').addEventListener('click', () => goTo(index - 1, true));
+    const nextBtn = document.getElementById('next');
+    const prevBtn = document.getElementById('prev');
+    nextBtn.appendChild(window.makeClicker(nextBtn, 1));
+    prevBtn.appendChild(window.makeClicker(prevBtn, -1));
+    nextBtn.addEventListener('click', () => goTo(index + 1, true));
+    prevBtn.addEventListener('click', () => goTo(index - 1, true));
 
     // Keeps the infinite loop illusion: once we scroll past a clone, jump by
     // exactly one full lap (count card-units) so it lines up with the real
@@ -7061,8 +7323,6 @@
       [['wrcModal', '[data-opens-wrc]'], ['bookModal', '[data-opens-book]'], ['productModal', '[data-opens-products]']],
       [['bookModal2', '[data-opens-book-2]'], ['bookModal3', '[data-opens-book-3]'], ['bookModal4', '[data-opens-book-4]']],
     ];
-    const arrowLeft = '\u2190';
-    const arrowRight = '\u2192';
 
     function cardInfo(opener) {
       const card = opener.closest('.card, .pg-card');
@@ -7096,7 +7356,7 @@
         prevLink.href = '#';
         prevLink.className = 'pn-prev';
         prevLink.innerHTML = '<span class="pn-label"></span><span class="pn-title"></span>';
-        prevLink.querySelector('.pn-label').textContent = arrowLeft + ' Previous';
+        prevLink.querySelector('.pn-label').append(window.makeClicker(prevLink, -1), 'Previous');
         prevLink.querySelector('.pn-title').textContent = prev.title;
         prevLink.addEventListener('click', (e) => { e.preventDefault(); go(modal, prevOpener); });
 
@@ -7104,7 +7364,7 @@
         nextLink.href = '#';
         nextLink.className = 'pn-next';
         nextLink.innerHTML = '<span class="pn-label"></span><span class="pn-title"></span>';
-        nextLink.querySelector('.pn-label').textContent = 'Next ' + arrowRight;
+        nextLink.querySelector('.pn-label').append('Next', window.makeClicker(nextLink, 1));
         nextLink.querySelector('.pn-title').textContent = next.title;
         if (next.img) {
           const img = document.createElement('img');
@@ -7206,6 +7466,21 @@
     };
     const observer = new MutationObserver(sync);
     projects.forEach((m) => observer.observe(m, { attributes: true, attributeFilter: ['class'] }));
+
+    // The name goes on project pages (not About) and the Playground: by
+    // belt from the carousel's projects, by drawer on the Playground.
+    // Showing waits a beat, because previous/next closes one project and
+    // opens the next 60ms later and the name shouldn't flicker out and back.
+    let showTimer = null;
+    const updateName = () => {
+      const b = document.body.classList;
+      const hidden = (b.contains('project-open') && !b.contains('about-open')) || b.contains('playground-open');
+      const mode = b.contains('playground-open') ? 'drawer' : 'belt';
+      clearTimeout(showTimer);
+      if (hidden) window.headerMark.setHidden(true, mode);
+      else showTimer = setTimeout(() => window.headerMark.setHidden(false, mode), 150);
+    };
+    new MutationObserver(updateName).observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
     // On a project page, a click on the header (logo, X, empty space)
     // closes it and returns home. About and Playground have their own
