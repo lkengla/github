@@ -6042,7 +6042,7 @@
     // of that project. Stopping just freezes the interval — it deliberately
     // doesn't reset back to the first image, so it holds on whatever was
     // showing when the cursor left.
-    const CYCLE_INTERVAL = 750;
+    const CYCLE_INTERVAL = 2000;
     let cycleTimer = null;
 
     function getCardImages(card) {
@@ -9184,7 +9184,7 @@
   // only ones on screen move, and nothing runs while a project is open.
   (function () {
     const MOMENT_MS = 4200;
-    const SWAP_MS = 5000; // hover: desktop <-> laptop, iPad, iPhone
+    const SWAP_MS = 4000; // hover: desktop <-> laptop, iPad, iPhone
     const ease = (u) => (u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2);
     const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const t0 = performance.now();
@@ -9192,14 +9192,15 @@
     function frame(now) {
       if (!document.querySelector('.book-modal.open')) {
         const elapsed = now - t0;
-        // Hovering a Kodak card shows the three smaller devices first, then
-        // trades back and forth with the desktop until the pointer leaves.
+        // Hovering a Kodak card holds the desktop for SWAP_MS, then trades
+        // back and forth with the three smaller devices at the same pace
+        // until the pointer leaves, so no change comes sooner than the rest.
         document.querySelectorAll('.kd-thumb').forEach((thumb) => {
           const hovered = thumb.matches(':hover') || !!thumb.closest('.card.is-hovered');
           if (!hovered) { hoverSince.delete(thumb); thumb.classList.remove('show-trio'); return; }
           if (!hoverSince.has(thumb)) hoverSince.set(thumb, now);
           const phase = Math.floor((now - hoverSince.get(thumb)) / SWAP_MS) % 2;
-          thumb.classList.toggle('show-trio', phase === 0);
+          thumb.classList.toggle('show-trio', phase === 1);
         });
         document.querySelectorAll('.kd-moments').forEach((screen) => {
           const r = screen.getBoundingClientRect();
