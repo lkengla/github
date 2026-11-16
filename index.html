@@ -2864,12 +2864,50 @@
   }
 
   .ob-spin figcaption {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
     margin-top: 8px;
     font-size: 13px;
     font-weight: 700;
     text-align: center;
     text-transform: uppercase;
     letter-spacing: 0.06em;
+  }
+
+  .ob-step {
+    display: block;
+    width: 12px;
+    height: 12px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+
+  .ob-step .clicker {
+    display: block;
+    width: 12px;
+    height: 12px;
+  }
+
+  /* The battle of the tomato: twelve competitor shelf photos, the way the
+     research slide set them, six across. */
+  .ob-battle {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .ob-battle img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  @media (max-width: 900px) {
+    .ob-battle { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
 
   /* The pasta bag: one view at a time, picked from the angles below it. */
@@ -2896,6 +2934,13 @@
 
   .ob-view img.on {
     opacity: 1;
+  }
+
+  /* Angle buttons spaced well apart, so two-word labels read as one
+     button each. */
+  #obPasta .kd-tabs {
+    gap: 12px 56px;
+    margin-top: 28px;
   }
 
   /* Materials, as on the gallery poster: a swatch, the name, the spec. */
@@ -5293,8 +5338,25 @@
       </div>
     </div>
     <div class="kd-part">
-      <p class="interjection is-long">Instead of fighting the battle of the tomato, the product itself becomes the star and main focal point of the packaging.</p>
+      <p class="interjection is-long">Every upscale tomato sauce competed the same way: a standard label wrap with an illustration of a tomato.</p>
       <span class="kd-label">The Battle of the Tomato</span>
+    </div>
+    <div class="pj-section ob-battle">
+      <img data-src="portfolio projects/OrganicoBello/web/battle/jar-01.jpg" alt="Primal Kitchen vodka sauce" width="700" height="1166" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/battle/jar-02.jpg" alt="Primal Kitchen tomato basil" width="700" height="1172" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/battle/jar-03.jpg" alt="Lucini rustic tomato basil" width="700" height="1166" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/battle/jar-04.jpg" alt="Bianco DiNapoli marinara" width="700" height="1171" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/battle/jar-05.jpg" alt="Bianco DiNapoli arrabbiata" width="700" height="1172" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/battle/jar-06.jpg" alt="Nonna Pia's Siciliana" width="700" height="1166" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/battle/jar-07.jpg" alt="San Merican crushed tomatoes" width="700" height="1162" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/battle/jar-08.jpg" alt="Cento San Marzano" width="700" height="1169" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/battle/jar-09.jpg" alt="Bianco DiNapoli crushed tomatoes" width="700" height="1162" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/battle/jar-10.jpg" alt="La San Marzano pomodori pelati" width="700" height="1167" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/battle/jar-11.jpg" alt="Muir Glen whole peeled" width="700" height="1169" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/battle/jar-12.jpg" alt="The original Organico Bello can" width="700" height="1162" loading="lazy">
+    </div>
+    <div class="kd-part">
+      <p class="interjection is-long">Instead of fighting the battle of the tomato, the product itself becomes the star and main focal point of the packaging.</p>
     </div>
     <div class="pj-section">
       <img data-src="portfolio projects/OrganicoBello/web/hand models/OB-vodka_sauce-front-hand_model.webp" alt="Vodka Tomato Sauce held in hand" width="2880" height="1800" loading="lazy">
@@ -5306,27 +5368,27 @@
     <div class="ob-spins">
         <figure class="ob-spin" data-frames='["portfolio projects/OrganicoBello/web/OB-vodka_sauce-front.webp", "portfolio projects/OrganicoBello/web/OB-vodka_sauce-back.webp", "portfolio projects/OrganicoBello/web/OB-vodka_sauce-top.webp"]'>
           <div class="ob-photo"><img data-src="portfolio projects/OrganicoBello/web/OB-vodka_sauce-front.webp" alt="Vodka Tomato Sauce" width="1600" height="1600"></div>
-          <figcaption>Vodka Tomato Sauce</figcaption>
+          <figcaption><button type="button" class="ob-step" data-dir="-1" aria-label="Previous angle, Vodka Tomato Sauce"></button><span>Vodka Tomato Sauce</span><button type="button" class="ob-step" data-dir="1" aria-label="Next angle, Vodka Tomato Sauce"></button></figcaption>
         </figure>
         <figure class="ob-spin" data-frames='["portfolio projects/OrganicoBello/web/OB-tomato_sauce-front.webp", "portfolio projects/OrganicoBello/web/OB-tomato_sauce-right.webp", "portfolio projects/OrganicoBello/web/OB-tomato_sauce-back.webp", "portfolio projects/OrganicoBello/web/OB-tomato_sauce-left.webp"]'>
           <div class="ob-photo"><img data-src="portfolio projects/OrganicoBello/web/OB-tomato_sauce-front.webp" alt="Classic Tomato Sauce" width="1600" height="1600"></div>
-          <figcaption>Classic Tomato Sauce</figcaption>
+          <figcaption><button type="button" class="ob-step" data-dir="-1" aria-label="Previous angle, Classic Tomato Sauce"></button><span>Classic Tomato Sauce</span><button type="button" class="ob-step" data-dir="1" aria-label="Next angle, Classic Tomato Sauce"></button></figcaption>
         </figure>
         <figure class="ob-spin" data-frames='["portfolio projects/OrganicoBello/web/OB-tomato_bouillon-front.webp", "portfolio projects/OrganicoBello/web/OB-tomato_bouillon-right.webp", "portfolio projects/OrganicoBello/web/OB-tomato_bouillon-back.webp", "portfolio projects/OrganicoBello/web/OB-tomato_bouillon-left.webp", "portfolio projects/OrganicoBello/web/OB-tomato_bouillon-top.webp"]'>
           <div class="ob-photo"><img data-src="portfolio projects/OrganicoBello/web/OB-tomato_bouillon-front.webp" alt="Tomato Bouillon" width="1600" height="1600"></div>
-          <figcaption>Tomato Bouillon</figcaption>
+          <figcaption><button type="button" class="ob-step" data-dir="-1" aria-label="Previous angle, Tomato Bouillon"></button><span>Tomato Bouillon</span><button type="button" class="ob-step" data-dir="1" aria-label="Next angle, Tomato Bouillon"></button></figcaption>
         </figure>
         <figure class="ob-spin" data-frames='["portfolio projects/OrganicoBello/web/OB-italian_oregano-front.webp", "portfolio projects/OrganicoBello/web/OB-italian_oregano-right.webp", "portfolio projects/OrganicoBello/web/OB-italian_oregano-back.webp", "portfolio projects/OrganicoBello/web/OB-italian_oregano-left.webp", "portfolio projects/OrganicoBello/web/P2Sp26_LiamKengla_OrganicoBello_25.webp"]'>
           <div class="ob-photo"><img data-src="portfolio projects/OrganicoBello/web/OB-italian_oregano-front.webp" alt="Sicilian Oregano" width="1600" height="1600"></div>
-          <figcaption>Sicilian Oregano</figcaption>
+          <figcaption><button type="button" class="ob-step" data-dir="-1" aria-label="Previous angle, Sicilian Oregano"></button><span>Sicilian Oregano</span><button type="button" class="ob-step" data-dir="1" aria-label="Next angle, Sicilian Oregano"></button></figcaption>
         </figure>
         <figure class="ob-spin" data-frames='["portfolio projects/OrganicoBello/web/OB-bruschetta_spread-front.webp", "portfolio projects/OrganicoBello/web/OB-bruschetta_spread-right.webp", "portfolio projects/OrganicoBello/web/OB-bruschetta_spread-back.webp", "portfolio projects/OrganicoBello/web/OB-bruschetta_spread-left.webp", "portfolio projects/OrganicoBello/web/OB-bruschetta_spread-top.webp"]'>
           <div class="ob-photo"><img data-src="portfolio projects/OrganicoBello/web/OB-bruschetta_spread-front.webp" alt="Bruschetta Spread" width="1600" height="1600"></div>
-          <figcaption>Bruschetta Spread</figcaption>
+          <figcaption><button type="button" class="ob-step" data-dir="-1" aria-label="Previous angle, Bruschetta Spread"></button><span>Bruschetta Spread</span><button type="button" class="ob-step" data-dir="1" aria-label="Next angle, Bruschetta Spread"></button></figcaption>
         </figure>
         <figure class="ob-spin" data-frames='["portfolio projects/OrganicoBello/web/OB-tomato_paste-front.webp", "portfolio projects/OrganicoBello/web/OB-tomato_paste-back.webp"]'>
           <div class="ob-photo"><img data-src="portfolio projects/OrganicoBello/web/OB-tomato_paste-front.webp" alt="Tomato Paste" width="1600" height="1600"></div>
-          <figcaption>Tomato Paste</figcaption>
+          <figcaption><button type="button" class="ob-step" data-dir="-1" aria-label="Previous angle, Tomato Paste"></button><span>Tomato Paste</span><button type="button" class="ob-step" data-dir="1" aria-label="Next angle, Tomato Paste"></button></figcaption>
         </figure>
     </div>
     <div class="kd-part">
@@ -5336,14 +5398,14 @@
     <div class="ob-viewer" id="obPasta">
       <div class="ob-view">
           <img data-src="portfolio projects/OrganicoBello/web/OB-penne_rigate-front.webp" alt="Penne Rigate bag, front" width="1600" height="1600" class="on">
-          <img data-src="portfolio projects/OrganicoBello/web/OB-penne_rigate-right.webp" alt="Penne Rigate bag, side" width="1600" height="1600">
+          <img data-src="portfolio projects/OrganicoBello/web/OB-penne_rigate-right.webp" alt="Penne Rigate bag, right side" width="1600" height="1600">
           <img data-src="portfolio projects/OrganicoBello/web/OB-penne_rigate-back.webp" alt="Penne Rigate bag, back" width="1600" height="1600">
-          <img data-src="portfolio projects/OrganicoBello/web/OB-penne_rigate-left.webp" alt="Penne Rigate bag, other side" width="1600" height="1600">
+          <img data-src="portfolio projects/OrganicoBello/web/OB-penne_rigate-left.webp" alt="Penne Rigate bag, left side" width="1600" height="1600">
           <img data-src="portfolio projects/OrganicoBello/web/OB-penne_rigate-top.webp" alt="Penne Rigate bag, top" width="1600" height="1600">
           <img data-src="portfolio projects/OrganicoBello/web/hand models/OB-penne_rigate-front-hand_model.webp" alt="Penne Rigate bag, in hand" width="2880" height="1800">
           <img data-src="portfolio projects/OrganicoBello/web/hand models/OB-penne_rigate-right-hand_model.webp" alt="Penne Rigate bag, in hand, side" width="2880" height="1800">
       </div>
-      <div class="kd-tabs" aria-label="Viewing angle"><button type="button" class="on">Front</button><button type="button">Side</button><button type="button">Back</button><button type="button">Other Side</button><button type="button">Top</button><button type="button">In Hand</button><button type="button">In Hand, Side</button></div>
+      <div class="kd-tabs" aria-label="Viewing angle"><button type="button" class="on">Front</button><button type="button">Right Side</button><button type="button">Back</button><button type="button">Left Side</button><button type="button">Top</button><button type="button">In Hand 1</button><button type="button">In Hand 2</button></div>
     </div>
     <div class="kd-part">
       <p class="interjection is-long">Recycled paper the color of fresh pasta, so the sauces visually coat the packaging the way sauce coats pasta.</p>
@@ -7858,7 +7920,7 @@
     const closeBtn = document.getElementById('productClose');
     const scroll = document.getElementById('productScroll');
     const carouselControls = document.querySelector('.controls');
-    const SPIN_FRAME_MS = 350;
+    const SPIN_FRAME_MS = 700;
 
     modal.querySelectorAll('.ob-spin').forEach((card) => {
       const frames = JSON.parse(card.dataset.frames);
@@ -7877,9 +7939,26 @@
         img.src = frames[0];
         card.classList.remove('is-turning');
       }
-      card.addEventListener('mouseenter', start);
-      card.addEventListener('mouseleave', stop);
-      card.addEventListener('click', () => { if (timer) stop(); else start(); });
+      // The arrows beside the name step one angle at a time (the same
+      // chevron clickers as the homepage carousel); using them stops the
+      // hover turn until the pointer leaves the jar.
+      let manual = false;
+      card.addEventListener('mouseenter', () => { if (!manual) start(); });
+      card.addEventListener('mouseleave', () => { manual = false; stop(); });
+      card.querySelector('.ob-photo').addEventListener('click', () => { if (timer) stop(); else start(); });
+      card.querySelectorAll('.ob-step').forEach((button) => {
+        button.appendChild(window.makeClicker(button, +button.dataset.dir));
+        button.addEventListener('click', (e) => {
+          e.stopPropagation();
+          manual = true;
+          clearInterval(timer);
+          timer = null;
+          card.classList.remove('is-turning');
+          if (!warmed) { warmed = true; frames.forEach((src) => { new Image().src = src; }); }
+          i = (i + +button.dataset.dir + frames.length) % frames.length;
+          img.src = frames[i];
+        });
+      });
     });
 
     const viewer = document.getElementById('obPasta');
