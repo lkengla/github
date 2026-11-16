@@ -39,3 +39,12 @@ portfolio projects/WRC/envelopes/
 portfolio projects/WRC/rally.tv posters/
 portfolio projects/WRC/wrc posters/
 portfolio projects/WRC/example layout*.pdf
+
+# Full-size Figma renders of the Kodak site (the page uses web copies in Kodak/web/).
+portfolio projects/Kodak/src/
+what do i do.png
+
+# Apple product bezel downloads (the site uses the web copies in Kodak/web/devices/).
+Apple Device Frames/
+# Screenshots of the current Kodak site (the page uses crops in Kodak/web/before/).
+portfolio projects/Kodak/Kodak_Original-website- Screenshots /

@@ -561,7 +561,8 @@
 
   .pg-thumb[data-opens-book-2]:hover img,
   .pg-thumb[data-opens-book-3]:hover img,
-  .pg-thumb[data-opens-book-4]:hover img {
+  .pg-thumb[data-opens-book-4]:hover img,
+  .pg-thumb[data-opens-ad]:hover img {
     transform: scale(1.02);
   }
 
@@ -1449,6 +1450,475 @@
 
     .pn-next {
       margin-top: 48px;
+    }
+  }
+
+  /* Shared project page (Art Division, San Diego FC), the WRC layout in
+     general form: a large image on the margin, the head, then each part
+     introduced by an interjection. Rows set images side by side at one
+     height, each growing by its own aspect ratio (--ar), together exactly
+     the margin width. Nothing is cropped. */
+  .pj-page {
+    --pj-gap: 16px;
+  }
+
+  .pj-section {
+    padding: 0 var(--margin);
+  }
+
+  .pj-section + .pj-section {
+    margin-top: var(--pj-gap);
+  }
+
+  .pj-section img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .pj-hero {
+    padding-top: var(--fade-bottom);
+  }
+
+  .pj-row {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--pj-gap);
+  }
+
+  .pj-row > img {
+    flex: var(--ar) 1 0;
+    min-width: 0;
+  }
+
+  .pj-posters {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    gap: var(--pj-gap);
+  }
+
+  /* A short text beside nothing: the first four columns of the grid. */
+  .pj-text {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 16px;
+    padding: 0 var(--margin);
+    margin-bottom: 32px;
+  }
+
+  .pj-text > div {
+    grid-column: 1 / span 5;
+    max-width: 36em;
+  }
+
+  .pj-text h3 {
+    margin: 0 0 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .pj-text p {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.45;
+    text-wrap: pretty;
+  }
+
+  /* The crest breakdown and the clothing rows keep their own layouts. */
+  #bookModal4 .crest-breakdown-figure {
+    margin-top: 0;
+  }
+
+  #bookModal4.pj-page .book-embed-section {
+    padding: 0 var(--margin);
+  }
+
+  #bookModal4 .video-player {
+    width: 100%;
+  }
+
+  #bookModal4 .brand-gallery-row:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 900px) {
+    .pj-text > div {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .pj-row {
+      flex-direction: column;
+    }
+
+    .pj-row > img {
+      flex: none;
+    }
+
+    .pj-posters {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+
+  /* Kodak. Devices are drawn here, each sized by its own width (cqw), so
+     one device scales as a unit. A screen holds a "tape" of the page's
+     frame, sliced into tiles, that the script scrolls when it's in view. */
+  .dev {
+    position: relative;
+    container-type: inline-size;
+    min-width: 0;
+  }
+
+  .dev-screen {
+    position: relative;
+    overflow: hidden;
+    background: #000;
+  }
+
+  .dev-tape {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    will-change: transform;
+  }
+
+  .dev-tape img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Apple's own product bezels (the ones Figma's prototype devices use)
+     sit over the screen; the screen is placed in the bezel's opening by
+     percentages measured from each bezel image. */
+  .dev-frame {
+    position: relative;
+    z-index: 2;
+    display: block;
+    width: 100%;
+    height: auto;
+    pointer-events: none;
+  }
+
+  .dev .dev-screen {
+    position: absolute;
+    z-index: 1;
+  }
+
+  /* iMac 24" (4760 x 4050; screen 4480 x 2520 at 140, 150) */
+  .dev-imac .dev-screen {
+    left: calc(140 / 4760 * 100%);
+    top: calc(150 / 4050 * 100%);
+    width: calc(4480 / 4760 * 100%);
+    height: calc(2520 / 4050 * 100%);
+  }
+
+  /* MacBook Air 13" (3400 x 2240; screen 2560 x 1664 at 420, 288) */
+  .dev-laptop .dev-screen {
+    left: calc(420 / 3400 * 100%);
+    top: calc(288 / 2240 * 100%);
+    width: calc(2560 / 3400 * 100%);
+    height: calc(1664 / 2240 * 100%);
+  }
+
+  /* iPad Air 11" upright (1900 x 2620; screen 1640 x 2360 at 130, 130) */
+  .dev-tablet .dev-screen {
+    left: calc(130 / 1900 * 100%);
+    top: calc(130 / 2620 * 100%);
+    width: calc(1640 / 1900 * 100%);
+    height: calc(2360 / 2620 * 100%);
+  }
+
+  /* iPhone 17 Pro (1350 x 2760; screen 1206 x 2620 at 72, 70) */
+  .dev-phone .dev-screen {
+    left: calc(72 / 1350 * 100%);
+    top: calc(70 / 2760 * 100%);
+    width: calc(1206 / 1350 * 100%);
+    height: calc(2620 / 2760 * 100%);
+  }
+
+  /* Opening: the large desktop in an iMac, filling the first screen. */
+  .kd-hero {
+    padding-top: var(--fade-bottom);
+  }
+
+  .kd-hero .dev-imac {
+    width: min(100%, calc((100vh - var(--fade-bottom) - var(--margin)) * 4760 / 4050));
+    margin: 0 auto;
+  }
+
+  /* Rows of devices showing one page: same bottom line, together the
+     margin width, each sized by its share (--w). */
+  .kd-set {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 3vw;
+    padding: 0 var(--margin);
+  }
+
+  .kd-set .dev {
+    flex: var(--w) 1 0;
+  }
+
+  /* A second product follows the first without a new statement. */
+  .kd-set.kd-next {
+    margin-top: 200px;
+  }
+
+  /* The same page on the large desktop, under its row. */
+  .kd-desk {
+    margin-top: 6vw;
+  }
+
+  .kd-desk .dev-imac {
+    width: min(100%, calc((100vh - var(--fade-bottom) - var(--margin)) / 0.79));
+    margin: 0 auto;
+  }
+
+  /* Each part of the Kodak page: its statement, with a small label at
+     the left margin saying which page it is. */
+  .kd-part {
+    position: relative;
+  }
+
+  .kd-part .interjection {
+    padding-bottom: 20px;
+  }
+
+  .kd-label {
+    display: block;
+    margin-bottom: 76px;
+    padding: 0 var(--margin);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.45;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .kd-cell {
+    margin: 0;
+  }
+
+  .kd-cell figcaption,
+  .kd-pair figcaption {
+    margin-top: 12px;
+    font-size: 13px;
+    line-height: 1.45;
+    text-align: center;
+  }
+
+  /* Before and after: the old site and the redesign at one size. */
+  .kd-pairs {
+    display: grid;
+    gap: 64px;
+    padding: 0 var(--margin);
+  }
+
+  .kd-pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 16px;
+    margin: 0;
+  }
+
+  .kd-pair figcaption {
+    grid-column: 1 / -1;
+  }
+
+  .kd-pair img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .kd-pair span {
+    display: block;
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  @media (max-width: 640px) {
+    .kd-pair {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
+    }
+  }
+
+  /* Every page resizing at once: three across, then the rest centered. */
+  .kd-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 32px 16px;
+  }
+
+  .kd-grid .kd-cell {
+    flex: 0 0 calc((100% - 32px) / 3);
+  }
+
+  @media (max-width: 900px) {
+    .kd-grid .kd-cell {
+      flex-basis: 100%;
+    }
+  }
+
+  /* Working prototype in the laptop. Click loads it. */
+  .kd-proto {
+    padding: 0 var(--margin);
+  }
+
+  .kd-proto .dev-laptop {
+    width: min(100%, calc((100vh - var(--fade-bottom) - 60px) * 3400 / 2240));
+    margin: 0 auto;
+  }
+
+  .kd-proto .dev-screen {
+    cursor: pointer;
+  }
+
+  .kd-proto .dev-screen > img,
+  .kd-proto iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    object-fit: cover;
+    object-position: top;
+  }
+
+  /* Before it starts: the screen dims and says so in the middle. */
+  .kd-proto .player-hint {
+    inset: 0;
+    top: 0;
+    left: 0;
+    max-width: none;
+    transform: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.35);
+    color: #fff;
+    pointer-events: none;
+  }
+
+  .kd-proto .dev-screen:hover .player-hint {
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .kd-proto.is-live .player-hint,
+  .kd-proto.is-live .dev-screen > img {
+    display: none;
+  }
+
+  .kd-caption {
+    margin: 24px 0 0;
+    font-size: 13px;
+    line-height: 1.45;
+    text-align: center;
+  }
+
+  /* One page resizing from phone to desktop and back: the frames stack
+     centered, the window between two page-colored curtains widens and
+     narrows (transforms only), and each size fades in as it's reached. */
+  .kd-resize {
+    padding: 0 var(--margin);
+  }
+
+  .kd-stage {
+    position: relative;
+    aspect-ratio: 2000 / 1100;
+    overflow: hidden;
+  }
+
+  .kd-stage img {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    height: 100%;
+    width: auto;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.9s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  .kd-stage img.on {
+    opacity: 1;
+  }
+
+  .kd-curtain {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    background: var(--bg-page, #f6f5f1);
+    transition: transform 0.9s cubic-bezier(0.65, 0, 0.35, 1);
+    z-index: 2;
+  }
+
+  .kd-curtain.left { right: 50%; }
+  .kd-curtain.right { left: 50%; }
+
+  .kd-sizes {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin-top: 24px;
+    font-size: 13px;
+  }
+
+  .kd-sizes span {
+    opacity: 0.35;
+    transition: opacity 0.4s ease;
+  }
+
+  .kd-sizes span.on {
+    opacity: 1;
+  }
+
+  /* Every size of the home page side by side at one scale, full length,
+     scrolling together inside one window. */
+  .kd-lineup {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    height: min(80vh, 900px);
+    margin: 0 var(--margin);
+    overflow: hidden;
+  }
+
+  .kd-lineup .kd-col {
+    position: relative;
+    flex: var(--w) 1 0;
+    min-width: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  @media (max-width: 640px) {
+    .kd-set {
+      flex-wrap: wrap;
+    }
+
+    .kd-set .dev-laptop,
+    .kd-set .dev-imac {
+      flex-basis: 100%;
+    }
+
+    .kd-sizes {
+      gap: 16px;
     }
   }
 
@@ -3630,8 +4100,13 @@
         <span>Book Design, Bookbinding, Curation</span>
       </div>
       <div class="card">
-        <div class="thumb placeholder" aria-label="Kodak &mdash; images coming soon"></div>
-        <h3>Kodak [COMING SOON]</h3>
+        <div class="thumb is-photo" data-opens-kodak="true" data-images='[
+          "portfolio projects/Kodak/web/home-top.jpg",
+          "portfolio projects/Kodak/web/film-top.jpg"
+        ]'>
+          <img fetchpriority="high" src="portfolio projects/Kodak/web/home-top.jpg" alt="Kodak &mdash; home page, Kodak Captures Beauty">
+        </div>
+        <h3>Kodak</h3>
         <span>UI Design, Curation</span>
       </div>
       <div class="card">
@@ -3675,11 +4150,11 @@
       <span>Branding, Motion, Campaign</span>
     </div>
     <div class="pg-card">
-      <div class="pg-thumb">
-        <img data-src="portfolio projects/ArtDivision/artdivison-freeway_signage-mockup.jpg" alt="Art Division &mdash; freeway signage mockup">
+      <div class="pg-thumb" data-opens-ad="true">
+        <img data-src="portfolio projects/ArtDivision/web/freeway-signage.jpg" alt="Art Division &mdash; freeway billboard">
       </div>
-      <h3>ArtDivision [COMING SOON]</h3>
-      <span>Branding, UI Design [Web]</span>
+      <h3>Art Division</h3>
+      <span>Branding, Campaign</span>
     </div>
   </div>
 </section>
@@ -3874,20 +4349,27 @@
   </div>
 </div>
 
-<div class="book-modal" id="bookModal4" aria-hidden="true">
+<div class="book-modal pj-page" id="bookModal4" aria-hidden="true">
   <button class="book-close" id="bookClose4" aria-label="Close">&times;</button>
   <div class="gallery-scroll" id="galleryScroll4">
-    <div class="book-description">
-      <h2>San Diego Football Club</h2>
-      <p style="max-width: 54ch">This proposed rebrand of San Diego FC was developed for the club&rsquo;s inaugural season, building a bold, cinematic identity rooted in the character and history of San Diego. The crest combines mission&#8209;inspired arches, a shield&#8209;shaped outline, and a custom anchor, all designed to symbolize the city&rsquo;s architecture, proximity to the Pacific coastline, naval heritage, and military community.</p>
-      <p style="max-width: 50ch">The visual and promotional language is built around fan engagement and positive mantras and slogans such as &ldquo;The City&rsquo;s Anchor,&rdquo; &ldquo;Our Strength, Our Anchor,&rdquo; and &ldquo;Making Waves That Matter.&rdquo; The rebrand embraces the energy of the team and its supporters, intentionally moving away from the increasingly corporate design and language of modern sports in favor of something bold, local, and community&#8209;driven.</p>
-      <dl>
-        <div class="dl-col">
-          <div><dt>Oversight</dt><dd>Pamela Olecki<br>Associate Professor, ArtCenter College of Design</dd></div>
-        </div>
-      </dl>
+    <div class="pj-section pj-hero">
+      <img width="2400" height="1350" data-src="portfolio projects/SanDiego-Football-Club/web/flag-mock.jpg" alt="San Diego Football Club flag flying beside the city flag">
     </div>
-    <div class="brand-gallery" id="brandGalleryFlag4"></div>
+    <div class="project-head">
+      <h2 class="project-title">A proposed rebrand of San Diego FC<br> for the club&rsquo;s inaugural season,<br> rooted in the character of the city.</h2>
+      <div class="project-texts">
+        <div class="pt-description">
+          <h3>Project Description</h3>
+          <p style="max-width: 54ch">This proposed rebrand of San Diego FC was developed for the club&rsquo;s inaugural season, building a bold, cinematic identity rooted in the character and history of San Diego. The crest combines mission&#8209;inspired arches, a shield&#8209;shaped outline, and a custom anchor, all designed to symbolize the city&rsquo;s architecture, proximity to the Pacific coastline, naval heritage, and military community.</p>
+          <p style="max-width: 50ch">The visual and promotional language is built around fan engagement and positive mantras and slogans such as &ldquo;The City&rsquo;s Anchor,&rdquo; &ldquo;Our Strength, Our Anchor,&rdquo; and &ldquo;Making Waves That Matter.&rdquo; The rebrand embraces the energy of the team and its supporters, intentionally moving away from the increasingly corporate design and language of modern sports in favor of something bold, local, and community&#8209;driven.</p>
+        </div>
+        <div>
+          <h3>Design</h3><p>L.J. Kengla</p>
+          <h3>Oversight</h3><p>Pamela Olecki<br>ArtCenter College of Design</p>
+        </div>
+      </div>
+    </div>
+    <p class="interjection is-long">A crest built from San Diego&rsquo;s mission architecture, its naval heritage, and the Pacific coastline.</p>
     <div class="crest-breakdown-figure">
       <div class="crest-img-wrap">
         <img data-src="portfolio projects/SanDiego-Football-Club/SDFC_Crest-trimmed.png" alt="San Diego Football Club &mdash; crest, annotated" loading="lazy">
@@ -3907,24 +4389,266 @@
       <div class="crest-line crest-line-right" style="top: 89%;"></div>
       <div class="crest-label crest-label-right" style="top: 89%;">&ldquo;FC&rdquo; sits nested at the anchor&rsquo;s base, grounding the mark without competing with it.</div>
     </div>
-    <div class="brand-gallery" id="brandGalleryBefore4"></div>
+    <p class="interjection">Stationery and staff credentials.</p>
+    <div class="pj-section pj-row">
+      <img width="2400" height="1350" data-src="portfolio projects/SanDiego-Football-Club/web/bis-card-mock.jpg" alt="Business cards, front and back" loading="lazy" style="--ar: 1.778">
+      <img width="2400" height="1600" data-src="portfolio projects/SanDiego-Football-Club/web/letterhead-mock.jpg" alt="Letterhead and envelope" loading="lazy" style="--ar: 1.5">
+      <img width="2400" height="1600" data-src="portfolio projects/SanDiego-Football-Club/web/staff-badge.jpg" alt="Staff badge, front and back" loading="lazy" style="--ar: 1.5">
+    </div>
+    <p class="interjection">The inaugural season schedule.</p>
+    <div class="pj-section">
+      <img width="1920" height="1080" data-src="portfolio projects/SanDiego-Football-Club/web/brochure-mock.jpg" alt="Season schedule brochure, home and away fixtures" loading="lazy">
+    </div>
+    <p class="interjection">Matchday posters for the players.</p>
+    <div class="pj-section pj-posters">
+      <img width="1466" height="2200" data-src="portfolio projects/SanDiego-Football-Club/web/poster-macro-1.jpg" alt="Player poster with the crest behind him" loading="lazy">
+      <img width="1466" height="2200" data-src="portfolio projects/SanDiego-Football-Club/web/poster-hirving-lozano.jpg" alt="Hirving Lozano poster" loading="lazy">
+      <img width="1467" height="2200" data-src="portfolio projects/SanDiego-Football-Club/web/logo-poster.jpg" alt="Player poster in the yellow away kit" loading="lazy">
+    </div>
+    <p class="interjection">Social posts for match days and the player of the match.</p>
+    <div class="pj-section pj-row">
+      <img width="2400" height="1350" data-src="portfolio projects/SanDiego-Football-Club/web/stories.jpg" alt="Instagram stories, player of the match" loading="lazy" style="--ar: 1.778">
+      <img width="2400" height="1350" data-src="portfolio projects/SanDiego-Football-Club/web/instagram.jpg" alt="Instagram posts, match day" loading="lazy" style="--ar: 1.778">
+    </div>
+    <p class="interjection">A brand video for the first season.</p>
     <div class="book-embed-section">
       <div class="video-player" id="sdfcVideoPlayer">
-        <img data-src="portfolio projects/SanDiego-Football-Club/web/video-poster.jpg" alt="San Diego Football Club &mdash; brand video" draggable="false">
+        <img width="1920" height="1080" data-src="portfolio projects/SanDiego-Football-Club/web/video-poster.jpg" alt="San Diego Football Club &mdash; brand video" draggable="false">
         <video id="sdfcVideo" src="portfolio projects/SanDiego-Football-Club/SDFC-brand-video.mp4" playsinline controls preload="none"></video>
         <div class="video-hint" id="sdfcVideoHint"><span>Click to play</span></div>
       </div>
     </div>
+    <p class="interjection">Home and away kits and training wear.</p>
     <div class="brand-gallery" id="brandGalleryClothing4"></div>
-    <div class="brand-gallery" id="brandGalleryAfter4"></div>
-    <div class="split-grid">
-      <img data-src="portfolio projects/SanDiego-Football-Club/web/campaign/bus-stop.jpg" alt="San Diego Seahorses &mdash; bus stop" loading="lazy">
-      <img data-src="portfolio projects/SanDiego-Football-Club/web/campaign/billboard.jpg" alt="San Diego Seahorses &mdash; billboard" loading="lazy">
-      <img data-src="portfolio projects/SanDiego-Football-Club/web/campaign/updated-signs.jpg" alt="San Diego Seahorses &mdash; field signage" loading="lazy">
-      <div class="section-text">
-        <h2>San Diego Seahorses</h2>
+    <p class="interjection">The team bus, the club offices, and the website.</p>
+    <div class="pj-section">
+      <img width="2400" height="1350" data-src="portfolio projects/SanDiego-Football-Club/web/travel-bus.jpg" alt="Open-top team bus wrapped in the new identity" loading="lazy">
+    </div>
+    <div class="pj-section pj-row">
+      <img width="2400" height="1600" data-src="portfolio projects/SanDiego-Football-Club/web/building-mock.jpg" alt="Illuminated crest and wordmark on the club building" loading="lazy" style="--ar: 1.5">
+      <img width="2400" height="1600" data-src="portfolio projects/SanDiego-Football-Club/web/website-mock.jpg" alt="Club website on laptop, desktop, tablet, and phone" loading="lazy" style="--ar: 1.5">
+    </div>
+    <p class="interjection is-long">San Diego Seahorses, a proposed U&#8209;14 youth team sponsored by SDFC.</p>
+    <div class="pj-text">
+      <div>
         <p>A proposed youth extension of San Diego FC, the San Diego Seahorses is a U&#8209;14 soccer team sponsored by SDFC and designed with a complementary visual identity. The program creates a professional, branded environment for young players to develop their skills while providing SDFC with a meaningful opportunity to engage with and invest in the youth of the San Diego community, working alongside a generation that can grow with the club.</p>
       </div>
+    </div>
+    <div class="pj-section">
+      <img width="2400" height="1600" data-src="portfolio projects/SanDiego-Football-Club/web/campaign/billboard.jpg" alt="San Diego Seahorses billboard" loading="lazy">
+    </div>
+    <div class="pj-section pj-row">
+      <img width="2400" height="1600" data-src="portfolio projects/SanDiego-Football-Club/web/campaign/bus-stop.jpg" alt="San Diego Seahorses bus stop" loading="lazy" style="--ar: 1.5">
+      <img width="2400" height="1760" data-src="portfolio projects/SanDiego-Football-Club/web/campaign/updated-signs.jpg" alt="San Diego Seahorses tryout signs" loading="lazy" style="--ar: 1.364">
+    </div>
+    <div class="book-contact">
+      <span>&copy; Liam Jacob Kengla</span>
+    </div>
+  </div>
+</div>
+
+<div class="book-modal pj-page" id="kodakModal" aria-hidden="true">
+  <button class="book-close" id="kodakClose" aria-label="Close">&times;</button>
+  <div class="gallery-scroll" id="kodakScroll">
+    <div class="pj-section kd-hero">
+      <div class="dev dev-imac" role="img" aria-label="The Kodak homepage on a large desktop, scrolling"><div class="dev-screen"><div class="dev-tape" data-tape="home-desktop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/imac.webp" alt=""></div>
+    </div>
+    <div class="project-head">
+      <h2 class="project-title">A proposed redesign of the<br> Kodak website, built as one system<br> for every page and every screen.</h2>
+      <div class="project-texts">
+        <div class="pt-description">
+          <h3>Project Description</h3>
+          <p style="max-width: 50ch">This proposed redesign of the Kodak website is built on large example photography, white space, close product cropping, and heavy grid&#8209;like layouts.</p>
+          <p style="max-width: 50ch">The same system carries from the homepage to the film and camera pages, and works at every size from a phone to a large desktop.</p>
+        </div>
+        <div>
+          <h3>Design</h3><p>L.J. Kengla</p>
+          <h3>Oversight</h3><p>Brian Boyl<br>ArtCenter College of Design</p>
+        </div>
+      </div>
+    </div>
+    <p class="interjection">Every page, from a phone to a large desktop.</p>
+    <div class="kd-resize kd-all" id="kodakResizeAll">
+      <div class="kd-grid">
+        <figure class="kd-cell">
+        <div class="kd-stage" role="img" aria-label="The Kodak Homepage resizing from phone to desktop">
+          <img data-src="portfolio projects/Kodak/web/resize/home-360.jpg" alt="" data-w="360">
+          <img data-src="portfolio projects/Kodak/web/resize/home-750.jpg" alt="" data-w="750">
+          <img data-src="portfolio projects/Kodak/web/resize/home-1279.jpg" alt="" data-w="1279">
+          <img data-src="portfolio projects/Kodak/web/resize/home-2000.jpg" alt="" data-w="2000">
+          <div class="kd-curtain left"></div><div class="kd-curtain right"></div>
+        </div>
+        <figcaption>Homepage</figcaption>
+      </figure>
+        <figure class="kd-cell">
+        <div class="kd-stage" role="img" aria-label="The Kodak camera page resizing from phone to desktop">
+          <img data-src="portfolio projects/Kodak/web/resize/cameras-360.jpg" alt="" data-w="360">
+          <img data-src="portfolio projects/Kodak/web/resize/cameras-750.jpg" alt="" data-w="750">
+          <img data-src="portfolio projects/Kodak/web/resize/cameras-1279.jpg" alt="" data-w="1279">
+          <img data-src="portfolio projects/Kodak/web/resize/cameras-2000.jpg" alt="" data-w="2000">
+          <div class="kd-curtain left"></div><div class="kd-curtain right"></div>
+        </div>
+        <figcaption>Camera Page</figcaption>
+      </figure>
+        <figure class="kd-cell">
+        <div class="kd-stage" role="img" aria-label="The Kodak film page resizing from phone to desktop">
+          <img data-src="portfolio projects/Kodak/web/resize/film-360.jpg" alt="" data-w="360">
+          <img data-src="portfolio projects/Kodak/web/resize/film-750.jpg" alt="" data-w="750">
+          <img data-src="portfolio projects/Kodak/web/resize/film-1279.jpg" alt="" data-w="1279">
+          <img data-src="portfolio projects/Kodak/web/resize/film-2000.jpg" alt="" data-w="2000">
+          <div class="kd-curtain left"></div><div class="kd-curtain right"></div>
+        </div>
+        <figcaption>Film Page</figcaption>
+      </figure>
+        <figure class="kd-cell">
+        <div class="kd-stage" role="img" aria-label="The Kodak Product Page, Ektar H35N resizing from phone to desktop">
+          <img data-src="portfolio projects/Kodak/web/resize/ektar-360.jpg" alt="" data-w="360">
+          <img data-src="portfolio projects/Kodak/web/resize/ektar-750.jpg" alt="" data-w="750">
+          <img data-src="portfolio projects/Kodak/web/resize/ektar-1279.jpg" alt="" data-w="1279">
+          <img data-src="portfolio projects/Kodak/web/resize/ektar-2000.jpg" alt="" data-w="2000">
+          <div class="kd-curtain left"></div><div class="kd-curtain right"></div>
+        </div>
+        <figcaption>Product Page, Ektar H35N</figcaption>
+      </figure>
+        <figure class="kd-cell">
+        <div class="kd-stage" role="img" aria-label="The Kodak Product Page, PIXPRO WPZ2 resizing from phone to desktop">
+          <img data-src="portfolio projects/Kodak/web/resize/pixpro-360.jpg" alt="" data-w="360">
+          <img data-src="portfolio projects/Kodak/web/resize/pixpro-750.jpg" alt="" data-w="750">
+          <img data-src="portfolio projects/Kodak/web/resize/pixpro-1279.jpg" alt="" data-w="1279">
+          <img data-src="portfolio projects/Kodak/web/resize/pixpro-2000.jpg" alt="" data-w="2000">
+          <div class="kd-curtain left"></div><div class="kd-curtain right"></div>
+        </div>
+        <figcaption>Product Page, PIXPRO WPZ2</figcaption>
+      </figure>
+      </div>
+      <div class="kd-sizes" aria-hidden="true"><span>Phone</span><span>Tablet</span><span>Laptop</span><span>Desktop</span></div>
+    </div>
+    <div class="kd-part">
+      <p class="interjection is-long">Large example photography and white space, applied at every scale.</p>
+      <span class="kd-label">Camera Page</span>
+    </div>
+    <div class="kd-set">
+      <div class="dev dev-laptop" style="--w: 304"><div class="dev-screen"><div class="dev-tape" data-tape="cameras-laptop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt=""></div>
+      <div class="dev dev-tablet" style="--w: 179"><div class="dev-screen"><div class="dev-tape" data-tape="cameras-tablet"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/tablet.webp" alt=""></div>
+      <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="cameras-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp" alt=""></div>
+    </div>
+    <div class="kd-part">
+      <p class="interjection is-long">A film page that sells film by actually showing photography.</p>
+      <span class="kd-label">Film Page</span>
+    </div>
+    <div class="kd-set">
+      <div class="dev dev-laptop" style="--w: 304"><div class="dev-screen"><div class="dev-tape" data-tape="film-laptop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt=""></div>
+      <div class="dev dev-tablet" style="--w: 179"><div class="dev-screen"><div class="dev-tape" data-tape="film-tablet"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/tablet.webp" alt=""></div>
+      <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="film-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp" alt=""></div>
+    </div>
+    <div class="kd-part">
+      <p class="interjection is-long">The current Kodak website beside the redesign.</p>
+      <span class="kd-label">Before and After</span>
+    </div>
+    <div class="kd-pairs">
+      <figure class="kd-pair">
+        <div><img data-src="portfolio projects/Kodak/web/before/old-home.jpg" alt="The current Kodak website, homepage" loading="lazy" width="2000" height="1180"><span>Before</span></div>
+        <div><img data-src="portfolio projects/Kodak/web/before/new-home.jpg" alt="The redesign, homepage" loading="lazy" width="2000" height="1180"><span>After</span></div>
+        <figcaption>Homepage</figcaption>
+      </figure>
+      <figure class="kd-pair">
+        <div><img data-src="portfolio projects/Kodak/web/before/old-ektar.jpg" alt="The current Kodak website, Ektar H35N product page" loading="lazy" width="2000" height="1180"><span>Before</span></div>
+        <div><img data-src="portfolio projects/Kodak/web/before/new-ektar.jpg" alt="The redesign, Ektar H35N product page" loading="lazy" width="2000" height="1180"><span>After</span></div>
+        <figcaption>Ektar H35N product page</figcaption>
+      </figure>
+      <figure class="kd-pair">
+        <div><img data-src="portfolio projects/Kodak/web/before/old-cameras.jpg" alt="The current Kodak website, more cameras, as cards and as a stack" loading="lazy" width="2000" height="1180"><span>Before</span></div>
+        <div><img data-src="portfolio projects/Kodak/web/before/new-cameras.jpg" alt="The redesign, more cameras, as cards and as a stack" loading="lazy" width="2000" height="1180"><span>After</span></div>
+        <figcaption>More cameras, as cards and as a stack</figcaption>
+      </figure>
+    </div>
+    <div class="kd-part">
+      <p class="interjection">A working prototype of the site at laptop size.</p>
+      <span class="kd-label">Prototype</span>
+    </div>
+    <div class="kd-proto" id="kodakProto">
+      <div class="dev dev-laptop"><div class="dev-screen" id="kodakProtoScreen" role="button" tabindex="0" aria-label="Start the working prototype">
+        <img data-src="portfolio projects/Kodak/web/laptop-poster.jpg" alt="The Kodak homepage at laptop size">
+        <div class="player-hint">Click to start</div>
+      </div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt=""></div>
+      <p class="kd-caption">Scroll and click inside the screen to move through the site.</p>
+    </div>
+    <div class="kd-part">
+      <p class="interjection is-long">The system emphasizes color variations and product photography, creating a product page that inspires you to create.</p>
+      <span class="kd-label">Product Page, Ektar H35N</span>
+    </div>
+    <div class="kd-set">
+      <div class="dev dev-laptop" style="--w: 304"><div class="dev-screen"><div class="dev-tape" data-tape="ektar-laptop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt=""></div>
+      <div class="dev dev-tablet" style="--w: 179"><div class="dev-screen"><div class="dev-tape" data-tape="ektar-tablet"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/tablet.webp" alt=""></div>
+      <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="ektar-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp" alt=""></div>
+    </div>
+    <div class="kd-part">
+      <p class="interjection is-long">Each feature of the camera is shown with a photograph taken using it.</p>
+      <span class="kd-label">Product Page, PIXPRO WPZ2</span>
+    </div>
+    <div class="kd-set">
+      <div class="dev dev-laptop" style="--w: 304"><div class="dev-screen"><div class="dev-tape" data-tape="pixpro-laptop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt=""></div>
+      <div class="dev dev-tablet" style="--w: 179"><div class="dev-screen"><div class="dev-tape" data-tape="pixpro-tablet"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/tablet.webp" alt=""></div>
+      <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="pixpro-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp" alt=""></div>
+    </div>
+    <div class="book-contact">
+      <span>&copy; Liam Jacob Kengla</span>
+    </div>
+  </div>
+</div>
+
+<div class="book-modal pj-page" id="adModal" aria-hidden="true">
+  <button class="book-close" id="adClose" aria-label="Close">&times;</button>
+  <div class="gallery-scroll" id="adScroll">
+    <div class="pj-section pj-hero">
+      <img width="2000" height="1125" data-src="portfolio projects/ArtDivision/web/freeway-signage.jpg" alt="Art Division freeway billboard, the word ART filled with student artwork">
+    </div>
+    <div class="project-head">
+      <h2 class="project-title">A proposed rebrand for Art Division,<br> a nonprofit offering cost&#8209;free art and<br> design instruction in Los Angeles.</h2>
+      <div class="project-texts">
+        <div class="pt-description">
+          <h3>Project Description</h3>
+          <p style="max-width: 52ch">This proposed rebrand of Art Division, a Los Angeles nonprofit, is designed to bring more young people into its cost&#8209;free classes in photography, printmaking, illustration, painting, graphic design, film arts, and art history for ages 18&#8209;27.</p>
+          <p style="max-width: 50ch">The identity is built on a triangle grid that divides every layout. Each triangle is filled with work by Art Division students, so many separate pieces read as one, the idea behind the line &ldquo;Vision divided, vision unified.&rdquo;</p>
+        </div>
+        <div>
+          <h3>Design</h3><p>L.J. Kengla</p>
+        </div>
+      </div>
+    </div>
+    <p class="interjection is-long">Bus stop posters for each class, with student work set in the triangle grid.</p>
+    <div class="pj-section">
+      <img width="2000" height="1451" data-src="portfolio projects/ArtDivision/web/bus-stop-poster1.jpg" alt="Bus stop poster, Basics of Printmaking" loading="lazy">
+    </div>
+    <div class="pj-section pj-row">
+      <img width="2000" height="1451" data-src="portfolio projects/ArtDivision/web/bus-stop-poster2.jpg" alt="Bus stop poster, Fundamentals of Painting" loading="lazy" style="--ar: 1">
+      <img width="2000" height="1451" data-src="portfolio projects/ArtDivision/web/bus-stop-poster3.jpg" alt="Bus stop poster, Basics of Photography" loading="lazy" style="--ar: 1">
+    </div>
+    <p class="interjection">Sidewalk signs listing every class.</p>
+    <div class="pj-section">
+      <img width="2000" height="1333" data-src="portfolio projects/ArtDivision/web/a-frame.jpg" alt="Two sidewalk A-frame signs: Join today and create what has never been created before, and the list of classes" loading="lazy">
+    </div>
+    <p class="interjection">A fold&#8209;out schedule of the spring classes.</p>
+    <div class="pj-section pj-row">
+      <img width="2000" height="1314" data-src="portfolio projects/ArtDivision/web/quadfold-front.jpg" alt="Quadfold brochure, front" loading="lazy" style="--ar: 1">
+      <img width="2000" height="1314" data-src="portfolio projects/ArtDivision/web/quadfold-back.jpg" alt="Quadfold brochure, back" loading="lazy" style="--ar: 1">
+    </div>
+    <p class="interjection">Social posts for classes, gallery shows, and community events.</p>
+    <div class="pj-section pj-row">
+      <img width="2000" height="1125" data-src="portfolio projects/ArtDivision/web/instagram.jpg" alt="Instagram posts" loading="lazy" style="--ar: 1.778">
+      <img width="2000" height="1333" data-src="portfolio projects/ArtDivision/web/instagram-stories.jpg" alt="Instagram stories: food drive, film workshop, annual dinner auction" loading="lazy" style="--ar: 1.5">
+    </div>
+    <p class="interjection">Stationery, a student planner, and merchandise.</p>
+    <div class="pj-section">
+      <img width="2000" height="1333" data-src="portfolio projects/ArtDivision/web/stationary.jpg" alt="Stationery: folder, letterhead, envelopes, and business cards" loading="lazy">
+    </div>
+    <div class="pj-section pj-row">
+      <img width="2000" height="1333" data-src="portfolio projects/ArtDivision/web/planner.jpg" alt="2026 student planner, closed and open" loading="lazy" style="--ar: 1">
+      <img width="2000" height="1333" data-src="portfolio projects/ArtDivision/web/pen.jpg" alt="Pens: Unleash your potential, design your future" loading="lazy" style="--ar: 1">
+    </div>
+    <div class="pj-section pj-row">
+      <img width="2000" height="1333" data-src="portfolio projects/ArtDivision/web/totebag.jpg" alt="Tote bags: Create with passion, think bigger, design for you" loading="lazy" style="--ar: 1">
+      <img width="2000" height="1333" data-src="portfolio projects/ArtDivision/web/tablecard.jpg" alt="Table card: Dream big, work hard, never stop" loading="lazy" style="--ar: 1">
     </div>
     <div class="book-contact">
       <span>&copy; Liam Jacob Kengla</span>
@@ -4098,7 +4822,7 @@
           <div class="about-links">
             <a href="mailto:kenglaliam@gmail.com" class="mail-flip" aria-label="Email Liam"><span aria-hidden="true">M</span><span aria-hidden="true">a</span><span aria-hidden="true">i</span><span aria-hidden="true">l</span></a>
             <a href="https://www.linkedin.com/in/liam-kengla-0637b2316" target="_blank" rel="noopener">LinkedIn</a>
-            <a href="#" class="resume-link">Resume</a>
+            <a href="#" class="resume-link">Résumé</a>
           </div>
           <p class="about-location">Based in Los Angeles, CA. Born in and frequents Portland, OR.</p>
         </div>
@@ -4118,7 +4842,7 @@
   <div class="gallery-scroll" id="contactScroll">
     <div class="book-description contact-page">
       <a class="contact-option" href="mailto:kenglaliam@gmail.com">kenglaliam@gmail.com</a>
-      <p class="contact-note">Resume upon request</p>
+      <p class="contact-note">Résumé upon request</p>
     </div>
   </div>
 </div>
@@ -6445,20 +7169,8 @@
     const videoPlayer = document.getElementById('sdfcVideoPlayer');
     const video = document.getElementById('sdfcVideo');
 
-    // size: 'lg' | 'md' | 'sm' (row height tier, biggest for the mockups
-    // that matter most). items: a plain filename, relative to PROJECT_DIR.
-    // The flag gets its own row/container (see buildGallery below) so the
-    // crest breakdown figure — static HTML, not built from these rows —
-    // can sit between it and the rest of BEFORE_ROWS.
-    const FLAG_ROW = [
-      { size: 'lg', items: ['flag-mock.jpg'] },
-    ];
-    const BEFORE_ROWS = [
-      { size: 'sm', items: ['bis-card-mock.jpg', 'letterhead-mock.jpg', 'staff-badge.jpg'] },
-      { size: 'lg', items: ['brochure-mock.jpg'] },
-      { size: 'md', items: ['stories.jpg', 'instagram.jpg'] },
-      { size: 'lg', items: ['poster-macro-1.jpg', 'poster-hirving-lozano.jpg', 'logo-poster.jpg'], className: 'before-video' },
-    ];
+    // size: a row height tier (see .brand-gallery-row). items: a plain
+    // filename, relative to PROJECT_DIR.
     // Left-right pairs, one row per item: jersey (home/away), then
     // hoodie (front/back), ending with longsleeve (front/back). Longsleeve's
     // photo is noticeably wider than the other two (landscape vs. upright),
@@ -6471,10 +7183,7 @@
       { size: 'clothing', items: ['hoodie-front.webp', 'hoodie-back.webp'] },
       { size: 'md', items: ['longsleeve-front.webp', 'longsleeve-back.webp'], className: 'row-longsleeve' },
     ];
-    const AFTER_ROWS = [
-      { size: 'lg', items: ['travel-bus.jpg'] },
-    ];
-    // The Seahorses campaign is static HTML (.split-grid).
+    // Everything else on the page is static HTML (.pj-section).
 
     function makeItem(filename) {
       const wrap = document.createElement('div');
@@ -6498,10 +7207,7 @@
 
     let galleryBuilt = false;
     function buildGallery() {
-      buildRows(document.getElementById('brandGalleryFlag4'), FLAG_ROW);
-      buildRows(document.getElementById('brandGalleryBefore4'), BEFORE_ROWS);
       buildRows(document.getElementById('brandGalleryClothing4'), CLOTHING_ROWS);
-      buildRows(document.getElementById('brandGalleryAfter4'), AFTER_ROWS);
       galleryBuilt = true;
     }
 
@@ -6551,8 +7257,7 @@
     closeBtn.addEventListener('click', closeBook);
 
     galleryScroll.addEventListener('click', (e) => {
-      const wrapper = e.target.closest('.book-description, .brand-gallery, .brand-gallery-row, .crest-breakdown-figure, .book-embed-section, .split-grid, .book-contact');
-      if (wrapper === e.target) closeBook();
+      if (e.target === galleryScroll || e.target.matches('.pj-section, .pj-text, .project-head, .interjection, .brand-gallery, .brand-gallery-row, .crest-breakdown-figure, .book-embed-section, .book-contact')) closeBook();
     });
 
     document.addEventListener('keydown', (e) => {
@@ -7388,14 +8093,257 @@
     });
   })();
 
+  // Kodak. Each device's screen holds a tape of its page (tiles of one
+  // Figma frame, listed in TAPES as [width, height, tiles]) that scrolls
+  // while it's in view: a pause on each screenful, a smooth move to the
+  // next, then back to the top. Tiles load only when their device gets
+  // near the viewport. The prototype loads only when clicked.
+  (function () {
+    const BASE = 'portfolio projects/Kodak/web/';
+    const TILE = 2000;
+    const TAPES = {
+      'home-desktop': [1600, 11328, 6], 'home-laptop': [1279, 13932, 7], 'home-tablet': [750, 16135, 9], 'home-phone': [360, 12433, 7],
+      'cameras-laptop': [1279, 14767, 8], 'cameras-tablet': [750, 19944, 10], 'cameras-phone': [360, 19668, 10],
+      'cameras-desktop': [1600, 9682, 5], 'film-desktop': [1600, 8168, 5],
+      'ektar-laptop': [1279, 9484, 5],
+      'pixpro-desktop': [1600, 7137, 4], 'pixpro-laptop': [1279, 8555, 5], 'pixpro-tablet': [750, 9594, 5], 'pixpro-phone': [360, 11148, 6],
+      'film-laptop': [1279, 10805, 6], 'film-tablet': [750, 14977, 8], 'film-phone': [360, 14865, 8],
+      'ektar-desktop': [1600, 8097, 5], 'ektar-tablet': [750, 9533, 5], 'ektar-phone': [360, 11435, 6],
+    };
+    const PROTO = 'https://embed.figma.com/proto/GsRDBPyEznpsSSH1aAjXzl/FIGMA-KODAK-PROJECT?node-id=1-15365&starting-point-node-id=1%3A15365&scaling=scale-down-width&content-scaling=fixed&hide-ui=1&embed-host=503designs';
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const modal = document.getElementById('kodakModal');
+    const scroll = document.getElementById('kodakScroll');
+    const carouselControls = document.querySelector('.controls');
+    const ease = (u) => (u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2);
+
+    // Tapes: tiles as images with their real sizes, so the tape has its
+    // full height before anything loads.
+    const tapes = [...modal.querySelectorAll('.dev-tape')].map((tape) => {
+      const [w, h, n] = TAPES[tape.dataset.tape];
+      for (let i = 0; i < n; i++) {
+        const img = document.createElement('img');
+        img.width = w;
+        img.height = Math.min(TILE, h - i * TILE);
+        img.alt = '';
+        img.decoding = 'async';
+        img.dataset.tile = BASE + tape.dataset.tape + '/' + String(i).padStart(2, '0') + '.jpg';
+        tape.appendChild(img);
+      }
+      return { tape, ratio: h / w, view: tape.parentElement };
+    });
+
+    // Screenful-by-screenful scrolling for device screens: a timeline of
+    // holds and moves, so the position is a pure function of time.
+    function timeline(t) {
+      const vw = t.view.clientWidth, vh = t.view.clientHeight;
+      const max = Math.max(0, vw * t.ratio - vh);
+      const stops = [];
+      for (let y = 0; y < max; y += vh * 0.8) stops.push(y);
+      stops.push(max);
+      const segs = [];
+      stops.forEach((y, i) => {
+        segs.push({ d: i === 0 ? 2200 : 1300, a: y, b: y });
+        if (i < stops.length - 1) segs.push({ d: 1100, a: y, b: stops[i + 1], move: true });
+      });
+      segs.push({ d: 1800, a: max, b: max });
+      segs.push({ d: 1800, a: max, b: 0, move: true });
+      t.segs = segs;
+      t.cycle = segs.reduce((sum, s) => sum + s.d, 0);
+    }
+
+    function positionAt(t, ms) {
+      let u = ms % t.cycle;
+      for (const s of t.segs) {
+        if (u < s.d) return s.move ? s.a + (s.b - s.a) * ease(u / s.d) : s.a;
+        u -= s.d;
+      }
+      return 0;
+    }
+
+    // The lineup: every column runs its full length in the same time, so
+    // they stay together section by section; down, then back up.
+    const lineup = document.getElementById('kodakLineup');  // optional
+    const LINEUP_MS = 48000;
+    function lineupAt(t, ms) {
+      const max = Math.max(0, t.view.clientWidth * t.ratio - t.view.clientHeight);
+      const u = (ms % LINEUP_MS) / LINEUP_MS;
+      const p = u < 0.5 ? u * 2 : 2 - u * 2;
+      return max * ease(p);
+    }
+
+    const visible = new Set();
+    let clock = 0, last = 0, raf = 0;
+    function frame(now) {
+      clock += Math.min(64, now - (last || now));
+      last = now;
+      visible.forEach((t) => {
+        if (!t.segs && !t.inLineup) timeline(t);
+        const y = t.inLineup ? lineupAt(t, clock) : positionAt(t, clock + (t.offset || 0));
+        t.tape.style.transform = `translate3d(0, ${-y}px, 0)`;
+      });
+      raf = visible.size && modal.classList.contains('open') ? requestAnimationFrame(frame) : 0;
+    }
+    function run() {
+      if (!raf && !still && visible.size) { last = 0; raf = requestAnimationFrame(frame); }
+    }
+    tapes.forEach((t, i) => {
+      t.inLineup = !!lineup && lineup.contains(t.tape);
+      t.offset = (i % 3) * 700;
+    });
+    addEventListener('resize', () => tapes.forEach((t) => { t.segs = null; }));
+
+    let io = null, loadIo = null;
+    function watch() {
+      if (io) return;
+      loadIo = new IntersectionObserver((entries) => entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        e.target.querySelectorAll('img[data-tile]').forEach((img) => {
+          img.src = img.dataset.tile;
+          img.removeAttribute('data-tile');
+        });
+        loadIo.unobserve(e.target);
+      }), { root: scroll, rootMargin: '1200px 0px' });
+      io = new IntersectionObserver((entries) => entries.forEach((e) => {
+        const t = tapes.find((x) => x.view === e.target);
+        if (e.isIntersecting) visible.add(t); else visible.delete(t);
+        run();
+      }), { root: scroll, rootMargin: '0px' });
+      tapes.forEach((t) => { loadIo.observe(t.view); io.observe(t.view); });
+    }
+
+    // Resizing: widths in order, out and back. Each .kd-resize block runs
+    // its stages in step on one timer while it's in view.
+    const ORDER = [0, 1, 2, 3, 2, 1];
+    const resizers = [...modal.querySelectorAll('.kd-resize')].map((block) => {
+      const stages = [...block.querySelectorAll('.kd-stage')].map((stage) => ({
+        stage,
+        frames: [...stage.querySelectorAll('img')],
+        left: stage.querySelector('.kd-curtain.left'),
+        right: stage.querySelector('.kd-curtain.right'),
+      }));
+      return { block, stages, labels: [...block.querySelectorAll('.kd-sizes span')], step: 0, timer: 0 };
+    });
+    function showSize(r) {
+      const i = ORDER[r.step];
+      r.stages.forEach((st) => {
+        const open = (+st.frames[i].dataset.w * st.stage.clientWidth / 2000) / 2;
+        st.left.style.transform = `translateX(${-open}px)`;
+        st.right.style.transform = `translateX(${open}px)`;
+        st.frames.forEach((f, j) => f.classList.toggle('on', j === i));
+      });
+      r.labels.forEach((l, j) => l.classList.toggle('on', j === i));
+    }
+    resizers.forEach(showSize);
+    const resizeIo = new IntersectionObserver((entries) => entries.forEach((e) => {
+      const r = resizers.find((x) => x.block === e.target);
+      clearInterval(r.timer);
+      if (!e.isIntersecting || still) return;
+      r.timer = setInterval(() => {
+        r.step = (r.step + 1) % ORDER.length;
+        showSize(r);
+      }, 2000);
+    }), { root: scroll, threshold: 0.4 });
+    addEventListener('resize', () => resizers.forEach(showSize));
+
+    // The working prototype: Figma's player, loaded on the first click.
+    const proto = document.getElementById('kodakProto');
+    const protoScreen = document.getElementById('kodakProtoScreen');
+    function startProto() {
+      if (proto.classList.contains('is-live')) return;
+      const frame = document.createElement('iframe');
+      frame.src = PROTO;
+      frame.title = 'Kodak website prototype';
+      frame.allow = 'fullscreen';
+      protoScreen.appendChild(frame);
+      proto.classList.add('is-live');
+      protoScreen.removeAttribute('role');
+      protoScreen.removeAttribute('aria-label');
+    }
+    protoScreen.addEventListener('click', startProto);
+    protoScreen.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); startProto(); }
+    });
+
+    function openKodak() {
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      scroll.scrollTop = 0;
+      clock = 0;
+      if (carouselControls) carouselControls.style.visibility = 'hidden';
+      if (window.pauseCarouselForModal) window.pauseCarouselForModal();
+      watch();
+      resizers.forEach((r) => resizeIo.observe(r.block));
+      requestAnimationFrame(() => { resizers.forEach(showSize); run(); });
+    }
+
+    function closeKodak() {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (carouselControls) carouselControls.style.visibility = '';
+      resizers.forEach((r) => { clearInterval(r.timer); resizeIo.unobserve(r.block); });
+    }
+
+    document.querySelectorAll('[data-opens-kodak]').forEach((el) => {
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', openKodak);
+    });
+    document.getElementById('kodakClose').addEventListener('click', closeKodak);
+    scroll.addEventListener('click', (e) => {
+      if (e.target === scroll || e.target.matches('.pj-section, .project-head, .interjection, .kd-part, .kd-set, .kd-proto, .kd-resize, .kd-grid, .kd-pairs, .book-contact')) closeKodak();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (modal.classList.contains('open') && e.key === 'Escape') closeKodak();
+    });
+  })();
+
+  // Art Division: a static page (images only), so opening and closing is
+  // all it needs.
+  (function () {
+    const modal = document.getElementById('adModal');
+    const scroll = document.getElementById('adScroll');
+    const carouselControls = document.querySelector('.controls');
+
+    function openAd() {
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      scroll.scrollTop = 0;
+      if (carouselControls) carouselControls.style.visibility = 'hidden';
+      if (window.pauseCarouselForModal) window.pauseCarouselForModal();
+    }
+
+    function closeAd() {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (carouselControls) carouselControls.style.visibility = '';
+    }
+
+    document.querySelectorAll('[data-opens-ad]').forEach((el) => {
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', openAd);
+    });
+    document.getElementById('adClose').addEventListener('click', closeAd);
+    scroll.addEventListener('click', (e) => {
+      if (e.target === scroll || e.target.matches('.pj-section, .project-head, .interjection, .book-contact')) closeAd();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (modal.classList.contains('open') && e.key === 'Escape') closeAd();
+    });
+  })();
+
   // Previous/next at the end of every project page. Carousel projects
   // follow the carousel's order, Playground projects the Playground's,
   // each wrapping around. Titles and preview images come from the cards
   // themselves, so renaming a card renames its link.
   (function () {
     const SEQUENCES = [
-      [['wrcModal', '[data-opens-wrc]'], ['bookModal', '[data-opens-book]'], ['productModal', '[data-opens-products]']],
-      [['bookModal2', '[data-opens-book-2]'], ['bookModal3', '[data-opens-book-3]'], ['bookModal4', '[data-opens-book-4]']],
+      [['wrcModal', '[data-opens-wrc]'], ['bookModal', '[data-opens-book]'], ['kodakModal', '[data-opens-kodak]'], ['productModal', '[data-opens-products]']],
+      [['bookModal2', '[data-opens-book-2]'], ['bookModal3', '[data-opens-book-3]'], ['bookModal4', '[data-opens-book-4]'], ['adModal', '[data-opens-ad]']],
     ];
 
     function cardInfo(opener) {
@@ -7463,7 +8411,7 @@
   // scroll area, so arrow keys scroll it), keeps Tab inside itself and the
   // header, and hands focus back to whatever opened it when it closes.
   (function () {
-    const OPENERS = '[data-opens-products], [data-opens-wrc], [data-opens-book], [data-opens-book-2], [data-opens-book-3], [data-opens-book-4]';
+    const OPENERS = '[data-opens-products], [data-opens-wrc], [data-opens-book], [data-opens-book-2], [data-opens-book-3], [data-opens-book-4], [data-opens-ad], [data-opens-kodak]';
     document.querySelectorAll(OPENERS).forEach((el) => {
       const card = el.closest('.card, .pg-card');
       const title = card && card.querySelector('h3');
