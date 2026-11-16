@@ -5175,14 +5175,13 @@
     </div>
     <div class="kd-part">
       <p class="interjection">The full website, one page at a time.</p>
-      <span class="kd-note">Select a page below, then scroll through it inside the screen.</span>
     </div>
     <div class="pj-section kd-desktop">
       <div class="kd-desktop-main">
         <div class="dev dev-imac" id="kodakExplorer"><div class="dev-screen kd-explore" tabindex="0" aria-label="The Kodak website on a large desktop. Scroll inside to explore."><div class="kd-explore-page"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/imac.webp?v=2" alt="" width="2400" height="2023"></div>
         <div class="kd-tabs" aria-label="Pages"><button type="button" data-page="home">Homepage</button><button type="button" data-page="cameras">Cameras Page</button><button type="button" data-page="ektar">Ektar H35N</button><button type="button" data-page="pixpro">PIXPRO WPZ2</button><button type="button" data-page="film">Film Page</button></div>
       </div>
-      <p class="kd-side-text" id="kodakSideText">Scroll to interact.</p>
+      <p class="kd-side-text" id="kodakSideText">Scroll the screen, or pick a page below to explore.</p>
     </div>
     <div class="kd-part">
       <p class="interjection is-long">The redesign promotes community engagement by highlighting user photography.</p>
@@ -8983,11 +8982,8 @@
     // few seconds left alone it eases back to the top and plays again.
     let lastTouch = 0, resumeTimer = 0;
     const sideText = document.getElementById('kodakSideText');
-    function say(text) {
-      if (sideText.textContent === text) return;
-      sideText.classList.add('is-swapping');
-      setTimeout(() => { sideText.textContent = text; sideText.classList.remove('is-swapping'); }, 300);
-    }
+    // One instruction that stays put (it used to change with the state).
+    function say() {}
     function takeOver() {
       say('Click a page below to explore more.');
       auto = false;
@@ -9052,7 +9048,6 @@
       auto = !still;
       heroT.segs = null;
       fill('home');
-      sideText.textContent = 'Scroll to interact.';
       seenSinceOpen = false;
       autoStart = performance.now();
       runHero();
