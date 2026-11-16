@@ -9184,7 +9184,7 @@
   // only ones on screen move, and nothing runs while a project is open.
   (function () {
     const MOMENT_MS = 4200;
-    const SWAP_MS = 2600; // hover: desktop <-> laptop, iPad, iPhone
+    const SWAP_MS = 5000; // hover: desktop <-> laptop, iPad, iPhone
     const ease = (u) => (u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2);
     const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const t0 = performance.now();
