@@ -1652,6 +1652,45 @@
     margin: 0 auto;
   }
 
+  .kd-desktop {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 64px;
+    align-items: center;
+  }
+
+  .kd-desktop-main {
+    width: min(calc(100vw - 2 * var(--margin) - 360px), calc((100vh - var(--fade-bottom) - var(--margin) - 90px) * 4718 / 3976));
+  }
+
+  .kd-desktop .kd-desktop-main .dev-imac {
+    width: 100%;
+  }
+
+  .kd-side-text {
+    margin: 0;
+    font-family: var(--display);
+    font-size: clamp(26px, 2.6vw, 40px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  @media (max-width: 900px) {
+    .kd-desktop {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .kd-desktop-main {
+      width: 100%;
+    }
+
+    .kd-side-text {
+      margin-top: 32px;
+      text-align: center;
+    }
+  }
+
   .kd-desktop .dev-imac {
     width: min(100%, calc((100vh - var(--fade-bottom) - var(--margin) - 90px) * 4718 / 3976));
     margin: 0 auto;
@@ -4986,8 +5025,11 @@
       <span class="kd-note">Select a page below, then scroll through it inside the screen.</span>
     </div>
     <div class="pj-section kd-desktop">
-      <div class="dev dev-imac" id="kodakExplorer"><div class="dev-screen kd-explore" tabindex="0" aria-label="The Kodak website on a large desktop. Scroll inside to explore."><div class="kd-explore-page"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/imac.webp" alt="" width="2400" height="2023"></div>
-      <div class="kd-tabs" aria-label="Pages"><button type="button" data-page="home">Homepage</button><button type="button" data-page="cameras">Cameras Page</button><button type="button" data-page="ektar">Ektar H35N</button><button type="button" data-page="pixpro">PIXPRO WPZ2</button><button type="button" data-page="film">Film Page</button></div>
+      <div class="kd-desktop-main">
+        <div class="dev dev-imac" id="kodakExplorer"><div class="dev-screen kd-explore" tabindex="0" aria-label="The Kodak website on a large desktop. Scroll inside to explore."><div class="kd-explore-page"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/imac.webp" alt="" width="2400" height="2023"></div>
+        <div class="kd-tabs" aria-label="Pages"><button type="button" data-page="home">Homepage</button><button type="button" data-page="cameras">Cameras Page</button><button type="button" data-page="ektar">Ektar H35N</button><button type="button" data-page="pixpro">PIXPRO WPZ2</button><button type="button" data-page="film">Film Page</button></div>
+      </div>
+      <p class="kd-side-text">Scroll to interact.</p>
     </div>
     <div class="kd-part">
       <p class="interjection is-long">The redesign promotes community engagement by highlighting user photography.</p>
@@ -8746,10 +8788,29 @@
       }, 250);
     }
     tabButtons.forEach((b) => b.addEventListener('click', () => {
-      auto = false;
+      takeOver();
       showPage(b.dataset.page);
     }));
-    ['wheel', 'touchstart', 'pointerdown', 'keydown'].forEach((type) => screen.addEventListener(type, () => { auto = false; }, { passive: true }));
+    // Scrolling it, clicking into it, or picking a page takes over; after a
+    // few seconds left alone it eases back to the top and plays again.
+    let lastTouch = 0, resumeTimer = 0;
+    function takeOver() {
+      auto = false;
+      lastTouch = performance.now();
+      clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(resume, 5000);
+    }
+    function resume() {
+      if (still || !modal.classList.contains('open')) return;
+      screen.scrollTo({ top: 0, behavior: 'smooth' });
+      resumeTimer = setTimeout(() => {
+        auto = true;
+        heroT.segs = null;
+        autoStart = performance.now();
+        runHero();
+      }, 900);
+    }
+    ['wheel', 'touchstart', 'touchmove', 'pointerdown', 'keydown'].forEach((type) => screen.addEventListener(type, takeOver, { passive: true }));
 
     const heroT = { view: screen, ratio: 0, offset: 0 };
     function heroFrame(now) {
