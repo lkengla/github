@@ -4301,6 +4301,16 @@
         <span>Logo Design, Event Branding, UI [Web], Book Design, Typeface Design</span>
       </div>
       <div class="card">
+        <div class="thumb is-photo fit-contain" data-opens-products="true" style="background: url(data:image/webp;base64,UklGRrIAAABXRUJQVlA4IKYAAABwBACdASoYAA8APrVInkmnJCKhMAgA4BaJbACdMoRwAc/VCBRoyKTPnOFV8AD+4uYXUEkR7YKnKqpvRHyQd34UnMeNVKJve13FusZvMmeQ+ZbkdqEfvDSlFD1zRhgoJZiZ1UpnjF/HxO2jqqOOJvdAwJJrXfqNYBYCrXhU3WXrBNRH3cj68XcwR1ANbFXJ5enbW4cJ0fM7oybTIZ+4f18V6we6QAAA) center / contain no-repeat" data-images='[
+          "portfolio projects/OrganicoBello/OB-hero-red_bg.webp",
+          "portfolio projects/OrganicoBello/web/hand models/OB-penne_rigate-front-hand_model.webp"
+        ]'>
+          <img fetchpriority="high" src="portfolio projects/carousel-first/ob.webp" data-full="portfolio projects/OrganicoBello/OB-hero-red_bg.webp" alt="Organico Bello &mdash; full product lineup">
+        </div>
+        <h3>Organico Bello</h3>
+        <span>Food Packaging</span>
+      </div>
+      <div class="card">
         <div class="thumb is-photo" data-opens-book="true" style="background: url(data:image/webp;base64,UklGRrgAAABXRUJQVlA4IKwAAABwBACdASoYAA8APrUwqVCnIiSjGADgFolsAJ0yhHABz3cBymaF4kzvyVgM8AD+OngzvvD9FhuDVEXTX1lcGr3mmtg6j2x1d8YiR/YZWVyi1N//Yg14tKi/ht6QeVg7qwgHUz8VvyPn/1aLP/S7MeqLr/ihvb7reQYSRrKuUDuKV2KwThPSdSaAR8FLeW3WZ5g5UtYUqSp4T8knraZEp4lpgLGgPsaJO37iSAAA) center / cover" data-images='[
           "portfolio projects/OurWorkIsNeverDone/cover-spine-back-thumb.webp",
           "portfolio projects/OurWorkIsNeverDone/carousel_preview/spread-162.jpg"
@@ -4319,16 +4329,6 @@
         </div>
         <h3>Kodak</h3>
         <span>UI Design, Curation</span>
-      </div>
-      <div class="card">
-        <div class="thumb is-photo fit-contain" data-opens-products="true" style="background: url(data:image/webp;base64,UklGRrIAAABXRUJQVlA4IKYAAABwBACdASoYAA8APrVInkmnJCKhMAgA4BaJbACdMoRwAc/VCBRoyKTPnOFV8AD+4uYXUEkR7YKnKqpvRHyQd34UnMeNVKJve13FusZvMmeQ+ZbkdqEfvDSlFD1zRhgoJZiZ1UpnjF/HxO2jqqOOJvdAwJJrXfqNYBYCrXhU3WXrBNRH3cj68XcwR1ANbFXJ5enbW4cJ0fM7oybTIZ+4f18V6we6QAAA) center / contain no-repeat" data-images='[
-          "portfolio projects/OrganicoBello/OB-hero-red_bg.webp",
-          "portfolio projects/OrganicoBello/web/hand models/OB-penne_rigate-front-hand_model.webp"
-        ]'>
-          <img fetchpriority="high" src="portfolio projects/carousel-first/ob.webp" data-full="portfolio projects/OrganicoBello/OB-hero-red_bg.webp" alt="Organico Bello &mdash; full product lineup">
-        </div>
-        <h3>Organico Bello</h3>
-        <span>Food Packaging</span>
       </div>
     </div>
   </section>
@@ -5225,7 +5225,7 @@
       })));
     }
 
-    const ahead = ['wrcModal', 'bookModal', 'productModal'].map((id) => document.getElementById(id));
+    const ahead = ['wrcModal', 'productModal', 'bookModal'].map((id) => document.getElementById(id));
     Promise.race([previewsLoaded, new Promise((done) => setTimeout(done, 30000))]).then(async () => {
       // Placeholders off once the real images are in (they'd otherwise
       // show in the letterbox of a contained image).
@@ -8652,7 +8652,7 @@
   // themselves, so renaming a card renames its link.
   (function () {
     const SEQUENCES = [
-      [['wrcModal', '[data-opens-wrc]'], ['bookModal', '[data-opens-book]'], ['kodakModal', '[data-opens-kodak]'], ['productModal', '[data-opens-products]']],
+      [['wrcModal', '[data-opens-wrc]'], ['productModal', '[data-opens-products]'], ['bookModal', '[data-opens-book]'], ['kodakModal', '[data-opens-kodak]']],
       [['bookModal2', '[data-opens-book-2]'], ['bookModal3', '[data-opens-book-3]'], ['bookModal4', '[data-opens-book-4]'], ['adModal', '[data-opens-ad]']],
     ];
 
