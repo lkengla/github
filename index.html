@@ -509,6 +509,26 @@
   }
 
 
+  /* Kodak's card: the film page on the desktop, centered on a 20% grey
+     ground that fills the card, scrolling like the project's opener. */
+  .thumb.kd-thumb {
+    background: #ccc;
+  }
+
+  .kd-thumb .kd-thumb-dev {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 64%;
+    transform: translate(-50%, -50%);
+  }
+
+  .kd-thumb img {
+    width: 100%;
+    height: auto;
+    object-fit: initial;
+  }
+
   /* Kodak has no images yet: a flat grey stand-in. */
   .thumb.placeholder {
     background: #d9d8d4;
@@ -4626,11 +4646,8 @@
         <span>Book Design, Bookbinding, Curation</span>
       </div>
       <div class="card">
-        <div class="thumb is-photo" data-opens-kodak="true" data-images='[
-          "portfolio projects/Kodak/web/home-top.jpg",
-          "portfolio projects/Kodak/web/film-top.jpg"
-        ]'>
-          <img fetchpriority="high" src="portfolio projects/Kodak/web/home-top.jpg" alt="Kodak &mdash; home page, Kodak Captures Beauty">
+        <div class="thumb is-photo kd-thumb" data-opens-kodak="true" data-preview="portfolio projects/Kodak/web/film-top.jpg" role="img" aria-label="Kodak &mdash; the film page on a desktop, scrolling">
+          <div class="dev dev-imac kd-thumb-dev"><div class="dev-screen"><div class="dev-tape kd-card-tape" data-h="8168" data-w="1600"><img fetchpriority="high" src="portfolio projects/Kodak/web/film-desktop/00.jpg" alt="" width="1600" height="2000"><img src="portfolio projects/Kodak/web/film-desktop/01.jpg" alt="" width="1600" height="2000"><img src="portfolio projects/Kodak/web/film-desktop/02.jpg" alt="" width="1600" height="2000"><img src="portfolio projects/Kodak/web/film-desktop/03.jpg" alt="" width="1600" height="2000"><img src="portfolio projects/Kodak/web/film-desktop/04.jpg" alt="" width="1600" height="168"></div></div><img class="dev-frame" src="portfolio projects/Kodak/web/devices/imac.webp?v=2" alt="" width="2400" height="2023"></div>
         </div>
         <h3>Kodak</h3>
         <span>UI Design, Curation</span>
@@ -9056,7 +9073,7 @@
       const card = opener.closest('.card, .pg-card');
       return {
         title: card.querySelector('h3').textContent.trim(),
-        img: opener.querySelector('img'),
+        img: opener.dataset.preview ? { getAttribute: () => opener.dataset.preview, dataset: {} } : opener.querySelector('img'),
       };
     }
 
@@ -9109,6 +9126,52 @@
         else scroll.appendChild(nav);
       });
     });
+  })();
+
+  // Kodak's carousel card: the desktop scrolls through the film page the
+  // way the project's opener does (a hold on each screenful, a smooth move
+  // to the next, then back to the top). Cards are cloned by the carousel,
+  // so every copy is found each frame; only ones on screen move, and
+  // nothing runs while a project page is open.
+  (function () {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const ease = (u) => (u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2);
+    let t0 = performance.now();
+    function positionAt(view, ratio, ms) {
+      const vw = view.clientWidth, vh = view.clientHeight;
+      if (vw < 20 || vh < 20) return 0;
+      const max = Math.max(0, vw * ratio - vh);
+      const segs = [];
+      const stops = [];
+      for (let y = 0; y < max; y += vh * 0.8) stops.push(y);
+      stops.push(max);
+      stops.forEach((y, i) => {
+        segs.push({ d: i === 0 ? 2200 : 1300, a: y, b: y });
+        if (i < stops.length - 1) segs.push({ d: 1100, a: y, b: stops[i + 1] });
+      });
+      segs.push({ d: 1800, a: max, b: max });
+      segs.push({ d: 1800, a: max, b: 0 });
+      const cycle = segs.reduce((sum, s) => sum + s.d, 0);
+      let u = ms % cycle;
+      for (const s of segs) {
+        if (u < s.d) return s.a + (s.b - s.a) * ease(u / s.d);
+        u -= s.d;
+      }
+      return 0;
+    }
+    function frame(now) {
+      if (!document.querySelector('.book-modal.open')) {
+        document.querySelectorAll('.kd-card-tape').forEach((tape) => {
+          const view = tape.parentElement;
+          const r = view.getBoundingClientRect();
+          if (r.right < 0 || r.left > innerWidth || r.bottom < 0 || r.top > innerHeight) return;
+          const y = positionAt(view, +tape.dataset.h / +tape.dataset.w, now - t0);
+          tape.style.transform = `translate3d(0, ${-y}px, 0)`;
+        });
+      }
+      requestAnimationFrame(frame);
+    }
+    requestAnimationFrame(frame);
   })();
 
   // About portrait: tap to switch on touch screens (hover does it with a
