@@ -1911,15 +1911,25 @@
   .kd-footers .kd-grid {
     flex-direction: column;
     align-items: center;
-    gap: 64px;
+    gap: 48px;
   }
 
+  /* Both footers fit one screen at their largest; each box takes the
+     height of the footer showing, so the gap between them never changes. */
   .kd-footers .kd-grid .kd-cell {
     flex: none;
-    width: min(100%, calc((100vh - var(--fade-bottom) - 140px) * 2000 / 1940));
+    width: min(100%, calc((100vh - var(--fade-bottom) - 200px) * 2000 / 2528));
+  }
+
+  .kd-stage.kd-fit {
+    width: 100%;
+    aspect-ratio: auto;
+    transition: height 0.9s cubic-bezier(0.65, 0, 0.35, 1);
   }
 
   .kd-footers .kd-cell figcaption {
+    margin-left: -50%;
+    margin-right: -50%;
     font-weight: 400;
     text-transform: none;
     letter-spacing: 0;
@@ -4707,21 +4717,21 @@
     <div class="kd-resize kd-footers">
       <div class="kd-grid">
         <figure class="kd-cell">
-        <div class="kd-stage" style="aspect-ratio: 2000 / 1940" role="img" aria-label="Homepage Footer resizing from phone to desktop">
-          <img data-src="portfolio projects/Kodak/web/footer/home-360.jpg" alt="" data-w="360" style="height: calc(1388 / 1940 * 100%)">
-          <img data-src="portfolio projects/Kodak/web/footer/home-750.jpg?v=2" alt="" data-w="750" style="height: calc(1348 / 1940 * 100%)">
-          <img data-src="portfolio projects/Kodak/web/footer/home-1279.jpg" alt="" data-w="1279" style="height: calc(1940 / 1940 * 100%)">
-          <img data-src="portfolio projects/Kodak/web/footer/home-2000.jpg" alt="" data-w="2000" style="height: calc(1940 / 1940 * 100%)">
+        <div class="kd-stage kd-fit" role="img" aria-label="Homepage Footer resizing from phone to desktop">
+          <img data-src="portfolio projects/Kodak/web/footer/home-360.jpg" alt="" data-w="360" data-h="1388" style="width: calc(360 / 2000 * 100%); height: auto">
+          <img data-src="portfolio projects/Kodak/web/footer/home-750.jpg?v=2" alt="" data-w="750" data-h="1348" style="width: calc(750 / 2000 * 100%); height: auto">
+          <img data-src="portfolio projects/Kodak/web/footer/home-1279.jpg" alt="" data-w="1279" data-h="1940" style="width: calc(1279 / 2000 * 100%); height: auto">
+          <img data-src="portfolio projects/Kodak/web/footer/home-2000.jpg" alt="" data-w="2000" data-h="1940" style="width: calc(2000 / 2000 * 100%); height: auto">
           <div class="kd-curtain left"></div><div class="kd-curtain right"></div>
         </div>
         <figcaption>The photographic footer, used only on the homepage.</figcaption>
       </figure>
         <figure class="kd-cell">
-        <div class="kd-stage" style="aspect-ratio: 2000 / 588" role="img" aria-label="Footer, Every Other Page resizing from phone to desktop">
-          <img data-src="portfolio projects/Kodak/web/footer/main-360.jpg" alt="" data-w="360" style="height: calc(413 / 588 * 100%)">
-          <img data-src="portfolio projects/Kodak/web/footer/main-750.jpg" alt="" data-w="750" style="height: calc(503 / 588 * 100%)">
-          <img data-src="portfolio projects/Kodak/web/footer/main-1279.jpg" alt="" data-w="1279" style="height: calc(503 / 588 * 100%)">
-          <img data-src="portfolio projects/Kodak/web/footer/main-2000.jpg" alt="" data-w="2000" style="height: calc(588 / 588 * 100%)">
+        <div class="kd-stage kd-fit" role="img" aria-label="Footer, Every Other Page resizing from phone to desktop">
+          <img data-src="portfolio projects/Kodak/web/footer/main-360.jpg" alt="" data-w="360" data-h="413" style="width: calc(360 / 2000 * 100%); height: auto">
+          <img data-src="portfolio projects/Kodak/web/footer/main-750.jpg" alt="" data-w="750" data-h="503" style="width: calc(750 / 2000 * 100%); height: auto">
+          <img data-src="portfolio projects/Kodak/web/footer/main-1279.jpg" alt="" data-w="1279" data-h="503" style="width: calc(1279 / 2000 * 100%); height: auto">
+          <img data-src="portfolio projects/Kodak/web/footer/main-2000.jpg" alt="" data-w="2000" data-h="588" style="width: calc(2000 / 2000 * 100%); height: auto">
           <div class="kd-curtain left"></div><div class="kd-curtain right"></div>
         </div>
         <figcaption>The standard footer, used on every other page.</figcaption>
@@ -8458,6 +8468,9 @@
         st.left.style.transform = `translateX(${-open}px)`;
         st.right.style.transform = `translateX(${open}px)`;
         st.frames.forEach((f, j) => f.classList.toggle('on', j === i));
+        if (st.stage.classList.contains('kd-fit')) {
+          st.stage.style.height = (+st.frames[i].dataset.h * st.stage.clientWidth / 2000) + 'px';
+        }
       });
       r.labels.forEach((l, j) => l.classList.toggle('on', j === i));
     }
