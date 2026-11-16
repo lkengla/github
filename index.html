@@ -1646,8 +1646,17 @@
   /* Opening: the large desktop on its own, one page at a time. It scrolls
      itself until you scroll it, click into it, or pick a page below. */
   .kd-hero .dev-imac {
-    width: min(100%, calc((100vh - var(--fade-bottom) - var(--margin) - 48px) * 4760 / 4050));
+    width: min(100%, calc((100vh - var(--fade-bottom) - var(--margin)) * 4760 / 4050));
     margin: 0 auto;
+  }
+
+  .kd-desktop .dev-imac {
+    width: min(100%, calc((100vh - var(--fade-bottom) - var(--margin) - 90px) * 4760 / 4050));
+    margin: 0 auto;
+  }
+
+  .kd-label-only {
+    padding-top: 200px;
   }
 
   .kd-explore {
@@ -4511,8 +4520,7 @@
   <button class="book-close" id="kodakClose" aria-label="Close">&times;</button>
   <div class="gallery-scroll" id="kodakScroll">
     <div class="pj-section kd-hero">
-      <div class="dev dev-imac" id="kodakExplorer"><div class="dev-screen kd-explore" tabindex="0" aria-label="The Kodak website on a large desktop. Scroll inside to explore."><div class="kd-explore-page"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/imac.webp" alt="" width="2400" height="2042"></div>
-      <div class="kd-tabs" aria-label="Pages"><button type="button" data-page="film">Film Page</button><button type="button" data-page="home">Homepage</button><button type="button" data-page="cameras">Camera Page</button><button type="button" data-page="ektar">Product Page, Ektar H35N</button><button type="button" data-page="pixpro">Product Page, PIXPRO WPZ2</button></div>
+      <div class="dev dev-imac" role="img" aria-label="The Kodak film page on a large desktop, scrolling"><div class="dev-screen"><div class="dev-tape" data-tape="film-desktop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/imac-yellow.webp" alt="" width="2400" height="2042"></div>
     </div>
     <div class="project-head">
       <h2 class="project-title">A proposed redesign of the<br> Kodak website, built as one system<br> for every page and every screen.</h2>
@@ -4527,53 +4535,6 @@
           <h3>Oversight</h3><p>Brian Boyl<br>ArtCenter College of Design</p>
         </div>
       </div>
-    </div>
-    <div class="kd-part">
-      <p class="interjection is-long">The redesigned system takes a retro&#8209;futurist style, compared to the corporate original.</p>
-    </div>
-    <div class="kd-pairs">
-      <figure class="kd-pair">
-        <figcaption>Homepage</figcaption>
-        <div><img data-src="portfolio projects/Kodak/web/before/old-home.jpg" alt="The current Kodak website, homepage" loading="lazy" width="2000" height="1180"><span>Before</span></div>
-        <div><img data-src="portfolio projects/Kodak/web/before/new-home.jpg" alt="The redesign, homepage" loading="lazy" width="2000" height="1180"><span>After</span></div>
-      </figure>
-      <figure class="kd-pair">
-        <figcaption>Ektar H35N product page</figcaption>
-        <div><img data-src="portfolio projects/Kodak/web/before/old-ektar.jpg" alt="The current Kodak website, Ektar H35N product page" loading="lazy" width="2000" height="1180"><span>Before</span></div>
-        <div><img data-src="portfolio projects/Kodak/web/before/new-ektar.jpg" alt="The redesign, Ektar H35N product page" loading="lazy" width="2000" height="1180"><span>After</span></div>
-      </figure>
-      <figure class="kd-pair">
-        <figcaption>More cameras, as cards and as a stack</figcaption>
-        <div><img data-src="portfolio projects/Kodak/web/before/old-cameras.jpg" alt="The current Kodak website, more cameras, as cards and as a stack" loading="lazy" width="2000" height="1180"><span>Before</span></div>
-        <div><img data-src="portfolio projects/Kodak/web/before/new-cameras.jpg" alt="The redesign, more cameras, as cards and as a stack" loading="lazy" width="2000" height="1180"><span>After</span></div>
-      </figure>
-    </div>
-    <div class="kd-part">
-      <p class="interjection is-long">The system emphasizes color variations and product photography, creating a product page that inspires you to create.</p>
-      <span class="kd-label">Product Page, Ektar H35N</span>
-    </div>
-    <div class="kd-set">
-      <div class="dev dev-laptop" style="--w: 304"><div class="dev-screen"><div class="dev-tape" data-tape="ektar-laptop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt="" width="2000" height="1318"></div>
-      <div class="dev dev-tablet" style="--w: 179"><div class="dev-screen"><div class="dev-tape" data-tape="ektar-tablet"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/tablet.webp" alt="" width="1000" height="1379"></div>
-      <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="ektar-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp" alt="" width="600" height="1227"></div>
-    </div>
-    <div class="kd-part">
-      <p class="interjection is-long">Each feature of the camera is shown with a photograph taken using it.</p>
-      <span class="kd-label">Product Page, PIXPRO WPZ2</span>
-    </div>
-    <div class="kd-set">
-      <div class="dev dev-laptop" style="--w: 304"><div class="dev-screen"><div class="dev-tape" data-tape="pixpro-laptop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt="" width="2000" height="1318"></div>
-      <div class="dev dev-tablet" style="--w: 179"><div class="dev-screen"><div class="dev-tape" data-tape="pixpro-tablet"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/tablet.webp" alt="" width="1000" height="1379"></div>
-      <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="pixpro-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp" alt="" width="600" height="1227"></div>
-    </div>
-    <div class="kd-part">
-      <p class="interjection is-long">Large example photography and white space, applied at every scale.</p>
-      <span class="kd-label">Camera Page</span>
-    </div>
-    <div class="kd-set">
-      <div class="dev dev-laptop" style="--w: 304"><div class="dev-screen"><div class="dev-tape" data-tape="cameras-laptop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt="" width="2000" height="1318"></div>
-      <div class="dev dev-tablet" style="--w: 179"><div class="dev-screen"><div class="dev-tape" data-tape="cameras-tablet"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/tablet.webp" alt="" width="1000" height="1379"></div>
-      <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="cameras-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp" alt="" width="600" height="1227"></div>
     </div>
     <p class="interjection">Every page, from a phone to a large desktop.</p>
     <div class="kd-resize kd-all" id="kodakResizeAll">
@@ -4630,6 +4591,60 @@
       </figure>
       </div>
       <div class="kd-sizes" aria-label="Show every page at one size"><button type="button">Phone</button><button type="button">Tablet</button><button type="button">Laptop</button><button type="button">Desktop</button></div>
+    </div>
+    <div class="kd-part">
+      <p class="interjection is-long">The redesigned system takes a retro&#8209;futurist style, compared to the corporate original.</p>
+    </div>
+    <div class="kd-pairs">
+      <figure class="kd-pair">
+        <figcaption>Homepage</figcaption>
+        <div><img data-src="portfolio projects/Kodak/web/before/old-home.jpg" alt="The current Kodak website, homepage" loading="lazy" width="2000" height="1180"><span>Before</span></div>
+        <div><img data-src="portfolio projects/Kodak/web/before/new-home.jpg" alt="The redesign, homepage" loading="lazy" width="2000" height="1180"><span>After</span></div>
+      </figure>
+      <figure class="kd-pair">
+        <figcaption>Ektar H35N product page</figcaption>
+        <div><img data-src="portfolio projects/Kodak/web/before/old-ektar.jpg" alt="The current Kodak website, Ektar H35N product page" loading="lazy" width="2000" height="1180"><span>Before</span></div>
+        <div><img data-src="portfolio projects/Kodak/web/before/new-ektar.jpg" alt="The redesign, Ektar H35N product page" loading="lazy" width="2000" height="1180"><span>After</span></div>
+      </figure>
+      <figure class="kd-pair">
+        <figcaption>More cameras, as cards and as a stack</figcaption>
+        <div><img data-src="portfolio projects/Kodak/web/before/old-cameras.jpg" alt="The current Kodak website, more cameras, as cards and as a stack" loading="lazy" width="2000" height="1180"><span>Before</span></div>
+        <div><img data-src="portfolio projects/Kodak/web/before/new-cameras.jpg" alt="The redesign, more cameras, as cards and as a stack" loading="lazy" width="2000" height="1180"><span>After</span></div>
+      </figure>
+    </div>
+    <div class="kd-part">
+      <p class="interjection">The full website, one page at a time.</p>
+    </div>
+    <div class="pj-section kd-desktop">
+      <div class="dev dev-imac" id="kodakExplorer"><div class="dev-screen kd-explore" tabindex="0" aria-label="The Kodak website on a large desktop. Scroll inside to explore."><div class="kd-explore-page"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/imac.webp" alt="" width="2400" height="2042"></div>
+      <div class="kd-tabs" aria-label="Pages"><button type="button" data-page="home">Homepage</button><button type="button" data-page="film">Film Page</button><button type="button" data-page="cameras">Camera Page</button><button type="button" data-page="ektar">Product Page, Ektar H35N</button><button type="button" data-page="pixpro">Product Page, PIXPRO WPZ2</button></div>
+      <p class="kd-caption">Pick a page, then scroll inside the screen.</p>
+    </div>
+    <div class="kd-part">
+      <p class="interjection is-long">Large example photography and white space, applied at every scale.</p>
+      <span class="kd-label">Camera Page</span>
+    </div>
+    <div class="kd-set">
+      <div class="dev dev-laptop" style="--w: 304"><div class="dev-screen"><div class="dev-tape" data-tape="cameras-laptop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt="" width="2000" height="1318"></div>
+      <div class="dev dev-tablet" style="--w: 179"><div class="dev-screen"><div class="dev-tape" data-tape="cameras-tablet"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/tablet.webp" alt="" width="1000" height="1379"></div>
+      <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="cameras-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp" alt="" width="600" height="1227"></div>
+    </div>
+    <div class="kd-part">
+      <p class="interjection is-long">The system emphasizes color variations and product photography, creating a product page that inspires you to create.</p>
+      <span class="kd-label">Product Page, Ektar H35N</span>
+    </div>
+    <div class="kd-set">
+      <div class="dev dev-laptop" style="--w: 304"><div class="dev-screen"><div class="dev-tape" data-tape="ektar-laptop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt="" width="2000" height="1318"></div>
+      <div class="dev dev-tablet" style="--w: 179"><div class="dev-screen"><div class="dev-tape" data-tape="ektar-tablet"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/tablet.webp" alt="" width="1000" height="1379"></div>
+      <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="ektar-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp" alt="" width="600" height="1227"></div>
+    </div>
+    <div class="kd-part kd-label-only">
+      <span class="kd-label">Product Page, PIXPRO WPZ2</span>
+    </div>
+    <div class="kd-set">
+      <div class="dev dev-laptop" style="--w: 304"><div class="dev-screen"><div class="dev-tape" data-tape="pixpro-laptop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt="" width="2000" height="1318"></div>
+      <div class="dev dev-tablet" style="--w: 179"><div class="dev-screen"><div class="dev-tape" data-tape="pixpro-tablet"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/tablet.webp" alt="" width="1000" height="1379"></div>
+      <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="pixpro-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp" alt="" width="600" height="1227"></div>
     </div>
     <div class="kd-part">
       <p class="interjection is-long">A film page that sells film by actually showing photography.</p>
@@ -8377,7 +8392,17 @@
     function runHero() {
       if (!heroRaf && auto && heroVisible) heroRaf = requestAnimationFrame(heroFrame);
     }
-    new IntersectionObserver(([e]) => { heroVisible = e.isIntersecting; runHero(); }, { root: scroll }).observe(screen);
+    // Its own scrolling starts from the top the first time it comes into view.
+    let seenSinceOpen = false;
+    new IntersectionObserver(([e]) => {
+      heroVisible = e.isIntersecting;
+      if (heroVisible && !seenSinceOpen) {
+        seenSinceOpen = true;
+        screen.scrollTop = 0;
+        autoStart = performance.now();
+      }
+      runHero();
+    }, { root: scroll }).observe(screen);
 
     function openKodak() {
       modal.classList.add('open');
@@ -8390,7 +8415,8 @@
       watch();
       auto = !still;
       heroT.segs = null;
-      fill('film');
+      fill('home');
+      seenSinceOpen = false;
       autoStart = performance.now();
       runHero();
       resizers.forEach((r) => resizeIo.observe(r.block));
