@@ -1906,9 +1906,23 @@
     }
   }
 
-  /* Footers: two stages side by side. */
+  /* Footers: the homepage's photographic footer, then the standard one
+     under it at the same width, each with a line saying where it's used. */
+  .kd-footers .kd-grid {
+    flex-direction: column;
+    align-items: center;
+    gap: 64px;
+  }
+
   .kd-footers .kd-grid .kd-cell {
-    flex-basis: calc((100% - 16px) / 2);
+    flex: none;
+    width: min(100%, calc((100vh - var(--fade-bottom) - 140px) * 2000 / 1940));
+  }
+
+  .kd-footers .kd-cell figcaption {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
   }
 
   /* Before and after: the old site and the redesign at one size. */
@@ -4811,7 +4825,7 @@
           <img data-src="portfolio projects/Kodak/web/footer/home-2000.jpg" alt="" data-w="2000" style="height: calc(1940 / 1940 * 100%)">
           <div class="kd-curtain left"></div><div class="kd-curtain right"></div>
         </div>
-        <figcaption>Homepage Footer</figcaption>
+        <figcaption>The photographic footer, used on the homepage.</figcaption>
       </figure>
         <figure class="kd-cell">
         <div class="kd-stage" style="aspect-ratio: 2000 / 588" role="img" aria-label="Footer, Every Other Page resizing from phone to desktop">
@@ -4821,7 +4835,7 @@
           <img data-src="portfolio projects/Kodak/web/footer/main-2000.jpg" alt="" data-w="2000" style="height: calc(588 / 588 * 100%)">
           <div class="kd-curtain left"></div><div class="kd-curtain right"></div>
         </div>
-        <figcaption>Footer, Every Other Page</figcaption>
+        <figcaption>The standard footer, used on every other page.</figcaption>
       </figure>
       </div>
       <div class="kd-sizes" aria-label="Show both footers at one size"><button type="button">Phone</button><button type="button">Tablet</button><button type="button">Laptop</button><button type="button">Desktop</button></div>
