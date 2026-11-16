@@ -2799,6 +2799,187 @@
     opacity: 0.6;
   }
 
+  /* Organico Bello sections. */
+  .ob-spins {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 48px 16px;
+    padding: 0 var(--margin);
+  }
+
+  .ob-spin {
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .ob-photo {
+    aspect-ratio: 1 / 1;
+    background: #fff;
+  }
+
+  .ob-photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .ob-spin figcaption {
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* The pasta bag: one view at a time, picked from the angles below it. */
+  .ob-viewer {
+    padding: 0 var(--margin);
+  }
+
+  .ob-view {
+    position: relative;
+    width: min(100%, calc((100vh - var(--fade-bottom) - 80px) * 1.6));
+    aspect-ratio: 16 / 10;
+    margin: 0 auto;
+  }
+
+  .ob-view img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+
+  .ob-view img.on {
+    opacity: 1;
+  }
+
+  /* Materials, as on the gallery poster: a swatch, the name, the spec. */
+  .ob-materials {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 48px;
+    padding: 0 var(--margin);
+  }
+
+  .ob-materials h3,
+  .ob-system h3 {
+    margin: 12px 0 4px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .ob-materials p,
+  .ob-colors p {
+    margin: 0;
+    max-width: 44ch;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  .ob-swatch {
+    display: block;
+    height: 120px;
+  }
+
+  .ob-birch { background: #efe5d3; }
+  .ob-glass { background: linear-gradient(110deg, #e9ecee, #f8f9fa 45%, #dfe3e6); }
+
+  .ob-backs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    padding: 0 var(--margin);
+  }
+
+  .ob-backs img,
+  .ob-grid-3 img,
+  .ob-grid-4 img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* Brand system: type on the left, color on the right. */
+  .ob-system {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 64px;
+    padding: 0 var(--margin);
+  }
+
+  .ob-type > div {
+    padding: 16px 0;
+    border-top: 1px solid var(--ink);
+  }
+
+  .ob-type span {
+    font-size: 13px;
+  }
+
+  .ob-type p {
+    margin: 4px 0 0;
+    font-size: 40px;
+    line-height: 1.1;
+    color: #115740;
+  }
+
+  .ob-type .ob-sample {
+    font-size: 20px;
+    color: #7c2529;
+  }
+
+  .ob-georgia { font-family: Georgia, "Times New Roman", serif; }
+  .ob-optima { font-family: Optima, Candara, "Noto Sans", sans-serif; }
+  .ob-gt { font-family: "GT America", "Helvetica Neue", Helvetica, Arial, sans-serif; }
+
+  .ob-chip {
+    display: flex;
+    align-items: flex-end;
+    height: 96px;
+    margin-bottom: 8px;
+    padding: 12px;
+    background: var(--c);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .ob-colors p {
+    margin-top: 16px;
+  }
+
+  .ob-grid-3,
+  .ob-grid-4 {
+    display: grid;
+    gap: 16px;
+  }
+
+  .ob-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .ob-grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+  @media (max-width: 900px) {
+    .ob-spins,
+    .ob-backs,
+    .ob-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .ob-system,
+    .ob-materials { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  @media (max-width: 640px) {
+    .ob-grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
   /* Organico Bello's product page — one white-bg product photo per item,
      hover-spinning through its own angle shots (see the JS below). Plain
      white backdrop instead of the book modals' blur, for now. */
@@ -5069,7 +5250,128 @@
         </div>
       </div>
     </div>
-    <div class="product-groups" id="productGroups"></div>
+    <div class="kd-part">
+      <p class="interjection is-long">Instead of fighting the battle of the tomato, the product itself becomes the star and main focal point of the packaging.</p>
+      <span class="kd-label">The Battle of the Tomato</span>
+    </div>
+    <div class="pj-section">
+      <img data-src="portfolio projects/OrganicoBello/web/hand models/OB-vodka_sauce-front-hand_model.webp" alt="Vodka Tomato Sauce held in hand" width="2880" height="1800" loading="lazy">
+    </div>
+    <div class="kd-part">
+      <p class="interjection is-long">A unique label system that lets you view the product from 360 degrees at all times.</p>
+      <span class="kd-note">Hover over a jar to turn it.</span>
+    </div>
+    <div class="ob-spins">
+        <figure class="ob-spin" data-frames='["portfolio projects/OrganicoBello/web/OB-vodka_sauce-front.webp", "portfolio projects/OrganicoBello/web/OB-vodka_sauce-back.webp", "portfolio projects/OrganicoBello/web/OB-vodka_sauce-top.webp"]'>
+          <div class="ob-photo"><img data-src="portfolio projects/OrganicoBello/web/OB-vodka_sauce-front.webp" alt="Vodka Tomato Sauce" width="1600" height="1600"></div>
+          <figcaption>Vodka Tomato Sauce</figcaption>
+        </figure>
+        <figure class="ob-spin" data-frames='["portfolio projects/OrganicoBello/web/OB-tomato_sauce-front.webp", "portfolio projects/OrganicoBello/web/OB-tomato_sauce-right.webp", "portfolio projects/OrganicoBello/web/OB-tomato_sauce-back.webp", "portfolio projects/OrganicoBello/web/OB-tomato_sauce-left.webp"]'>
+          <div class="ob-photo"><img data-src="portfolio projects/OrganicoBello/web/OB-tomato_sauce-front.webp" alt="Classic Tomato Sauce" width="1600" height="1600"></div>
+          <figcaption>Classic Tomato Sauce</figcaption>
+        </figure>
+        <figure class="ob-spin" data-frames='["portfolio projects/OrganicoBello/web/OB-tomato_bouillon-front.webp", "portfolio projects/OrganicoBello/web/OB-tomato_bouillon-right.webp", "portfolio projects/OrganicoBello/web/OB-tomato_bouillon-back.webp", "portfolio projects/OrganicoBello/web/OB-tomato_bouillon-left.webp", "portfolio projects/OrganicoBello/web/OB-tomato_bouillon-top.webp"]'>
+          <div class="ob-photo"><img data-src="portfolio projects/OrganicoBello/web/OB-tomato_bouillon-front.webp" alt="Tomato Bouillon" width="1600" height="1600"></div>
+          <figcaption>Tomato Bouillon</figcaption>
+        </figure>
+        <figure class="ob-spin" data-frames='["portfolio projects/OrganicoBello/web/OB-italian_oregano-front.webp", "portfolio projects/OrganicoBello/web/OB-italian_oregano-right.webp", "portfolio projects/OrganicoBello/web/OB-italian_oregano-back.webp", "portfolio projects/OrganicoBello/web/OB-italian_oregano-left.webp", "portfolio projects/OrganicoBello/web/P2Sp26_LiamKengla_OrganicoBello_25.webp"]'>
+          <div class="ob-photo"><img data-src="portfolio projects/OrganicoBello/web/OB-italian_oregano-front.webp" alt="Sicilian Oregano" width="1600" height="1600"></div>
+          <figcaption>Sicilian Oregano</figcaption>
+        </figure>
+        <figure class="ob-spin" data-frames='["portfolio projects/OrganicoBello/web/OB-bruschetta_spread-front.webp", "portfolio projects/OrganicoBello/web/OB-bruschetta_spread-right.webp", "portfolio projects/OrganicoBello/web/OB-bruschetta_spread-back.webp", "portfolio projects/OrganicoBello/web/OB-bruschetta_spread-left.webp", "portfolio projects/OrganicoBello/web/OB-bruschetta_spread-top.webp"]'>
+          <div class="ob-photo"><img data-src="portfolio projects/OrganicoBello/web/OB-bruschetta_spread-front.webp" alt="Bruschetta Spread" width="1600" height="1600"></div>
+          <figcaption>Bruschetta Spread</figcaption>
+        </figure>
+        <figure class="ob-spin" data-frames='["portfolio projects/OrganicoBello/web/OB-tomato_paste-front.webp", "portfolio projects/OrganicoBello/web/OB-tomato_paste-back.webp"]'>
+          <div class="ob-photo"><img data-src="portfolio projects/OrganicoBello/web/OB-tomato_paste-front.webp" alt="Tomato Paste" width="1600" height="1600"></div>
+          <figcaption>Tomato Paste</figcaption>
+        </figure>
+    </div>
+    <div class="kd-part">
+      <p class="interjection is-long">A custom pasta bag, intentionally undersized to save on packaging, so you can feel the rough cuts of the pasta through it.</p>
+      <span class="kd-note">Click an angle to turn the bag.</span>
+    </div>
+    <div class="ob-viewer" id="obPasta">
+      <div class="ob-view">
+          <img data-src="portfolio projects/OrganicoBello/web/OB-penne_rigate-front.webp" alt="Penne Rigate bag, front" width="1600" height="1600" class="on">
+          <img data-src="portfolio projects/OrganicoBello/web/OB-penne_rigate-right.webp" alt="Penne Rigate bag, side" width="1600" height="1600">
+          <img data-src="portfolio projects/OrganicoBello/web/OB-penne_rigate-back.webp" alt="Penne Rigate bag, back" width="1600" height="1600">
+          <img data-src="portfolio projects/OrganicoBello/web/OB-penne_rigate-left.webp" alt="Penne Rigate bag, other side" width="1600" height="1600">
+          <img data-src="portfolio projects/OrganicoBello/web/OB-penne_rigate-top.webp" alt="Penne Rigate bag, top" width="1600" height="1600">
+          <img data-src="portfolio projects/OrganicoBello/web/hand models/OB-penne_rigate-front-hand_model.webp" alt="Penne Rigate bag, in hand" width="2880" height="1800">
+          <img data-src="portfolio projects/OrganicoBello/web/hand models/OB-penne_rigate-right-hand_model.webp" alt="Penne Rigate bag, in hand, side" width="2880" height="1800">
+      </div>
+      <div class="kd-tabs" aria-label="Viewing angle"><button type="button" class="on">Front</button><button type="button">Side</button><button type="button">Back</button><button type="button">Other Side</button><button type="button">Top</button><button type="button">In Hand</button><button type="button">In Hand, Side</button></div>
+    </div>
+    <div class="kd-part">
+      <p class="interjection is-long">Recycled paper the color of fresh pasta, so the sauces visually coat the packaging the way sauce coats pasta.</p>
+    </div>
+    <div class="pj-section pj-row">
+      <img data-src="portfolio projects/OrganicoBello/web/hand models/OB-tomato_sauce-right-hand_model.webp" alt="Classic Tomato Sauce held in hand" width="2880" height="1800" loading="lazy" style="--ar: 1.6">
+      <img data-src="portfolio projects/OrganicoBello/web/hand models/OB-tomato_paste-front-hand_model.webp" alt="Tomato Paste held in hand" width="2880" height="1800" loading="lazy" style="--ar: 1.6">
+    </div>
+    <div class="ob-materials">
+      <div><span class="ob-swatch ob-birch"></span><h3>Recycled Birch Paper</h3><p>Neenah Royal Sundance, recycled and FSC certified. Uncoated, 70T and 80C.</p></div>
+      <div><span class="ob-swatch ob-glass"></span><h3>Recycled Glass</h3><p>BPA, VOC, and carbon free. A complete view of the product in 14.5, 7.9, and 4.5 oz.</p></div>
+    </div>
+    <div class="kd-part">
+      <p class="interjection is-long">Custom icons, modeled on the USDA Organic seal, mark the common additives people look to avoid on the back of every package.</p>
+    </div>
+    <div class="ob-backs">
+      <img data-src="portfolio projects/OrganicoBello/web/OB-vodka_sauce-back.webp" alt="Vodka Tomato Sauce, back label with additive-free icons" width="1600" height="1600" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/OB-bruschetta_spread-back.webp" alt="Bruschetta Spread, back label with additive-free icons" width="1600" height="1600" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/OB-tomato_bouillon-back.webp" alt="Tomato Bouillon, wraparound label with additive-free icons" width="1600" height="1600" loading="lazy">
+    </div>
+    <div class="kd-part">
+      <p class="interjection is-long">Comforting. Rich. Nostalgic. Flavorful. Spirited. Italian.</p>
+      <span class="kd-label">Brand Drivers</span>
+    </div>
+    <div class="ob-system">
+      <div class="ob-type">
+        <h3>Typography</h3>
+        <div><span>Primary</span><p class="ob-georgia">Georgia</p><p class="ob-sample ob-georgia">PENNE RIGATE</p></div>
+        <div><span>Secondary</span><p class="ob-optima">Optima</p><p class="ob-sample ob-optima">BRONZE EXTRUDED</p></div>
+        <div><span>Tertiary</span><p class="ob-gt">GT America</p><p class="ob-sample ob-gt">NET WT 45G</p></div>
+      </div>
+      <div class="ob-colors">
+        <h3>Color</h3>
+        <div class="ob-chip" style="--c: #4a1f1d"><span>Pantone 4975 C</span></div>
+        <div class="ob-chip" style="--c: #7c2529"><span>Pantone 1815 C</span></div>
+        <div class="ob-chip" style="--c: #115740"><span>Pantone 343 C</span></div>
+        <p>Deep tomato red, a darker wine hue, and a bold basil green, drawn from Italian cuisine, regional landscapes, and the national colors.</p>
+      </div>
+    </div>
+    <div class="kd-part">
+      <p class="interjection is-long">Hand&#8209;drawn logo ideations, then paper form studies on the jars until the label shape was right.</p>
+      <span class="kd-label">Process</span>
+    </div>
+    <div class="pj-section ob-grid-3">
+      <img data-src="portfolio projects/OrganicoBello/web/process/logo-sketchbook-1.jpg" alt="Hand-drawn Bello logo sketches" width="1600" height="1172" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/process/logo-sketchbook-2.jpg" alt="Hand-drawn Bello logo sketches with grape marks" width="1600" height="1132" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/process/logo-sketchbook-3.jpg" alt="Hand-drawn Bello monograms and marks" width="1600" height="1102" loading="lazy">
+    </div>
+    <div class="pj-section ob-grid-4">
+      <img data-src="portfolio projects/OrganicoBello/web/process/form-1.jpg" alt="Paper label form study #1" width="1400" height="1050" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/process/form-2.jpg" alt="Paper label form study #2" width="1400" height="1050" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/process/form-3.jpg" alt="Paper label form study #3" width="1400" height="1050" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/process/form-4.jpg" alt="Paper label form study #4" width="1400" height="1050" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/process/form-5.jpg" alt="Paper label form study #5" width="1400" height="1050" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/process/form-6.jpg" alt="Paper label form study #6" width="1400" height="1050" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/process/form-7.jpg" alt="Paper label form study #7" width="1400" height="1050" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/process/form-8.jpg" alt="Paper label form study #8" width="1400" height="1050" loading="lazy">
+    </div>
+    <div class="pj-section ob-grid-3">
+      <img data-src="portfolio projects/OrganicoBello/web/process/form-final-1202.jpg" alt="Birch paper label with a window cutout" width="1400" height="1050" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/process/form-final-1204.jpg" alt="Birch paper labels with window cutouts on three jars" width="1400" height="1050" loading="lazy">
+      <img data-src="portfolio projects/OrganicoBello/web/process/form-final-1205.jpg" alt="Final birch paper label forms" width="1400" height="1050" loading="lazy">
+    </div>
+    <div class="pj-section pj-row">
+      <img data-src="portfolio projects/OrganicoBello/web/process/painting-1.jpg" alt="Painting the jar lids" width="1050" height="1400" loading="lazy" style="--ar: 0.750">
+      <img data-src="portfolio projects/OrganicoBello/web/process/painting-2.jpg" alt="Painting the jar lids" width="1050" height="1400" loading="lazy" style="--ar: 0.750">
+      <img data-src="portfolio projects/OrganicoBello/web/process/painting-3.jpg" alt="Painting the jar lids" width="1050" height="1400" loading="lazy" style="--ar: 0.750">
+      <img data-src="portfolio projects/OrganicoBello/web/process/painting-4.jpg" alt="Painting the jar lids" width="1400" height="1050" loading="lazy" style="--ar: 1.333">
+    </div>
+
   </div>
 </div>
 
@@ -7506,142 +7808,47 @@
     });
   })();
 
-  // Organico Bello's product page — opens the same way as the book
-  // modals above (X, logo, or Escape to close; backdrop is plain white for
-  // now instead of blurred, see #productModal override below). Content is
-  // the full-lineup hero shot (see .product-hero in the HTML) up top, the
-  // description below it, then one 2-up grid per pair of plain white-bg
-  // product photos (hover-spinning through whichever angles each product
-  // actually has, pulled out of the carousel thumb's own cycle) — the two
-  // sauces, the two spices, the spread and the paste, with Penne Rigate
-  // left over on its own in the final grid. Every pair but the sauces
-  // (already visible in the top hero) gets its own hand-model shot
-  // leading into it (see .product-lead-in), standing in for that top
-  // hero — the top hero is the only full-page section on this page.
+  // Organico Bello. Static sections; two interactions: each jar turns
+  // through its angle shots while hovered (tap toggles on touch), and the
+  // pasta bag shows whichever angle is clicked.
   (function () {
-    const PROJECT_DIR = 'portfolio projects/OrganicoBello/';
-    // Web copies (web/): angles at 1600px, hand-model shots as 2880px JPEGs.
-    const WEB_DIR = PROJECT_DIR + 'web/';
-    const HAND_DIR = WEB_DIR + 'hand models/';
-    const ANGLE_ORDER = ['front', 'right', 'back', 'left', 'top'];
-    const vodkaSauce = { name: 'Vodka Sauce', slug: 'vodka_sauce', angles: ['front', 'back', 'top'] };
-    const tomatoSauce = { name: 'Tomato Sauce', slug: 'tomato_sauce', angles: ['front', 'right', 'back', 'left'] };
-    const tomatoBouillon = { name: 'Tomato Bouillon', slug: 'tomato_bouillon', angles: ['front', 'right', 'back', 'left', 'top'] };
-    const italianOregano = {
-      name: 'Italian Oregano',
-      slug: 'italian_oregano',
-      angles: ['front', 'right', 'back', 'left', 'top'],
-      // Shot before the OB-<slug>-<angle> naming convention existed, so
-      // its top view needs an explicit filename instead of the pattern
-      // every other angle/product follows.
-      overrides: { top: 'P2Sp26_LiamKengla_OrganicoBello_25.webp' },
-    };
-    const bruschettaSpread = { name: 'Bruschetta Spread', slug: 'bruschetta_spread', angles: ['front', 'right', 'back', 'left', 'top'] };
-    const tomatoPaste = { name: 'Tomato Paste', slug: 'tomato_paste', angles: ['front', 'back'] };
-    const penneRigate = { name: 'Penne Rigate', slug: 'penne_rigate', angles: ['front', 'right', 'back', 'left', 'top'] };
-
-    // Each group is a pair's product grid, optionally led into by a
-    // hand-model shot of one of its own products (see .product-lead-in) —
-    // standing in for the top hero for whichever pair isn't already
-    // covered by it. The sauces are visible in the top hero itself, so
-    // they get no lead-in of their own.
-    const PRODUCT_GROUPS = [
-      { products: [vodkaSauce, tomatoSauce] },
-      { products: [tomatoBouillon, italianOregano], leadInProduct: tomatoBouillon },
-      { products: [bruschettaSpread, tomatoPaste], leadInProduct: bruschettaSpread },
-      { products: [penneRigate], leadInProduct: penneRigate },
-    ];
-    const SPIN_FRAME_MS = 350;
-
-    function framesFor(product) {
-      return ANGLE_ORDER
-        .filter((angle) => product.angles.includes(angle))
-        .map((angle) => WEB_DIR + ((product.overrides && product.overrides[angle]) || ('OB-' + product.slug + '-' + angle + '.webp')));
-    }
-
-    function handShotFor(product) {
-      return HAND_DIR + 'OB-' + product.slug + '-front-hand_model.webp';
-    }
-
-    // A product's other angles load the first time its card is hovered
-    // (not on page load, which used to pull ~30 photos up front).
-
     const modal = document.getElementById('productModal');
     const closeBtn = document.getElementById('productClose');
     const scroll = document.getElementById('productScroll');
-    const groupsContainer = document.getElementById('productGroups');
     const carouselControls = document.querySelector('.controls');
-    let built = false;
+    const SPIN_FRAME_MS = 350;
 
-    function buildGroups() {
-      PRODUCT_GROUPS.forEach((group) => {
-        if (group.leadInProduct) {
-          const leadInWrap = document.createElement('div');
-          leadInWrap.className = 'product-lead-in';
-          const leadInImg = document.createElement('img');
-          window.setSrc(leadInImg, handShotFor(group.leadInProduct));
-          leadInImg.alt = group.leadInProduct.name + ' — hand model shot';
-          leadInImg.loading = 'lazy';
-          leadInWrap.appendChild(leadInImg);
-          groupsContainer.appendChild(leadInWrap);
-        }
+    modal.querySelectorAll('.ob-spin').forEach((card) => {
+      const frames = JSON.parse(card.dataset.frames);
+      const img = card.querySelector('img');
+      let timer = null, i = 0, warmed = false;
+      function start() {
+        if (!warmed) { warmed = true; frames.forEach((src) => { new Image().src = src; }); }
+        clearInterval(timer);
+        timer = setInterval(() => { i = (i + 1) % frames.length; img.src = frames[i]; }, SPIN_FRAME_MS);
+        card.classList.add('is-turning');
+      }
+      function stop() {
+        clearInterval(timer);
+        timer = null;
+        i = 0;
+        img.src = frames[0];
+        card.classList.remove('is-turning');
+      }
+      card.addEventListener('mouseenter', start);
+      card.addEventListener('mouseleave', stop);
+      card.addEventListener('click', () => { if (timer) stop(); else start(); });
+    });
 
-        const grid = document.createElement('div');
-        grid.className = 'product-grid';
-
-        group.products.forEach((product) => {
-          const frames = framesFor(product);
-
-          const card = document.createElement('div');
-          card.className = 'product-card';
-
-          const photo = document.createElement('div');
-          photo.className = 'product-photo';
-          const img = document.createElement('img');
-          window.setSrc(img, frames[0]);
-          img.alt = product.name;
-          photo.appendChild(img);
-          card.appendChild(photo);
-
-          const label = document.createElement('h4');
-          label.textContent = product.name;
-          card.appendChild(label);
-
-          let timer = null;
-          function stopSpin() {
-            if (timer) {
-              clearInterval(timer);
-              timer = null;
-            }
-          }
-          let warmed = false;
-          card.addEventListener('mouseenter', () => {
-            if (!warmed) {
-              warmed = true;
-              frames.forEach((src) => { new Image().src = src; });
-            }
-            stopSpin();
-            let i = 0;
-            timer = setInterval(() => {
-              i = (i + 1) % frames.length;
-              img.src = frames[i];
-            }, SPIN_FRAME_MS);
-          });
-          card.addEventListener('mouseleave', () => {
-            stopSpin();
-            img.src = frames[0];
-          });
-
-          grid.appendChild(card);
-        });
-
-        groupsContainer.appendChild(grid);
-      });
-      built = true;
-    }
+    const viewer = document.getElementById('obPasta');
+    const views = [...viewer.querySelectorAll('.ob-view img')];
+    const angleButtons = [...viewer.querySelectorAll('.kd-tabs button')];
+    angleButtons.forEach((button, i) => button.addEventListener('click', () => {
+      views.forEach((v, j) => v.classList.toggle('on', j === i));
+      angleButtons.forEach((b, j) => b.classList.toggle('on', j === i));
+    }));
 
     function openProducts() {
-      if (!built) buildGroups();
       modal.classList.add('open');
       modal.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
@@ -7663,7 +7870,6 @@
     });
 
     closeBtn.addEventListener('click', closeProducts);
-
 
     document.addEventListener('keydown', (e) => {
       if (!modal.classList.contains('open')) return;
