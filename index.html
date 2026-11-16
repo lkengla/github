@@ -1611,47 +1611,49 @@
     z-index: 1;
   }
 
-  /* iMac 24" (4760 x 4050; screen 4480 x 2520 at 140, 150) */
+  /* Bezels are cropped to the visible device, so its edges sit on the
+     page margins. */
+  /* iMac 24" (4718 x 3976; screen 4480 x 2520 at 119, 118) */
   .dev-imac .dev-screen {
-    left: calc(140 / 4760 * 100%);
-    top: calc(150 / 4050 * 100%);
-    width: calc(4480 / 4760 * 100%);
-    height: calc(2520 / 4050 * 100%);
+    left: calc(119 / 4718 * 100%);
+    top: calc(118 / 3976 * 100%);
+    width: calc(4480 / 4718 * 100%);
+    height: calc(2520 / 3976 * 100%);
   }
 
-  /* MacBook Air 13" (3400 x 2240; screen 2560 x 1664 at 420, 288) */
+  /* MacBook Air 13" (3205 x 1941; screen 2560 x 1664 at 323, 61) */
   .dev-laptop .dev-screen {
-    left: calc(420 / 3400 * 100%);
-    top: calc(288 / 2240 * 100%);
-    width: calc(2560 / 3400 * 100%);
-    height: calc(1664 / 2240 * 100%);
+    left: calc(323 / 3205 * 100%);
+    top: calc(61 / 1941 * 100%);
+    width: calc(2560 / 3205 * 100%);
+    height: calc(1664 / 1941 * 100%);
   }
 
-  /* iPad Air 11" upright (1900 x 2620; screen 1640 x 2360 at 130, 130) */
+  /* iPad Air 11" upright (1864 x 2584; screen 1640 x 2360 at 110, 114) */
   .dev-tablet .dev-screen {
-    left: calc(130 / 1900 * 100%);
-    top: calc(130 / 2620 * 100%);
-    width: calc(1640 / 1900 * 100%);
-    height: calc(2360 / 2620 * 100%);
+    left: calc(110 / 1864 * 100%);
+    top: calc(114 / 2584 * 100%);
+    width: calc(1640 / 1864 * 100%);
+    height: calc(2360 / 2584 * 100%);
   }
 
-  /* iPhone 17 Pro (1350 x 2760; screen 1206 x 2620 at 72, 70) */
+  /* iPhone 17 Pro (1318 x 2717; screen 1206 x 2620 at 56, 49) */
   .dev-phone .dev-screen {
-    left: calc(72 / 1350 * 100%);
-    top: calc(70 / 2760 * 100%);
-    width: calc(1206 / 1350 * 100%);
-    height: calc(2620 / 2760 * 100%);
+    left: calc(56 / 1318 * 100%);
+    top: calc(49 / 2717 * 100%);
+    width: calc(1206 / 1318 * 100%);
+    height: calc(2620 / 2717 * 100%);
   }
 
   /* Opening: the large desktop on its own, one page at a time. It scrolls
      itself until you scroll it, click into it, or pick a page below. */
   .kd-hero .dev-imac {
-    width: min(100%, calc((100vh - var(--fade-bottom) - var(--margin)) * 4760 / 4050));
+    width: min(100%, calc((100vh - var(--fade-bottom) - var(--margin)) * 4718 / 3976));
     margin: 0 auto;
   }
 
   .kd-desktop .dev-imac {
-    width: min(100%, calc((100vh - var(--fade-bottom) - var(--margin) - 90px) * 4760 / 4050));
+    width: min(100%, calc((100vh - var(--fade-bottom) - var(--margin) - 90px) * 4718 / 3976));
     margin: 0 auto;
   }
 
@@ -1999,7 +2001,7 @@
   }
 
   .kd-proto .dev-laptop {
-    width: min(100%, calc((100vh - var(--fade-bottom) - 60px) * 3400 / 2240));
+    width: min(100%, calc((100vh - var(--fade-bottom) - 60px) * 3205 / 1941));
     margin: 0 auto;
   }
 
@@ -4662,7 +4664,7 @@
   <button class="book-close" id="kodakClose" aria-label="Close">&times;</button>
   <div class="gallery-scroll" id="kodakScroll">
     <div class="pj-section kd-hero">
-      <div class="dev dev-imac" role="img" aria-label="The Kodak film page on a large desktop, scrolling"><div class="dev-screen"><div class="dev-tape" data-tape="film-desktop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/imac.webp" alt="" width="2400" height="2042"></div>
+      <div class="dev dev-imac" role="img" aria-label="The Kodak film page on a large desktop, scrolling"><div class="dev-screen"><div class="dev-tape" data-tape="film-desktop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/imac.webp" alt="" width="2400" height="2023"></div>
     </div>
     <div class="project-head">
       <h2 class="project-title">A proposed redesign of the<br> Kodak website, built as one system<br> for every page and every screen.</h2>
@@ -4803,7 +4805,7 @@
       <span class="kd-note">Select a page below, then scroll through it inside the screen.</span>
     </div>
     <div class="pj-section kd-desktop">
-      <div class="dev dev-imac" id="kodakExplorer"><div class="dev-screen kd-explore" tabindex="0" aria-label="The Kodak website on a large desktop. Scroll inside to explore."><div class="kd-explore-page"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/imac.webp" alt="" width="2400" height="2042"></div>
+      <div class="dev dev-imac" id="kodakExplorer"><div class="dev-screen kd-explore" tabindex="0" aria-label="The Kodak website on a large desktop. Scroll inside to explore."><div class="kd-explore-page"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/imac.webp" alt="" width="2400" height="2023"></div>
       <div class="kd-tabs" aria-label="Pages"><button type="button" data-page="home">Homepage</button><button type="button" data-page="cameras">Cameras Page</button><button type="button" data-page="ektar">Ektar H35N</button><button type="button" data-page="pixpro">PIXPRO WPZ2</button><button type="button" data-page="film">Film Page</button></div>
     </div>
     <div class="kd-part">
@@ -4811,44 +4813,44 @@
       <span class="kd-label">Homepage, Share Your Kodak Moments</span>
     </div>
     <div class="kd-set">
-      <div class="dev dev-laptop" style="--w: 304"><div class="dev-screen"><div class="dev-tape" data-tape="share-laptop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt="" width="2000" height="1318"></div>
-      <div class="dev dev-tablet" style="--w: 179"><div class="dev-screen"><div class="dev-tape" data-tape="share-tablet"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/tablet.webp" alt="" width="1000" height="1379"></div>
-      <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="share-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp" alt="" width="600" height="1227"></div>
+      <div class="dev dev-laptop" style="--w: 304"><div class="dev-screen"><div class="dev-tape" data-tape="share-laptop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt="" width="2000" height="1211"></div>
+      <div class="dev dev-tablet" style="--w: 179"><div class="dev-screen"><div class="dev-tape" data-tape="share-tablet"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/tablet.webp" alt="" width="1000" height="1386"></div>
+      <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="share-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp" alt="" width="600" height="1237"></div>
     </div>
     <div class="kd-part">
       <p class="interjection is-long">Large example photography and white space, applied at every scale.</p>
       <span class="kd-label">Camera Page</span>
     </div>
     <div class="kd-set">
-      <div class="dev dev-laptop" style="--w: 304"><div class="dev-screen"><div class="dev-tape" data-tape="cameras-laptop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt="" width="2000" height="1318"></div>
-      <div class="dev dev-tablet" style="--w: 179"><div class="dev-screen"><div class="dev-tape" data-tape="cameras-tablet"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/tablet.webp" alt="" width="1000" height="1379"></div>
-      <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="cameras-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp" alt="" width="600" height="1227"></div>
+      <div class="dev dev-laptop" style="--w: 304"><div class="dev-screen"><div class="dev-tape" data-tape="cameras-laptop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt="" width="2000" height="1211"></div>
+      <div class="dev dev-tablet" style="--w: 179"><div class="dev-screen"><div class="dev-tape" data-tape="cameras-tablet"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/tablet.webp" alt="" width="1000" height="1386"></div>
+      <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="cameras-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp" alt="" width="600" height="1237"></div>
     </div>
     <div class="kd-part">
       <p class="interjection is-long">The system emphasizes color variations and product photography, creating a product page that inspires you to create.</p>
       <span class="kd-label">Product Page, Ektar H35N</span>
     </div>
     <div class="kd-set">
-      <div class="dev dev-laptop" style="--w: 304"><div class="dev-screen"><div class="dev-tape" data-tape="ektar-laptop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt="" width="2000" height="1318"></div>
-      <div class="dev dev-tablet" style="--w: 179"><div class="dev-screen"><div class="dev-tape" data-tape="ektar-tablet"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/tablet.webp" alt="" width="1000" height="1379"></div>
-      <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="ektar-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp" alt="" width="600" height="1227"></div>
+      <div class="dev dev-laptop" style="--w: 304"><div class="dev-screen"><div class="dev-tape" data-tape="ektar-laptop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt="" width="2000" height="1211"></div>
+      <div class="dev dev-tablet" style="--w: 179"><div class="dev-screen"><div class="dev-tape" data-tape="ektar-tablet"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/tablet.webp" alt="" width="1000" height="1386"></div>
+      <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="ektar-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp" alt="" width="600" height="1237"></div>
     </div>
     <div class="kd-part kd-label-only">
       <span class="kd-label">Product Page, PIXPRO WPZ2</span>
     </div>
     <div class="kd-set">
-      <div class="dev dev-laptop" style="--w: 304"><div class="dev-screen"><div class="dev-tape" data-tape="pixpro-laptop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt="" width="2000" height="1318"></div>
-      <div class="dev dev-tablet" style="--w: 179"><div class="dev-screen"><div class="dev-tape" data-tape="pixpro-tablet"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/tablet.webp" alt="" width="1000" height="1379"></div>
-      <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="pixpro-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp" alt="" width="600" height="1227"></div>
+      <div class="dev dev-laptop" style="--w: 304"><div class="dev-screen"><div class="dev-tape" data-tape="pixpro-laptop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt="" width="2000" height="1211"></div>
+      <div class="dev dev-tablet" style="--w: 179"><div class="dev-screen"><div class="dev-tape" data-tape="pixpro-tablet"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/tablet.webp" alt="" width="1000" height="1386"></div>
+      <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="pixpro-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp" alt="" width="600" height="1237"></div>
     </div>
     <div class="kd-part">
       <p class="interjection is-long">A film page that sells film by highlighting user photography.</p>
       <span class="kd-label">Film Page</span>
     </div>
     <div class="kd-set">
-      <div class="dev dev-laptop" style="--w: 304"><div class="dev-screen"><div class="dev-tape" data-tape="film-laptop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt="" width="2000" height="1318"></div>
-      <div class="dev dev-tablet" style="--w: 179"><div class="dev-screen"><div class="dev-tape" data-tape="film-tablet"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/tablet.webp" alt="" width="1000" height="1379"></div>
-      <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="film-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp" alt="" width="600" height="1227"></div>
+      <div class="dev dev-laptop" style="--w: 304"><div class="dev-screen"><div class="dev-tape" data-tape="film-laptop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt="" width="2000" height="1211"></div>
+      <div class="dev dev-tablet" style="--w: 179"><div class="dev-screen"><div class="dev-tape" data-tape="film-tablet"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/tablet.webp" alt="" width="1000" height="1386"></div>
+      <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="film-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp" alt="" width="600" height="1237"></div>
     </div>
     <div class="book-contact">
       <span>&copy; Liam Jacob Kengla</span>
