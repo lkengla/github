@@ -1793,6 +1793,99 @@
     text-align: center;
   }
 
+  /* Small instruction under a statement. */
+  .kd-note {
+    display: block;
+    margin-bottom: 76px;
+    padding: 0 var(--margin);
+    font-size: 13px;
+    line-height: 1.45;
+    text-align: center;
+  }
+
+  /* Before and after as one frame: a line sweeps across on its own,
+     uncovering the current site from the left, holds, and sweeps back. */
+  .kd-swipe {
+    width: min(100%, calc((100vh - var(--fade-bottom) - 120px) * 2000 / 1180));
+    margin: 0 auto;
+  }
+
+  .kd-swipe figcaption {
+    margin-bottom: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.45;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .kd-swipe-box {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .kd-swipe-box img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .kd-swipe-old {
+    position: absolute;
+    inset: 0;
+    clip-path: inset(0 100% 0 0);
+    animation: kd-reveal 10s cubic-bezier(0.65, 0, 0.35, 1) var(--delay, 0s) infinite;
+  }
+
+  .kd-swipe-line {
+    position: absolute;
+    inset: 0;
+    border-left: 2px solid #fff;
+    box-shadow: inset 1px 0 0 rgba(0, 0, 0, 0.25);
+    transform: translateX(0);
+    animation: kd-sweep 10s cubic-bezier(0.65, 0, 0.35, 1) var(--delay, 0s) infinite;
+    pointer-events: none;
+  }
+
+  @keyframes kd-reveal {
+    0%, 15% { clip-path: inset(0 100% 0 0); }
+    40%, 65% { clip-path: inset(0 0 0 0); }
+    90%, 100% { clip-path: inset(0 100% 0 0); }
+  }
+
+  @keyframes kd-sweep {
+    0%, 15% { transform: translateX(0); opacity: 0; }
+    16% { opacity: 1; }
+    39% { opacity: 1; }
+    40%, 65% { transform: translateX(100%); opacity: 0; }
+    66% { opacity: 1; }
+    89% { opacity: 1; }
+    90%, 100% { transform: translateX(0); opacity: 0; }
+  }
+
+  .kd-swipe-tags {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .kd-swipe-old,
+    .kd-swipe-line {
+      animation: none;
+    }
+  }
+
+  /* Footers: two stages side by side. */
+  .kd-footers .kd-grid .kd-cell {
+    flex-basis: calc((100% - 16px) / 2);
+  }
+
   /* Before and after: the old site and the redesign at one size. */
   .kd-pairs {
     display: grid;
@@ -4520,7 +4613,7 @@
   <button class="book-close" id="kodakClose" aria-label="Close">&times;</button>
   <div class="gallery-scroll" id="kodakScroll">
     <div class="pj-section kd-hero">
-      <div class="dev dev-imac" role="img" aria-label="The Kodak film page on a large desktop, scrolling"><div class="dev-screen"><div class="dev-tape" data-tape="film-desktop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/imac-yellow.webp" alt="" width="2400" height="2042"></div>
+      <div class="dev dev-imac" role="img" aria-label="The Kodak film page on a large desktop, scrolling"><div class="dev-screen"><div class="dev-tape" data-tape="film-desktop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/imac.webp" alt="" width="2400" height="2042"></div>
     </div>
     <div class="project-head">
       <h2 class="project-title">A proposed redesign of the<br> Kodak website, built as one system<br> for every page and every screen.</h2>
@@ -4536,7 +4629,42 @@
         </div>
       </div>
     </div>
-    <p class="interjection">Every page, from a phone to a large desktop.</p>
+    <div class="kd-part">
+      <p class="interjection is-long">The redesigned system takes a retro&#8209;futurist style, compared to the corporate original.</p>
+    </div>
+    <div class="kd-pairs">
+      <figure class="kd-swipe" style="--delay: 0s">
+        <figcaption>Homepage</figcaption>
+        <div class="kd-swipe-box">
+          <img data-src="portfolio projects/Kodak/web/before/new-home.jpg" alt="The redesign, homepage" loading="lazy" width="2000" height="1180">
+          <div class="kd-swipe-old"><img data-src="portfolio projects/Kodak/web/before/old-home.jpg" alt="The current Kodak website, homepage" loading="lazy" width="2000" height="1180"></div>
+          <div class="kd-swipe-line" aria-hidden="true"></div>
+        </div>
+        <div class="kd-swipe-tags" aria-hidden="true"><span>Before</span><span>After</span></div>
+      </figure>
+      <figure class="kd-swipe" style="--delay: -2.5s">
+        <figcaption>Ektar H35N Product Page</figcaption>
+        <div class="kd-swipe-box">
+          <img data-src="portfolio projects/Kodak/web/before/new-ektar.jpg" alt="The redesign, ektar h35n product page" loading="lazy" width="2000" height="1180">
+          <div class="kd-swipe-old"><img data-src="portfolio projects/Kodak/web/before/old-ektar.jpg" alt="The current Kodak website, ektar h35n product page" loading="lazy" width="2000" height="1180"></div>
+          <div class="kd-swipe-line" aria-hidden="true"></div>
+        </div>
+        <div class="kd-swipe-tags" aria-hidden="true"><span>Before</span><span>After</span></div>
+      </figure>
+      <figure class="kd-swipe" style="--delay: -5s">
+        <figcaption>More Cameras</figcaption>
+        <div class="kd-swipe-box">
+          <img data-src="portfolio projects/Kodak/web/before/new-cameras.jpg" alt="The redesign, more cameras" loading="lazy" width="2000" height="1180">
+          <div class="kd-swipe-old"><img data-src="portfolio projects/Kodak/web/before/old-cameras.jpg" alt="The current Kodak website, more cameras" loading="lazy" width="2000" height="1180"></div>
+          <div class="kd-swipe-line" aria-hidden="true"></div>
+        </div>
+        <div class="kd-swipe-tags" aria-hidden="true"><span>Before</span><span>After</span></div>
+      </figure>
+    </div>
+    <div class="kd-part">
+      <p class="interjection is-long">Every page scales from iPhone to large desktop, 360 to 2000px.</p>
+      <span class="kd-note">Click a size to change the preview.</span>
+    </div>
     <div class="kd-resize kd-all" id="kodakResizeAll">
       <div class="kd-grid">
         <figure class="kd-cell">
@@ -4593,32 +4721,12 @@
       <div class="kd-sizes" aria-label="Show every page at one size"><button type="button">Phone</button><button type="button">Tablet</button><button type="button">Laptop</button><button type="button">Desktop</button></div>
     </div>
     <div class="kd-part">
-      <p class="interjection is-long">The redesigned system takes a retro&#8209;futurist style, compared to the corporate original.</p>
-    </div>
-    <div class="kd-pairs">
-      <figure class="kd-pair">
-        <figcaption>Homepage</figcaption>
-        <div><img data-src="portfolio projects/Kodak/web/before/old-home.jpg" alt="The current Kodak website, homepage" loading="lazy" width="2000" height="1180"><span>Before</span></div>
-        <div><img data-src="portfolio projects/Kodak/web/before/new-home.jpg" alt="The redesign, homepage" loading="lazy" width="2000" height="1180"><span>After</span></div>
-      </figure>
-      <figure class="kd-pair">
-        <figcaption>Ektar H35N product page</figcaption>
-        <div><img data-src="portfolio projects/Kodak/web/before/old-ektar.jpg" alt="The current Kodak website, Ektar H35N product page" loading="lazy" width="2000" height="1180"><span>Before</span></div>
-        <div><img data-src="portfolio projects/Kodak/web/before/new-ektar.jpg" alt="The redesign, Ektar H35N product page" loading="lazy" width="2000" height="1180"><span>After</span></div>
-      </figure>
-      <figure class="kd-pair">
-        <figcaption>More cameras, as cards and as a stack</figcaption>
-        <div><img data-src="portfolio projects/Kodak/web/before/old-cameras.jpg" alt="The current Kodak website, more cameras, as cards and as a stack" loading="lazy" width="2000" height="1180"><span>Before</span></div>
-        <div><img data-src="portfolio projects/Kodak/web/before/new-cameras.jpg" alt="The redesign, more cameras, as cards and as a stack" loading="lazy" width="2000" height="1180"><span>After</span></div>
-      </figure>
-    </div>
-    <div class="kd-part">
       <p class="interjection">The full website, one page at a time.</p>
+      <span class="kd-note">Select a page below, then scroll through it inside the screen.</span>
     </div>
     <div class="pj-section kd-desktop">
       <div class="dev dev-imac" id="kodakExplorer"><div class="dev-screen kd-explore" tabindex="0" aria-label="The Kodak website on a large desktop. Scroll inside to explore."><div class="kd-explore-page"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/imac.webp" alt="" width="2400" height="2042"></div>
       <div class="kd-tabs" aria-label="Pages"><button type="button" data-page="home">Homepage</button><button type="button" data-page="film">Film Page</button><button type="button" data-page="cameras">Camera Page</button><button type="button" data-page="ektar">Product Page, Ektar H35N</button><button type="button" data-page="pixpro">Product Page, PIXPRO WPZ2</button></div>
-      <p class="kd-caption">Pick a page, then scroll inside the screen.</p>
     </div>
     <div class="kd-part">
       <p class="interjection is-long">Large example photography and white space, applied at every scale.</p>
@@ -4654,6 +4762,35 @@
       <div class="dev dev-laptop" style="--w: 304"><div class="dev-screen"><div class="dev-tape" data-tape="film-laptop"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp" alt="" width="2000" height="1318"></div>
       <div class="dev dev-tablet" style="--w: 179"><div class="dev-screen"><div class="dev-tape" data-tape="film-tablet"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/tablet.webp" alt="" width="1000" height="1379"></div>
       <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="film-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp" alt="" width="600" height="1227"></div>
+    </div>
+    <div class="kd-part">
+      <p class="interjection is-long">Two footers, one for the homepage and one for every other page, at every size.</p>
+      <span class="kd-note">Click a size to change the preview.</span>
+    </div>
+    <div class="kd-resize kd-footers">
+      <div class="kd-grid">
+        <figure class="kd-cell">
+        <div class="kd-stage" style="aspect-ratio: 2000 / 1940" role="img" aria-label="Homepage Footer resizing from phone to desktop">
+          <img data-src="portfolio projects/Kodak/web/footer/home-360.jpg" alt="" data-w="360" style="height: calc(1388 / 1940 * 100%)">
+          <img data-src="portfolio projects/Kodak/web/footer/home-750.jpg" alt="" data-w="750" style="height: calc(1348 / 1940 * 100%)">
+          <img data-src="portfolio projects/Kodak/web/footer/home-1279.jpg" alt="" data-w="1279" style="height: calc(1940 / 1940 * 100%)">
+          <img data-src="portfolio projects/Kodak/web/footer/home-2000.jpg" alt="" data-w="2000" style="height: calc(1940 / 1940 * 100%)">
+          <div class="kd-curtain left"></div><div class="kd-curtain right"></div>
+        </div>
+        <figcaption>Homepage Footer</figcaption>
+      </figure>
+        <figure class="kd-cell">
+        <div class="kd-stage" style="aspect-ratio: 2000 / 588" role="img" aria-label="Footer, Every Other Page resizing from phone to desktop">
+          <img data-src="portfolio projects/Kodak/web/footer/main-360.jpg" alt="" data-w="360" style="height: calc(413 / 588 * 100%)">
+          <img data-src="portfolio projects/Kodak/web/footer/main-750.jpg" alt="" data-w="750" style="height: calc(503 / 588 * 100%)">
+          <img data-src="portfolio projects/Kodak/web/footer/main-1279.jpg" alt="" data-w="1279" style="height: calc(503 / 588 * 100%)">
+          <img data-src="portfolio projects/Kodak/web/footer/main-2000.jpg" alt="" data-w="2000" style="height: calc(588 / 588 * 100%)">
+          <div class="kd-curtain left"></div><div class="kd-curtain right"></div>
+        </div>
+        <figcaption>Footer, Every Other Page</figcaption>
+      </figure>
+      </div>
+      <div class="kd-sizes" aria-label="Show both footers at one size"><button type="button">Phone</button><button type="button">Tablet</button><button type="button">Laptop</button><button type="button">Desktop</button></div>
     </div>
     <div class="book-contact">
       <span>&copy; Liam Jacob Kengla</span>
