@@ -2397,6 +2397,28 @@
     grid-column: 1 / -1;
   }
 
+  /* Only when autoplay was refused: a quiet instruction on the screen. */
+  #wrcModal .wrc-video-tap {
+    display: none;
+    position: absolute;
+    left: 50%;
+    top: 42%;
+    transform: translate(-50%, -50%);
+    padding: 6px 12px;
+    background: rgba(246, 245, 241, 0.92);
+    color: var(--ink);
+    font-size: 13px;
+    pointer-events: none;
+  }
+
+  #wrcModal .wrc-video-wrap.needs-tap {
+    cursor: pointer;
+  }
+
+  #wrcModal .wrc-video-wrap.needs-tap .wrc-video-tap {
+    display: block;
+  }
+
   @media (max-width: 640px) {
     #wrcModal .wrc-stationery,
     #wrcModal .wrc-videos {
@@ -2648,16 +2670,26 @@
     transition: transform 0.7s cubic-bezier(0.45, 0.05, 0.25, 1);
   }
 
-  #wrcModal .sleeve-swap:hover .ss-body,
+  /* Hover only where there's a real pointer: on touch screens a tap
+     leaves :hover stuck, which would fight the tap toggle. */
   #wrcModal .sleeve-swap.is-closed .ss-body {
     opacity: 0;
   }
 
   /* 284/1800 of the image: from the open book's top edge down to where
      it's fully under the sleeve. */
-  #wrcModal .sleeve-swap:hover .ss-top img,
   #wrcModal .sleeve-swap.is-closed .ss-top img {
     transform: translateY(16.2%);
+  }
+
+  @media (hover: hover) {
+    #wrcModal .sleeve-swap:hover .ss-body {
+      opacity: 0;
+    }
+
+    #wrcModal .sleeve-swap:hover .ss-top img {
+      transform: translateY(16.2%);
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -2680,7 +2712,7 @@
     display: grid;
     grid-template-columns: repeat(7, minmax(0, 1fr));
     column-gap: 16px;
-    margin: 96px var(--margin) 0;
+    margin: 0 var(--margin) 64px;
     padding: 16px 0 0;
     border-top: 1px solid var(--ink);
     color: var(--ink);
@@ -2717,7 +2749,19 @@
      cover scans are 504x666, a hair larger than the pages, like a real
      hardcover's overhang. */
   #wrcModal .book-embed-section {
-    padding: 120px var(--margin) 0;
+    padding: 48px var(--margin) 0;
+  }
+
+  /* The sleeve and the book preview read as one part, so the statement
+     between them sits closer than the page's other statements. */
+  #wrcModal .interjection.wrc-book-intro {
+    padding-top: 112px;
+    padding-bottom: 0;
+  }
+
+  /* Tap instructions exist only on phones (see below). */
+  #wrcModal .wrc-tap-note {
+    display: none;
   }
 
   /* Same height as Our Work Is Never Done's player (64vh), so the book
@@ -2861,8 +2905,61 @@
       flex-direction: column;
     }
 
+    /* One poster large, the other three under it; tapping a small one
+       swaps it into the large spot. */
     #wrcModal .wrc-posters {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    #wrcModal .wrc-posters img:first-child {
+      grid-column: 1 / -1;
+    }
+
+    #wrcModal .wrc-posters img:not(:first-child) {
+      cursor: pointer;
+    }
+
+    #wrcModal .wrc-tap-note {
+      display: block;
+      margin: 0 0 16px;
+      padding: 0 var(--margin);
+      font-size: 13px;
+      line-height: 1.45;
+      text-align: center;
+      color: var(--ink);
+    }
+
+    #wrcModal .wrc-objects + .wrc-tap-note,
+    #wrcModal .wrc-tap-note.is-below {
+      margin: 16px 0 0;
+    }
+
+    /* One sleeve on phones: closed until tapped. */
+    #wrcModal .wrc-objects > img {
+      display: none;
+    }
+
+    #wrcModal .wrc-objects .sleeve-swap {
+      width: 72%;
+      max-width: none;
+    }
+
+    #wrcModal .book-specs {
+      margin-bottom: 40px;
+    }
+
+    #wrcModal .interjection.wrc-book-intro {
+      padding-top: 56px;
+    }
+
+    #wrcModal .book-embed-section {
+      padding-top: 32px;
+    }
+
+    #wrcModal .spread-player,
+    #wrcModal .player-progress {
+      margin-top: 0;
     }
 
     #wrcModal .wrc-spread-row {
@@ -3007,8 +3104,57 @@
     height: auto;
   }
 
+  /* The original Organico Bello can, the twelfth jar: a hairline frame
+     around it and a label under it, so it reads as the one that isn't a
+     competitor. The label hangs below without pushing the grid. */
+  .ob-original {
+    position: relative;
+    margin: 0;
+    outline: 1px solid var(--ink);
+    outline-offset: 6px;
+  }
+
+  .ob-original figcaption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 16px);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.3;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .ob-battle {
+    padding-bottom: 48px;
+  }
+
   @media (max-width: 900px) {
     .ob-battle { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+
+  /* Phones: eleven competitors small, five across, and the original can
+     at double size in the bottom right corner. */
+  @media (max-width: 640px) {
+    .ob-battle {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-auto-flow: row dense;
+      gap: 8px;
+    }
+
+    .ob-original {
+      grid-column: 4 / span 2;
+      grid-row: 2 / span 2;
+      align-self: center;
+      outline-offset: 4px;
+    }
+
+    .ob-original figcaption {
+      font-size: 11px;
+      top: calc(100% + 10px);
+    }
   }
 
   /* The pasta bag: one view at a time, picked from the angles below it. */
@@ -3163,6 +3309,21 @@
 
   @media (max-width: 640px) {
     .ob-grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    /* The product photos carry ~15% white above and below each jar, so
+       on phones they zoom 12% inside their square (nothing of the
+       product is cut) and sit closer together. */
+    .ob-spins {
+      gap: 24px 12px;
+    }
+
+    .ob-photo {
+      overflow: hidden;
+    }
+
+    .ob-photo img {
+      transform: scale(1.12);
+    }
   }
 
   /* Organico Bello's product page — one white-bg product photo per item,
@@ -3432,17 +3593,47 @@
     opacity: 0.6;
   }
 
+  /* The copyright line at the foot of every page, light grey caps. */
   .book-contact {
     display: flex;
     justify-content: center;
     gap: 24px;
     padding: 40px 24px 64px;
-    color: #1a1a1a;
+    color: #a3a3a3;
     font-size: 13px;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    opacity: 0.7;
   }
+
+  /* On the homepage it sits small in the bottom margin, under the card
+     captions. The Playground scrolls, so it carries its own at the
+     end of the grid instead. */
+  .site-copyright {
+    position: fixed;
+    left: var(--margin);
+    bottom: 14px;
+    margin: 0;
+    line-height: 1;
+    color: #a3a3a3;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    z-index: 2000;
+  }
+
+  body.playground-open .site-copyright {
+    visibility: hidden;
+  }
+
+  html.intro .site-copyright {
+    opacity: 0;
+  }
+
+  html.intro-out .site-copyright {
+    transition: opacity 0.7s ease;
+  }
+
+
 
   /* San Diego Football Club's gallery — reuses the book modals' chrome
      (.book-modal/.gallery-scroll/.book-description/.book-embed-section/
@@ -4133,6 +4324,20 @@
     opacity: 0.8;
   }
 
+  /* Touch screens: the strip becomes a plain line (see touchPlayer). */
+  .strip-touch-line {
+    display: none;
+  }
+
+  html.touch-player .player-strip,
+  html.touch-player .player-side-hint {
+    display: none;
+  }
+
+  html.touch-player .strip-touch-line {
+    display: block;
+  }
+
   /* Progress through the book, under the player. Same width formula as
      .spread-player, so the bar spans exactly the open book. The fill is
      scaled rather than resized so it stays on the compositor. */
@@ -4332,10 +4537,146 @@
     }
   }
 
-  /* Phones and tablets: swiping drives the carousel, so no arrows. */
-  @media (hover: none) and (pointer: coarse) {
-    .controls {
-      display: none;
+  /* Phones, every project page: the desktop's generous vertical space
+     read as broken gaps on a small screen, so statements and sections
+     sit closer, and the headline and statements are a step smaller. */
+  @media (max-width: 640px) {
+    .project-title {
+      font-size: 26px;
+    }
+
+    .interjection,
+    .interjection.is-long {
+      padding: 72px var(--margin) 32px;
+      font-size: 22px;
+    }
+
+    .kd-part .interjection:not(:last-child) {
+      padding-bottom: 12px;
+    }
+
+    .interjection.is-tight {
+      padding-bottom: 16px;
+    }
+
+    .interjection.has-credits {
+      padding-bottom: 12px;
+    }
+
+    .interjection-credits {
+      margin-bottom: 32px;
+    }
+
+    .kd-label,
+    .kd-note {
+      margin-bottom: 32px;
+    }
+
+    .project-head {
+      padding-top: 56px;
+    }
+
+    .project-texts {
+      margin-top: 40px;
+      row-gap: 24px;
+    }
+
+    .project-nav {
+      margin-top: 96px;
+    }
+
+    .project-nav + .book-contact {
+      margin-top: 48px;
+    }
+
+    .split-grid {
+      padding-top: 72px;
+    }
+
+    .kd-label-only {
+      padding-top: 72px;
+    }
+
+    .kd-set.kd-next,
+    #wrcModal .wrc-wayfinding {
+      margin-top: 72px;
+    }
+
+    #wrcModal .wrc-spreads {
+      gap: 40px;
+    }
+
+    #wrcModal .wrc-spread-row.continues {
+      margin-top: calc(var(--wrc-gap) - 40px);
+    }
+  }
+
+
+  /* Phones: the homepage header runs to two lines. First the lockup with
+     the corner marks at the right margin, bracketing the K's height as on
+     desktop (on project pages the X sits between them). Then, under a
+     hairline, the desktop's info block in one row: the question on the
+     left, About and Playground on the right. Project pages keep the
+     one-line header with the X. */
+  @media (max-width: 640px) {
+    body:not(.project-open):not(.contact-open) header .info {
+      position: static;
+      grid-column: 1 / -1;
+      height: auto;
+      margin-top: 20px;
+      padding: 10px 0 0;
+      border-top: 1px solid var(--ink);
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      font-size: 13px;
+      line-height: 17px;
+      white-space: normal;
+    }
+
+    body:not(.project-open):not(.contact-open) #navToggle span {
+      display: inline;
+    }
+
+    body:not(.project-open):not(.contact-open) header .info .pages {
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+    }
+
+    /* .info is static here, so the marks hang from the header itself:
+       level with the K's top and bottom, on the right margin. */
+    body:not(.project-open):not(.contact-open) header .corner.top {
+      top: 24px;
+      right: 24px;
+    }
+
+    body:not(.project-open):not(.contact-open) header .corner.bottom {
+      top: calc(24px + var(--mark) * 5 / 6);
+      bottom: auto;
+      right: 24px;
+    }
+
+    main {
+      padding-top: calc(72px + var(--phone-mark));
+    }
+
+    body.carousel-vertical main {
+      padding-top: calc(96px + var(--phone-mark));
+      padding-bottom: 64px;
+    }
+
+    .playground {
+      --fade-top: calc(84px + var(--phone-mark));
+      --fade-bottom: calc(84px + var(--phone-mark));
+    }
+
+    /* The copyright and the arrows share a strip under the carousel
+       (main's bottom padding above): copyright on the left margin, arrows
+       on the right, centered on the same line. */
+    .site-copyright {
+      left: 24px;
+      bottom: 35px;
     }
   }
 </style>
@@ -4757,12 +5098,17 @@
       <span>Branding, Campaign</span>
     </div>
   </div>
+  <div class="book-contact">
+    <span>Copyright 2026 Liam Kengla</span>
+  </div>
 </section>
 
 <div class="controls">
   <button id="prev" aria-label="Previous"></button>
   <button id="next" aria-label="Next"></button>
 </div>
+
+<p class="site-copyright">Copyright 2026 Liam Kengla</p>
 
 <div class="book-modal" id="bookModal" aria-hidden="true">
   <button class="book-close" id="bookClose" aria-label="Close">&times;</button>
@@ -4855,7 +5201,7 @@
     </div>
     <div class="gallery-rows" id="galleryRowsBinding"></div>
     <div class="book-contact">
-      <span>&copy; Liam Jacob Kengla</span>
+      <span>Copyright 2026 Liam Kengla</span>
     </div>
   </div>
 </div>
@@ -4899,7 +5245,7 @@
     </div>
     <div class="gallery-rows" id="galleryRowsAfter2"></div>
     <div class="book-contact">
-      <span>&copy; Liam Jacob Kengla</span>
+      <span>Copyright 2026 Liam Kengla</span>
     </div>
   </div>
 </div>
@@ -4944,7 +5290,7 @@
     </div>
     <div class="gallery-rows" id="galleryRowsAfter3"></div>
     <div class="book-contact">
-      <span>&copy; Liam Jacob Kengla</span>
+      <span>Copyright 2026 Liam Kengla</span>
     </div>
   </div>
 </div>
@@ -5042,7 +5388,7 @@
       <img width="2400" height="1760" data-src="portfolio projects/SanDiego-Football-Club/web/campaign/updated-signs.jpg" alt="San Diego Seahorses tryout signs" loading="lazy" style="--ar: 1.364">
     </div>
     <div class="book-contact">
-      <span>&copy; Liam Jacob Kengla</span>
+      <span>Copyright 2026 Liam Kengla</span>
     </div>
   </div>
 </div>
@@ -5242,7 +5588,7 @@
       <div class="dev dev-phone" style="--w: 72"><div class="dev-screen"><div class="dev-tape" data-tape="film-phone"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/phone.webp?v=2" alt="" width="600" height="1237"></div>
     </div>
     <div class="book-contact">
-      <span>&copy; Liam Jacob Kengla</span>
+      <span>Copyright 2026 Liam Kengla</span>
     </div>
   </div>
 </div>
@@ -5301,7 +5647,7 @@
       <img width="2000" height="1333" data-src="portfolio projects/ArtDivision/web/tablecard.jpg" alt="Table card: Dream big, work hard, never stop" loading="lazy" style="--ar: 1">
     </div>
     <div class="book-contact">
-      <span>&copy; Liam Jacob Kengla</span>
+      <span>Copyright 2026 Liam Kengla</span>
     </div>
   </div>
 </div>
@@ -5355,6 +5701,7 @@
       <img data-src="portfolio projects/WRC/web/posters-1000/wrc-poster-spain.jpg" alt="Rally Islas Canarias Spain event poster" loading="lazy">
       <img data-src="portfolio projects/WRC/web/posters-1000/wrc-poster-teams.jpg" alt="2026 manufacturer teams and cars reference poster" loading="lazy">
     </div>
+    <p class="wrc-tap-note is-below">Tap a poster to enlarge it.</p>
     <p class="interjection is-long">Bold street posters designed to grab attention, with one call to action: stream on Rally.TV.</p>
     <div class="wrc-section wrc-posters">
       <img data-src="portfolio projects/WRC/web/posters-1000/rtv-poster-binge-rally.jpg" alt="Rally.TV poster, Binge Rally" loading="lazy">
@@ -5362,6 +5709,7 @@
       <img data-src="portfolio projects/WRC/web/posters-1000/rtv-poster-rally-tv-car.jpg" alt="Rally.TV poster, Stream Rally.TV" loading="lazy">
       <img data-src="portfolio projects/WRC/web/posters-1000/rtv-poster-laser-focus.jpg" alt="Rally.TV poster, Laser Focus" loading="lazy">
     </div>
+    <p class="wrc-tap-note is-below">Tap a poster to enlarge it.</p>
     <p class="interjection">Stationery for WRC and Rally.TV.</p>
     <div class="wrc-section">
       <div class="wrc-stationery">
@@ -5380,14 +5728,6 @@
       </div>
     </div>
     <p class="interjection">A weight&#8209;reduced cover sleeve for the mid&#8209;season book.</p>
-    <div class="wrc-section wrc-objects">
-      <img data-src="portfolio projects/WRC/web/sleeve-closed.webp" alt="2026 mid-season book in its sleeve" loading="lazy">
-      <div class="sleeve-swap" aria-label="2026 mid-season book sliding out of its sleeve" role="img">
-        <img class="ss-closed" data-src="portfolio projects/WRC/web/sleeve-closed.webp" alt="" loading="lazy">
-        <img class="ss-body" data-src="portfolio projects/WRC/web/sleeve-open.webp" alt="" loading="lazy">
-        <div class="ss-top"><img data-src="portfolio projects/WRC/web/sleeve-open.webp" alt="" loading="lazy"></div>
-      </div>
-    </div>
     <dl class="wrc-section book-specs">
       <div><dt>Design</dt><dd>L.J. Kengla</dd></div>
       <div><dt>Texts by</dt><dd>L.J. Kengla</dd></div>
@@ -5397,7 +5737,16 @@
       <div><dt>Print</dt><dd>Chris Saw</dd></div>
       <div><dt>Typefaces</dt><dd>Basier Square Mono<br>Aktiv Grotesk</dd></div>
     </dl>
-    <p class="interjection is-long">Designed to teach new fans the stages of a rally weekend, the scoring system, the teams and manufacturers, vehicle specifications, and season standings.</p>
+    <div class="wrc-section wrc-objects">
+      <img data-src="portfolio projects/WRC/web/sleeve-closed.webp" alt="2026 mid-season book in its sleeve" loading="lazy">
+      <div class="sleeve-swap" aria-label="2026 mid-season book sliding out of its sleeve" role="img">
+        <img class="ss-closed" data-src="portfolio projects/WRC/web/sleeve-closed.webp" alt="" loading="lazy">
+        <img class="ss-body" data-src="portfolio projects/WRC/web/sleeve-open.webp" alt="" loading="lazy">
+        <div class="ss-top"><img data-src="portfolio projects/WRC/web/sleeve-open.webp" alt="" loading="lazy"></div>
+      </div>
+    </div>
+    <p class="wrc-tap-note">Tap to slide the book out of its sleeve.</p>
+    <p class="interjection is-long wrc-book-intro">This book is designed to teach new fans the stages of a rally weekend, the scoring system, the teams and manufacturers, vehicle specifications, and season standings.</p>
     <div class="book-embed-section">
       <div class="spread-player" id="spreadPlayerWrc">
         <img id="spreadPlayerImgWrc" data-src="portfolio projects/WRC/book-web/spread-001.jpg" alt="WRC 2026 Mid-Season &mdash; half-title page" draggable="false">
@@ -5427,12 +5776,13 @@
     <p class="interjection is-long is-tight">A web interface for Rally.TV that prioritizes live streaming. The live feed is designed to stay in view while you browse the teams, car specs, and standings.</p>
     <div class="wrc-section wrc-videos">
       <div class="wrc-video-wrap is-wide">
-        <video class="wrc-video" src="portfolio projects/WRC/web/primary-scenario.mp4" muted loop playsinline preload="none" aria-label="Scrolling through the Rally.TV website"></video>
+        <video class="wrc-video" src="portfolio projects/WRC/web/primary-scenario.mp4" data-poster="portfolio projects/WRC/web/primary-scenario-poster.jpg" muted loop playsinline preload="none" aria-label="Scrolling through the Rally.TV website"></video>
         <img class="wrc-video-cover" data-src="portfolio projects/WRC/web/primary-scenario-cover.png" alt="" aria-hidden="true">
+        <span class="wrc-video-tap">Tap to play</span>
       </div>
     </div>
     <div class="book-contact">
-      <span>&copy; Liam Jacob Kengla</span>
+      <span>Copyright 2026 Liam Kengla</span>
     </div>
   </div>
 </div>
@@ -5448,9 +5798,7 @@
       <div class="project-texts">
         <div class="pt-description">
           <h3>Project Description</h3>
-          <p style="max-width: 56ch">This proposed rebrand of Organico Bello centers the packaging around the quality and simplicity of its ingredients. Instead of following other brands that place the tomato front and center, the design leaves it off the label, allowing the product itself to stand out.</p>
-          <p style="max-width: 48ch">Made from recycled Birch paper that matches the natural color of fresh pasta, the packaging becomes a canvas for the ingredients themselves. The colors of the tomato&#8209;based ingredients visually coat the pasta&#8209;colored packaging, creating a direct connection between the food and its container. Cutouts keep the food visible, while the glass jars preserve the ingredients while, most importantly, keeping them visible from every angle. The custom label wraps frame the product rather than conceal it like a standard label.</p>
-          <p style="max-width: 51ch">Rooted in Naples&rsquo; tradition of wholesome, ingredient&#8209;first cooking, the packaging follows the same philosophy as the food itself: let the ingredients speak for themselves.</p>
+          <p style="max-width: 52ch">This proposed rebrand of Organico Bello centers the packaging around the quality and simplicity of its ingredients. Rooted in Naples&rsquo; tradition of wholesome, ingredient&#8209;first cooking, the packaging follows the same philosophy as the food itself: let the ingredients speak for themselves.</p>
         </div>
         <div>
           <h3>Design</h3><p>L.J. Kengla</p>
@@ -5474,7 +5822,10 @@
       <img data-src="portfolio projects/OrganicoBello/web/battle/jar-09.jpg" alt="Bianco DiNapoli crushed tomatoes" width="700" height="1162" loading="lazy">
       <img data-src="portfolio projects/OrganicoBello/web/battle/jar-10.jpg" alt="La San Marzano pomodori pelati" width="700" height="1167" loading="lazy">
       <img data-src="portfolio projects/OrganicoBello/web/battle/jar-11.jpg" alt="Muir Glen whole peeled" width="700" height="1169" loading="lazy">
-      <img data-src="portfolio projects/OrganicoBello/web/battle/jar-12.jpg" alt="The original Organico Bello can" width="700" height="1162" loading="lazy">
+      <figure class="ob-original">
+        <img data-src="portfolio projects/OrganicoBello/web/battle/jar-12.jpg" alt="The original Organico Bello can" width="700" height="1162" loading="lazy">
+        <figcaption>Original Organico Bello</figcaption>
+      </figure>
     </div>
     <div class="kd-part">
       <p class="interjection is-long">Instead of fighting the battle of the tomato, the product itself becomes the star and main focal point of the packaging.</p>
@@ -5596,7 +5947,9 @@
       <img data-src="portfolio projects/OrganicoBello/web/process/painting-3.jpg" alt="Painting the jar lids" width="1050" height="1400" loading="lazy" style="--ar: 0.750">
       <img data-src="portfolio projects/OrganicoBello/web/process/painting-4.jpg" alt="Painting the jar lids" width="1400" height="1050" loading="lazy" style="--ar: 1.333">
     </div>
-
+    <div class="book-contact">
+      <span>Copyright 2026 Liam Kengla</span>
+    </div>
   </div>
 </div>
 
@@ -5625,7 +5978,7 @@
       </figure>
     </div>
     <div class="book-contact">
-      <span>&copy; Liam Jacob Kengla</span>
+      <span>Copyright 2026 Liam Kengla</span>
     </div>
   </div>
 </div>
@@ -6194,7 +6547,9 @@
     // cursor crossing empty carousel on its way to a card, leaving the
     // carousel) waits for the hold to end instead, and then only starts if
     // the cursor isn't resting on a card. Each click restarts the hold.
-    const ARROW_PAUSE = 2500;
+    // Touch screens hold a little longer (no cursor resting on a card to
+    // keep it still).
+    const ARROW_PAUSE = window.matchMedia('(hover: none) and (pointer: coarse)').matches ? 3000 : 2500;
     let driftHoldUntil = 0;
     let driftHoldTimer = null;
     // An arrow click also disarms the edge-hover scroll (below): the
@@ -6532,6 +6887,22 @@
   // and the row can be longer than the strip; it then slides (centered on
   // the current spread, clamped at the ends) so only part of the book is
   // in view at a time. Without it the whole book fits the strip's width.
+  // Touch screens can't hover to pause or glide to scrub, so there the
+  // books simply play through once opened: no paging, no strip (a plain
+  // progress line instead), and the cues say so. See html.touch-player.
+  window.touchPlayer = () => window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  (function () {
+    const apply = () => {
+      const on = window.touchPlayer();
+      document.documentElement.classList.toggle('touch-player', on);
+      if (!on) return;
+      document.querySelectorAll('.player-hint').forEach((h) => { h.textContent = 'Tap to open the book and start autoplay'; });
+      document.querySelectorAll('.player-hint-playing').forEach((h) => { h.innerHTML = '<span>Full interactive playthrough available on desktop</span>'; });
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply);
+    else apply();
+  })();
+
   window.createBookStrip = function (opts) {
     const { el, count, sprite, cols, frameW, frameH, focus, gap, base, onScrub, onScrubbing } = opts;
     el.style.setProperty('--fw', frameW + 'px');
@@ -6688,7 +7059,22 @@
       update(index);
     });
     window.addEventListener('resize', () => update(index));
-    return { update };
+
+    // The plain progress line used instead of the strip on touch screens.
+    const line = document.createElement('div');
+    line.className = 'player-progress-bar strip-touch-line';
+    line.setAttribute('aria-hidden', 'true');
+    const fill = document.createElement('div');
+    fill.className = 'player-progress-fill';
+    line.appendChild(fill);
+    el.after(line);
+    const updateStrip = update;
+    return {
+      update: (i) => {
+        updateStrip(i);
+        fill.style.transform = 'scaleX(' + (i < 0 ? 0 : i / (count - 1)) + ')';
+      },
+    };
   };
 
   (function () {
@@ -7053,12 +7439,13 @@
     // outer player box instead sidesteps that entirely.
     player.addEventListener('mousemove', (e) => {
       const rect = playerImg.getBoundingClientRect();
+      if (window.touchPlayer()) return;
       paused = e.clientX >= rect.left && e.clientX <= rect.right &&
         e.clientY >= rect.top && e.clientY <= rect.bottom;
     });
     player.addEventListener('mouseleave', () => { paused = false; });
     playerImg.addEventListener('click', (e) => {
-      if (!started || timer === null) return;
+      if (window.touchPlayer() || !started || timer === null) return;
       const rect = playerImg.getBoundingClientRect();
       const ratio = (e.clientX - rect.left) / rect.width;
       if (ratio < 0.5) {
@@ -7439,12 +7826,13 @@
     // bound to the (resizing) image itself.
     player.addEventListener('mousemove', (e) => {
       const rect = playerImg.getBoundingClientRect();
+      if (window.touchPlayer()) return;
       paused = e.clientX >= rect.left && e.clientX <= rect.right &&
         e.clientY >= rect.top && e.clientY <= rect.bottom;
     });
     player.addEventListener('mouseleave', () => { paused = false; });
     playerImg.addEventListener('click', (e) => {
-      if (!started || timer === null) return;
+      if (window.touchPlayer() || !started || timer === null) return;
       const rect = playerImg.getBoundingClientRect();
       const ratio = (e.clientX - rect.left) / rect.width;
       if (ratio < 0.5) {
@@ -7787,12 +8175,13 @@
     // mouseenter/mouseleave bound to the (resizing) image itself.
     player.addEventListener('mousemove', (e) => {
       const rect = playerImg.getBoundingClientRect();
+      if (window.touchPlayer()) return;
       paused = e.clientX >= rect.left && e.clientX <= rect.right &&
         e.clientY >= rect.top && e.clientY <= rect.bottom;
     });
     player.addEventListener('mouseleave', () => { paused = false; });
     playerImg.addEventListener('click', (e) => {
-      if (!started || timer === null) return;
+      if (window.touchPlayer() || !started || timer === null) return;
       const rect = playerImg.getBoundingClientRect();
       const ratio = (e.clientX - rect.left) / rect.width;
       if (ratio < 0.5) {
@@ -8508,12 +8897,13 @@
     player.addEventListener('click', openCoverAndPlay);
     player.addEventListener('mousemove', (e) => {
       const rect = playerImg.getBoundingClientRect();
+      if (window.touchPlayer()) return;
       paused = e.clientX >= rect.left && e.clientX <= rect.right &&
         e.clientY >= rect.top && e.clientY <= rect.bottom;
     });
     player.addEventListener('mouseleave', () => { paused = false; });
     playerImg.addEventListener('click', (e) => {
-      if (!started || timer === null) return;
+      if (window.touchPlayer() || !started || timer === null) return;
       const rect = playerImg.getBoundingClientRect();
       const ratio = (e.clientX - rect.left) / rect.width;
       if (ratio < 0.5) {
@@ -8576,18 +8966,54 @@
     const sleeveSwap = modal.querySelector('.sleeve-swap');
     if (sleeveSwap) {
       sleeveSwap.addEventListener('click', () => sleeveSwap.classList.toggle('is-closed'));
+      // Phones show only this sleeve, so it starts closed and a tap
+      // slides the book out.
+      if (window.matchMedia('(max-width: 640px)').matches) sleeveSwap.classList.add('is-closed');
     }
+
+    // Phones: one poster large with the other three under it; tapping a
+    // small one swaps the two (the large spot is always first in the grid).
+    modal.querySelectorAll('.wrc-posters').forEach((grid) => {
+      grid.addEventListener('click', (e) => {
+        const img = e.target.closest('img');
+        if (!img || !window.matchMedia('(max-width: 640px)').matches) return;
+        const big = grid.firstElementChild;
+        if (img === big) return;
+        const marker = document.createComment('');
+        img.replaceWith(marker);
+        big.replaceWith(img);
+        marker.replaceWith(big);
+      });
+    });
 
     // Site recordings play muted on a loop, only while they're on screen
     // (nothing downloads until they're scrolled to).
+    // Phones can refuse to autoplay (Low Power Mode, data saver): the
+    // first frame stays up as a poster and a tap starts it instead.
     const videos = [...modal.querySelectorAll('.wrc-video')];
+    const tryPlay = (v) => {
+      const wrap = v.closest('.wrc-video-wrap');
+      v.play().then(() => wrap.classList.remove('needs-tap')).catch(() => wrap.classList.add('needs-tap'));
+    };
     const videoObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting && modal.classList.contains('open')) entry.target.play().catch(() => {});
+        if (entry.isIntersecting && modal.classList.contains('open')) tryPlay(entry.target);
         else entry.target.pause();
       });
     }, { root: galleryScroll, threshold: 0.25 });
-    videos.forEach((v) => videoObserver.observe(v));
+    // The poster loads a screen or two ahead of the video.
+    const posterObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting || !entry.target.dataset.poster) return;
+        entry.target.poster = entry.target.dataset.poster;
+        delete entry.target.dataset.poster;
+      });
+    }, { root: galleryScroll, rootMargin: '1500px 0px' });
+    videos.forEach((v) => {
+      videoObserver.observe(v);
+      posterObserver.observe(v);
+      v.closest('.wrc-video-wrap').addEventListener('click', () => { if (v.paused) tryPlay(v); });
+    });
 
     // The custom typeface, typing: WORLD RALLY CHAMPIONSHIP, backspaced,
     // then ENJOY, on a loop while the panel is on screen. Each glyph is a

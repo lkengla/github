@@ -52,3 +52,6 @@ wrong.png
 
 # Organico Bello source material (1.2GB slideshow, raw photos); the page uses web copies in OrganicoBello/web/.
 portfolio projects/OrganicoBello/new info /
+
+# Local phone preview server, not part of the site
+serve-phone.py
