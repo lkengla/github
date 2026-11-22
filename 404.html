@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Liam Kengla &mdash; Graphic Designer</title>
+<script>
+  // GitHub Pages serves this for any address without a file, like /wrc.
+  // It hands the address to the homepage as ?p=wrc; the homepage puts the
+  // address back and opens that page (see the top of index.html). On a
+  // github.io project site the first folder is the site's root.
+  (function () {
+    var l = location;
+    var depth = /\.github\.io$/.test(l.hostname) ? 1 : 0;
+    var base = l.pathname.split('/').slice(0, depth + 1).join('/') + '/';
+    var rest = l.pathname.slice(base.length);
+    l.replace(base + '?p=' + encodeURIComponent(rest) + l.hash);
+  })();
+</script>
+</head>
+<body></body>
+</html>

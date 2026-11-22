@@ -2,6 +2,24 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>
+  // Addresses (see the router at the end of the page). Runs before anything
+  // loads: a direct link that GitHub Pages bounced through 404.html arrives
+  // as ?p=wrc and is put back to /wrc; a trailing slash is dropped (so the
+  // page's relative paths still resolve); and the page named in the address
+  // is noted so the intro can step aside for it.
+  (function () {
+    var ROUTES = ['wrc', 'organicobello', 'kodak', 'ourworkisneverdone', 'oldnewmensclub', 'stylesmakefights', 'sandiegofc', 'artdivision', 'about', 'playground'];
+    var l = location, q = new URLSearchParams(l.search).get('p');
+    try {
+      if (q !== null) history.replaceState(null, '', l.pathname + q.replace(/\/+$/, '') + l.hash);
+      else if (l.protocol !== 'file:' && /[^/]\/+$/.test(l.pathname)) history.replaceState(null, '', l.pathname.replace(/\/+$/, '') + l.search + l.hash);
+    } catch (e) {}
+    var seg = l.protocol === 'file:' ? (l.hash.match(/^#\/([^/?#]+)/) || [])[1] : l.pathname.split('/').pop();
+    seg = (seg || '').toLowerCase();
+    window.__route = ROUTES.indexOf(seg) >= 0 ? seg : '';
+  })();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Liam Kengla &mdash; Graphic Designer</title>
 <link rel="icon" type="image/png" href="Liam-Kengla-Logo-Assets/favicon.png">
@@ -2435,6 +2453,429 @@
     height: auto;
   }
 
+  /* Rally.TV site in motion, recreating the recorded walkthrough: one
+     MacBook Air (the Kodak bezel) touring the finished pages in the order
+     of the recording, each a 1280 x 832 "world" in Figma pixels scaled to
+     the screen (--k). Layers: the rally clip pinned exactly as the Figma
+     BG-VIDEO-FOLDER pins it (sticky inside the folder, clipped to it), then
+     each page with its 85% white, the standings chart's race columns
+     sliding in their own window, and the logo dot. Pages dissolve into
+     each other. Driven by the script near the end. */
+  #wrcModal .rtv-tour-wrap {
+    padding: 0 var(--margin);
+  }
+
+  #wrcModal .rtv-tour {
+    width: min(100%, calc(84vh * 3205 / 1941));
+    margin: 0 auto;
+  }
+
+  .rtv-view {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .rtv-world {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1280px;
+    transform-origin: 0 0;
+    will-change: transform, opacity;
+  }
+
+  .rtv-world > * {
+    position: absolute;
+    left: 0;
+  }
+
+  .rtv-folder {
+    top: 80px;
+    width: 1280px;
+    overflow: hidden;
+  }
+
+  .rtv-folder video,
+  .rtv-folder .rtv-white {
+    position: absolute;
+    left: 0;
+    width: 1280px;
+  }
+
+  .rtv-folder video {
+    height: 938px;
+    object-fit: cover;
+    background: #888;
+  }
+
+  .rtv-folder .rtv-white {
+    height: 980px;
+    background: rgba(255, 255, 255, 0.85);
+  }
+
+  .rtv-page {
+    top: 0;
+    width: 1280px;
+    display: block;
+  }
+
+  .rtv-chart {
+    left: 268px;
+    top: 160px;
+    width: 972px;
+    overflow: hidden;
+  }
+
+  .rtv-chart img {
+    display: block;
+    width: 1673px;
+    height: 100%;
+    will-change: transform;
+  }
+
+  /* The header logo's dot, the same 2s loop as the Rally.TV R. above. */
+  .rtv-world .rtv-pdot {
+    --rtv-x: -0.071;
+    --rtv-y: -0.643;
+    left: 20px;
+    top: 56px;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #ee2527;
+    transform: translate(calc(var(--rtv-x) * 1px), calc(var(--rtv-y) * 1px));
+    animation: rtv-dot 2s linear infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .rtv-world .rtv-pdot { animation: none; }
+  }
+
+  /* Before and after, on a loop like Kodak's: the original FIA mark alone,
+     the new WRC logo sweeps over it in the same spot, the two part to sit
+     side by side, hold, come back together and the sweep returns. BEFORE and
+     AFTER labels (Kodak's tag style) ride under whichever logo is showing,
+     so it reads at any moment. 11s; sizes are shares of a 16:9 frame. */
+  #wrcModal .wrc-ba {
+    position: relative;
+    width: min(100%, calc(58vh * 16 / 9));
+    aspect-ratio: 16 / 6;
+    margin: 0 auto;
+  }
+
+  /* The logo line sits close under the before/after: one group. */
+  #wrcModal .interjection.is-near {
+    padding-top: 72px;
+  }
+
+  #wrcModal .ba-spot,
+  #wrcModal .ba-line {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 29.2%;
+    height: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  #wrcModal .ba-spot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: 11s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+
+  #wrcModal .ba-spot img {
+    display: block;
+    width: auto;
+    max-width: none;
+  }
+
+  #wrcModal .ba-old { animation-name: ba-old; }
+  #wrcModal .ba-old img { height: 83.3%; }
+  #wrcModal .ba-new { animation-name: ba-new; }
+  #wrcModal .ba-new img { height: 62.5%; }
+
+  #wrcModal .ba-line {
+    pointer-events: none;
+  }
+
+  #wrcModal .ba-line::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 2px;
+    margin-left: -1px;
+    background: var(--ink);
+    opacity: 0;
+    animation: ba-line 11s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+
+  #wrcModal .ba-tag {
+    position: absolute;
+    top: 80%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 13px;
+    line-height: 1.45;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    opacity: 0;
+    animation: 11s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+
+  #wrcModal .ba-tag.is-before { animation-name: ba-tag-before; }
+  #wrcModal .ba-tag.is-after { animation-name: ba-tag-after; }
+
+  @keyframes ba-old {
+    0%, 9.09% { left: 50%; opacity: 1; clip-path: inset(0 0 0 0); }
+    21.82%, 27.27% { left: 50%; opacity: 1; clip-path: inset(0 0 0 100%); }
+    27.28% { left: 50%; opacity: 0; clip-path: inset(0 0 0 0); }
+    40%, 70.91% { left: 31%; opacity: 1; clip-path: inset(0 0 0 0); }
+    81.82% { left: 50%; opacity: 0; clip-path: inset(0 0 0 0); }
+    81.83% { left: 50%; opacity: 1; clip-path: inset(0 0 0 100%); }
+    94.55%, 100% { left: 50%; opacity: 1; clip-path: inset(0 0 0 0); }
+  }
+
+  @keyframes ba-new {
+    0%, 9.09% { left: 50%; clip-path: inset(0 100% 0 0); }
+    21.82%, 27.27% { left: 50%; clip-path: inset(0 0 0 0); }
+    40%, 70.91% { left: 69%; clip-path: inset(0 0 0 0); }
+    81.82% { left: 50%; clip-path: inset(0 0 0 0); }
+    94.55%, 100% { left: 50%; clip-path: inset(0 100% 0 0); }
+  }
+
+  @keyframes ba-line {
+    0%, 9.09% { left: 0%; opacity: 0; }
+    9.1% { left: 0%; opacity: 1; }
+    21.81% { left: 100%; opacity: 1; }
+    21.82%, 81.82% { left: 100%; opacity: 0; }
+    81.83% { left: 100%; opacity: 1; }
+    94.54% { left: 0%; opacity: 1; }
+    94.55%, 100% { left: 0%; opacity: 0; }
+  }
+
+  /* BEFORE: under the old mark while it shows, off while the new one
+     covers it, back with it at the left, gone as they rejoin, back as the
+     sweep returns it. AFTER: in as the new logo arrives, rides it right,
+     out as the sweep takes it away. */
+  @keyframes ba-tag-before {
+    0%, 9.09% { left: 50%; opacity: 1; }
+    16% { left: 50%; opacity: 0; }
+    27.27% { left: 50%; opacity: 0; }
+    40%, 70.91% { left: 31%; opacity: 1; }
+    78% { left: 45%; opacity: 0; }
+    81.82% { left: 50%; opacity: 0; }
+    90%, 100% { left: 50%; opacity: 1; }
+  }
+
+  @keyframes ba-tag-after {
+    0%, 12% { left: 50%; opacity: 0; }
+    21.82%, 27.27% { left: 50%; opacity: 1; }
+    40%, 70.91% { left: 69%; opacity: 1; }
+    81.82% { left: 50%; opacity: 1; }
+    88%, 100% { left: 50%; opacity: 0; }
+  }
+
+  /* Still: just the pair, side by side, labelled. */
+  @media (prefers-reduced-motion: reduce) {
+    #wrcModal .ba-spot,
+    #wrcModal .ba-tag,
+    #wrcModal .ba-line::after { animation: none; }
+    #wrcModal .ba-old, #wrcModal .ba-tag.is-before { left: 31%; opacity: 1; }
+    #wrcModal .ba-new, #wrcModal .ba-tag.is-after { left: 69%; opacity: 1; }
+  }
+
+  /* Logos: the WRC mark on grey, the Rally.TV mark on its red, then
+     each one in motion in the cell below it. */
+  #wrcModal {
+    --wrc-grey: #2a2a2a;
+    --rtv-red: #ee2527;
+  }
+
+  #wrcModal .wrc-logos {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--wrc-gap);
+  }
+
+  #wrcModal .wrc-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 3 / 2;
+    background: var(--wrc-grey);
+  }
+
+  #wrcModal .wrc-logo.is-rtv {
+    background: var(--rtv-red);
+  }
+
+  /* A touch smaller, and capped so they don't balloon on big monitors. */
+  #wrcModal .wrc-logo > img,
+  .wrc-run {
+    width: min(54%, 540px);
+    height: auto;
+  }
+
+  /* The R. PNG carries transparent margin around the mark; at 36% (max
+     360px) the mark matches the animated one. */
+  #wrcModal .wrc-logo.is-rtv > img {
+    width: min(36%, 360px);
+  }
+
+  /* WRC in motion, the same move as the R.: the PNG with an SVG laid
+     exactly over it, in the PNG's own pixels. A track runs down the middle
+     of the red R's stroke; a grey dot (the panel's colour) drives it one
+     way, start to tip, then pauses, so it reads as a gap running through
+     the R. Driven by the script near the end. */
+  .wrc-run {
+    position: relative;
+  }
+
+  .wrc-run img,
+  .wrc-run svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .wrc-run svg {
+    position: absolute;
+    inset: 0;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .wrc-run .track {
+    fill: none;
+    stroke: none;
+  }
+
+  .wrc-run .car {
+    fill: var(--wrc-grey);
+  }
+
+  /* The mark is drawn in Figma units (58.552 x 41.001); --u is one unit,
+     so the dot's keyframes scale with the mark at any size. */
+  @property --rtv-x { syntax: '<number>'; initial-value: 0; inherits: false; }
+  @property --rtv-y { syntax: '<number>'; initial-value: 0; inherits: false; }
+
+  .rtv-mark {
+    container-type: inline-size;
+    position: relative;
+    width: min(29.5%, 295px); /* the R. PNG's mark: 0.819 of its width */
+    aspect-ratio: 58.552 / 41.001;
+  }
+
+  .rtv-mark > img {
+    --u: calc(100cqw / 58.552);
+    position: absolute;
+    display: block;
+    max-width: none;
+  }
+
+  .rtv-mark .rtv-r {
+    left: 0;
+    top: 0;
+    width: calc(40.687 * var(--u));
+    height: calc(40.7743 * var(--u));
+  }
+
+  /* The period is off for the first second, on for the second. */
+  .rtv-mark .rtv-period {
+    left: calc(42.874 * var(--u));
+    top: calc(25.064 * var(--u));
+    width: calc(15.6793 * var(--u));
+    height: calc(15.7126 * var(--u));
+    animation: rtv-period 2s linear infinite;
+  }
+
+  /* A red dot drives the R: up the stem, across the top, round the
+     bowl, down the leg, then back the same way. 2s loop, from the
+     Rally.TV header in Figma. */
+  .rtv-mark .rtv-dot {
+    --rtv-x: -0.071;
+    --rtv-y: -0.643;
+    left: 0;
+    top: calc(36 * var(--u));
+    width: calc(5 * var(--u));
+    height: calc(5 * var(--u));
+    transform: translate(calc(var(--rtv-x) * var(--u)), calc(var(--rtv-y) * var(--u)));
+    animation: rtv-dot 2s linear infinite;
+  }
+
+  @keyframes rtv-period {
+    0% { animation-timing-function: step-end; opacity: 0; }
+    50% { animation-timing-function: step-end; opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  @keyframes rtv-dot {
+    0% { --rtv-x: -0.071; --rtv-y: -0.643; }
+    10.51% { --rtv-x: -0.071; --rtv-y: -28.857; }
+    12.505% { --rtv-x: 1.143; --rtv-y: -34.071; }
+    13.34% { --rtv-x: 2.929; --rtv-y: -35.429; }
+    14.58% { --rtv-x: 6.214; --rtv-y: -36; }
+    22.83% { --rtv-x: 28.357; --rtv-y: -36.071; }
+    24.47% { --rtv-x: 32.714; --rtv-y: -35.429; }
+    25.51% { --rtv-x: 34.786; --rtv-y: -33.571; }
+    26.68% { --rtv-x: 35.5; --rtv-y: -30.5; }
+    28.21% { --rtv-x: 33.929; --rtv-y: -26.714; }
+    29.725% { --rtv-x: 30.071; --rtv-y: -25.429; }
+    35.93% { --rtv-x: 13.429; --rtv-y: -24.786; }
+    36.785% { --rtv-x: 11.571; --rtv-y: -23.429; }
+    38.135% { --rtv-x: 10.929; --rtv-y: -19.857; }
+    39.435% { --rtv-x: 12.571; --rtv-y: -16.786; }
+    50% { --rtv-x: 35.643; --rtv-y: -0.286; }
+    60.565% { --rtv-x: 12.571; --rtv-y: -16.786; }
+    61.865% { --rtv-x: 10.929; --rtv-y: -19.857; }
+    63.215% { --rtv-x: 11.571; --rtv-y: -23.429; }
+    64.07% { --rtv-x: 13.429; --rtv-y: -24.786; }
+    70.275% { --rtv-x: 30.071; --rtv-y: -25.429; }
+    71.79% { --rtv-x: 33.929; --rtv-y: -26.714; }
+    73.32% { --rtv-x: 35.5; --rtv-y: -30.5; }
+    74.49% { --rtv-x: 34.786; --rtv-y: -33.571; }
+    75.53% { --rtv-x: 32.714; --rtv-y: -35.429; }
+    77.17% { --rtv-x: 28.357; --rtv-y: -36.071; }
+    85.42% { --rtv-x: 6.214; --rtv-y: -36; }
+    86.66% { --rtv-x: 2.929; --rtv-y: -35.429; }
+    87.495% { --rtv-x: 1.143; --rtv-y: -34.071; }
+    89.49% { --rtv-x: -0.071; --rtv-y: -28.857; }
+    100% { --rtv-x: -0.071; --rtv-y: -0.643; }
+  }
+
+  /* Still: the whole mark, period on, no dot. */
+  @media (prefers-reduced-motion: reduce) {
+    .rtv-mark .rtv-period { animation: none; opacity: 1; }
+    .rtv-mark .rtv-dot { display: none; }
+  }
+
+  /* Still: the whole marks, no dots. */
+  @media (prefers-reduced-motion: reduce) {
+    .wrc-run .car { display: none; }
+  }
+
+  /* Phones: one column, each mark followed by its motion. */
+  @media (max-width: 640px) {
+    #wrcModal .wrc-logos {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    #wrcModal .wrc-logos > :nth-child(2) {
+      order: 1;
+    }
+
+    #wrcModal .wrc-logos > :nth-child(4) {
+      order: 2;
+    }
+  }
+
   /* Typing: WORLD RALLY CHAMPIONSHIP, backspaced, then ENJOY. Black
      panel, white glyphs; two lines tall so nothing shifts as it types. */
   .type-stage {
@@ -3081,6 +3522,9 @@
     padding: 0;
     border: 0;
     background: none;
+    color: var(--ink);
+    -webkit-appearance: none;
+    appearance: none;
     cursor: pointer;
   }
 
@@ -3127,8 +3571,17 @@
     letter-spacing: 0.06em;
   }
 
+  .ob-original figcaption strong,
+  .ob-original figcaption span {
+    display: block;
+  }
+
+  .ob-original figcaption span {
+    font-weight: 400;
+  }
+
   .ob-battle {
-    padding-bottom: 48px;
+    padding-bottom: 64px;
   }
 
   @media (max-width: 900px) {
@@ -3152,7 +3605,11 @@
     }
 
     .ob-original figcaption {
-      font-size: 11px;
+      left: 50%;
+      right: auto;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      font-size: 10px;
       top: calc(100% + 10px);
     }
   }
@@ -3576,6 +4033,11 @@
     .about-intro {
       grid-template-columns: 1fr;
       row-gap: 48px;
+    }
+
+    /* One column: the photo first, then "I am half my father." */
+    .about-portrait {
+      order: -1;
     }
 
     .about-portrait {
@@ -4679,6 +5141,59 @@
       bottom: 35px;
     }
   }
+
+  /* Organico Bello on phones: one jar per row, larger. Notes have a hover
+     wording and a touch wording; html.touch-player picks one. */
+  .kd-note .for-touch,
+  html.touch-player .kd-note .for-hover {
+    display: none;
+  }
+
+  html.touch-player .kd-note .for-touch {
+    display: inline;
+  }
+
+  .ob-pasta-note {
+    margin: 16px 0 0;
+  }
+
+  @media (max-width: 640px) {
+    .ob-spins {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    /* Back labels: the oregano full width, the other two side by side. */
+    .ob-backs {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .ob-backs img:first-child {
+      grid-column: 1 / -1;
+    }
+
+    /* Homepage: no fade at the carousel's top and bottom, a clean cut
+       like the desktop's header edge. Arrows and copyright sit lower,
+       just above the browser's bar. */
+    body.carousel-vertical .carousel {
+      mask-image: none;
+      -webkit-mask-image: none;
+      clip-path: inset(0);
+    }
+
+    body.carousel-vertical main {
+      padding-bottom: 48px;
+    }
+
+    .controls {
+      bottom: 8px;
+    }
+
+    .site-copyright {
+      bottom: 19px;
+    }
+  }
+
 </style>
 </head>
 <body>
@@ -4687,7 +5202,8 @@
   // The intro (playIntro, after the header) plays on every load unless the
   // visitor prefers reduced motion. Flagged here, before the header is
   // drawn, so the page never flashes in first.
-  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  // A link straight to a page (/wrc, /about...) skips it and opens that page.
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && !window.__route) {
     document.documentElement.classList.add('intro');
     document.body.style.overflow = 'hidden';
   }
@@ -5674,6 +6190,39 @@
         </div>
       </div>
     </div>
+    <p class="interjection is-long">A modernized mark that stays legible at any size, built from the shape language of racing rather than a literal car and checkered flag.</p>
+    <div class="wrc-section">
+      <div class="wrc-ba" role="img" aria-label="The original FIA World Rally Championship logo, replaced by the new WRC logo, then the two side by side">
+        <div class="ba-spot ba-old"><img data-src="portfolio projects/WRC/web/logos/old-logo.png" alt="" width="428" height="486"></div>
+        <div class="ba-spot ba-new"><img data-src="portfolio projects/WRC/web/logos/wrc-logo-black-red.png" alt="" width="1600" height="717"></div>
+        <div class="ba-line" aria-hidden="true"></div>
+        <span class="ba-tag is-before" aria-hidden="true">Before</span>
+        <span class="ba-tag is-after" aria-hidden="true">After</span>
+      </div>
+    </div>
+    <p class="interjection is-long is-near">A companion mark for Rally.TV, the championship's streaming platform, drawn from the same system as the WRC logo and the custom typeface.</p>
+    <div class="wrc-section">
+      <div class="wrc-logos">
+        <div class="wrc-logo"><img data-src="portfolio projects/WRC/logos/full logo WRC copy.png" alt="WRC logo, FIA World Rally Championship" width="4589" height="2058" loading="lazy"></div>
+        <div class="wrc-logo is-rtv"><img data-src="portfolio projects/WRC/logos/r.-logo copy.png" alt="Rally.TV logo, the R." width="3000" height="3000" loading="lazy"></div>
+        <div class="wrc-logo" role="img" aria-label="The WRC logo animated: a dot drives along the red R and back">
+          <div class="wrc-run" data-wrc-run aria-hidden="true">
+            <img data-src="portfolio projects/WRC/logos/full logo WRC copy.png" alt="" width="4589" height="2058">
+            <svg viewBox="0 0 4589 2058" preserveAspectRatio="none">
+              <path class="track" d="M1607.6 95.5 L2497.8 95.5 A343.2 343.2 0 0 1 2497.8 782 L1977 782 A175 175 0 0 0 1915.5 1120.9 L2841 1468"/>
+              <circle class="car" cx="1607.6" cy="95.5" r="100" style="visibility: hidden"/>
+            </svg>
+          </div>
+        </div>
+        <div class="wrc-logo is-rtv" role="img" aria-label="The Rally.TV logo animated: a dot drives along the R and back as the period appears">
+          <div class="rtv-mark" aria-hidden="true">
+            <img class="rtv-r" data-src="portfolio projects/WRC/web/logo-motion/rtv-r.svg" alt="">
+            <img class="rtv-period" data-src="portfolio projects/WRC/web/logo-motion/rtv-period.svg" alt="">
+            <img class="rtv-dot" data-src="portfolio projects/WRC/web/logo-motion/rtv-dot.svg" alt="">
+          </div>
+        </div>
+      </div>
+    </div>
     <p class="interjection is-long">A custom display typeface for WRC and Rally.TV, designed to resemble the linework of rally stage segments and racing iconography.</p>
     <div class="wrc-section">
       <div class="type-stage" id="typeStage" aria-label="World Rally Championship, typed in the custom typeface" role="img">
@@ -5774,12 +6323,8 @@
     <p class="interjection is-long">Highlighted spreads showing the team rosters, vehicle specifications, race winners, and mid&#8209;season standings from the book.</p>
     <div class="wrc-spreads" id="wrcSpreads"></div>
     <p class="interjection is-long is-tight">A web interface for Rally.TV that prioritizes live streaming. The live feed is designed to stay in view while you browse the teams, car specs, and standings.</p>
-    <div class="wrc-section wrc-videos">
-      <div class="wrc-video-wrap is-wide">
-        <video class="wrc-video" src="portfolio projects/WRC/web/primary-scenario.mp4" data-poster="portfolio projects/WRC/web/primary-scenario-poster.jpg" muted loop playsinline preload="none" aria-label="Scrolling through the Rally.TV website"></video>
-        <img class="wrc-video-cover" data-src="portfolio projects/WRC/web/primary-scenario-cover.png" alt="" aria-hidden="true">
-        <span class="wrc-video-tap">Tap to play</span>
-      </div>
+    <div class="wrc-section rtv-tour-wrap">
+      <div class="dev dev-laptop rtv-tour" id="rtvTour" role="img" aria-label="The Rally.TV website on a laptop: Rally Winners, the championship, Super Sunday and Wolf Power Stage standings, and the drivers, with the live rally feed behind every page"><div class="dev-screen"><div class="rtv-view"></div></div><img class="dev-frame" data-src="portfolio projects/Kodak/web/devices/laptop.webp?v=2" alt="" width="2000" height="1211"></div>
     </div>
     <div class="book-contact">
       <span>Copyright 2026 Liam Kengla</span>
@@ -5824,7 +6369,7 @@
       <img data-src="portfolio projects/OrganicoBello/web/battle/jar-11.jpg" alt="Muir Glen whole peeled" width="700" height="1169" loading="lazy">
       <figure class="ob-original">
         <img data-src="portfolio projects/OrganicoBello/web/battle/jar-12.jpg" alt="The original Organico Bello can" width="700" height="1162" loading="lazy">
-        <figcaption>Original Organico Bello</figcaption>
+        <figcaption><strong>Organico Bello</strong><span>Original Packaging</span></figcaption>
       </figure>
     </div>
     <div class="kd-part">
@@ -5835,7 +6380,7 @@
     </div>
     <div class="kd-part">
       <p class="interjection is-long">A unique label system that lets you view the product from 360 degrees at all times.</p>
-      <span class="kd-note">Hover over a jar to turn it.</span>
+      <span class="kd-note"><span class="for-hover">Hover over a jar to turn it.</span><span class="for-touch">Each jar turns on its own. Tap the arrows to turn one by hand.</span></span>
     </div>
     <div class="ob-spins">
         <figure class="ob-spin" data-frames='["portfolio projects/OrganicoBello/web/OB-bruschetta_spread-front.webp", "portfolio projects/OrganicoBello/web/OB-bruschetta_spread-right.webp", "portfolio projects/OrganicoBello/web/OB-bruschetta_spread-back.webp", "portfolio projects/OrganicoBello/web/OB-bruschetta_spread-left.webp", "portfolio projects/OrganicoBello/web/OB-bruschetta_spread-top.webp"]'>
@@ -5865,7 +6410,6 @@
     </div>
     <div class="kd-part">
       <p class="interjection is-long">A custom pasta bag, intentionally undersized to save on packaging, creating a tactile experience where you can feel the rough cuts of the pasta through the bag.</p>
-      <span class="kd-note">Click an angle to turn the bag.</span>
     </div>
     <div class="ob-viewer" id="obPasta">
       <div class="ob-view">
@@ -5878,6 +6422,7 @@
           <img data-src="portfolio projects/OrganicoBello/web/hand models/OB-penne_rigate-right-hand_model.webp" alt="Penne Rigate bag, in hand, side" width="2880" height="1800">
       </div>
       <div class="kd-tabs" aria-label="Viewing angle"><button type="button" class="on">Front</button><button type="button">Right Side</button><button type="button">Back</button><button type="button">Left Side</button><button type="button">Top</button><button type="button">In Hand 1</button><button type="button">In Hand 2</button></div>
+      <p class="kd-note ob-pasta-note"><span class="for-hover">Click an angle to turn the bag.</span><span class="for-touch">Tap an angle to hold it.</span></p>
     </div>
     <div class="kd-part">
       <p class="interjection is-long">Recycled paper the color of fresh pasta, so the sauces visually coat the packaging the way sauce coats pasta.</p>
@@ -5894,9 +6439,9 @@
       <p class="interjection is-long">Custom icons, modeled on the USDA Organic seal, mark the common additives people look to avoid on the back of every package.</p>
     </div>
     <div class="ob-backs">
+      <img data-src="portfolio projects/OrganicoBello/web/OB-italian_oregano-back.webp" alt="Sicilian Oregano, back label with additive-free icons" width="1600" height="1600" loading="lazy">
       <img data-src="portfolio projects/OrganicoBello/web/OB-vodka_sauce-back.webp" alt="Vodka Tomato Sauce, back label with additive-free icons" width="1600" height="1600" loading="lazy">
       <img data-src="portfolio projects/OrganicoBello/web/OB-bruschetta_spread-back.webp" alt="Bruschetta Spread, back label with additive-free icons" width="1600" height="1600" loading="lazy">
-      <img data-src="portfolio projects/OrganicoBello/web/OB-tomato_bouillon-back.webp" alt="Tomato Bouillon, wraparound label with additive-free icons" width="1600" height="1600" loading="lazy">
     </div>
     <div class="kd-part">
       <p class="interjection is-long">Comforting. Rich. Nostalgic. Flavorful. Spirited. Italian.</p>
@@ -8432,6 +8977,11 @@
     const scroll = document.getElementById('productScroll');
     const carouselControls = document.querySelector('.controls');
     const SPIN_FRAME_MS = 700;
+    // Touch screens: the jars and the pasta bag turn on their own, one
+    // angle every OB_AUTO_MS while on screen. Tapping a jar's arrows (or
+    // an angle) holds that one still until OB_HOLD_MS after the last tap.
+    const OB_AUTO_MS = 1500;
+    const OB_HOLD_MS = 3000;
 
     modal.querySelectorAll('.ob-spin').forEach((card) => {
       const frames = JSON.parse(card.dataset.frames);
@@ -8454,9 +9004,18 @@
       // chevron clickers as the homepage carousel); using them stops the
       // hover turn until the pointer leaves the jar.
       let manual = false;
-      card.addEventListener('mouseenter', () => { if (!manual) start(); });
-      card.addEventListener('mouseleave', () => { manual = false; stop(); });
-      card.querySelector('.ob-photo').addEventListener('click', () => { if (timer) stop(); else start(); });
+      card.addEventListener('mouseenter', () => { if (!manual && !window.touchPlayer()) start(); });
+      card.addEventListener('mouseleave', () => { manual = false; if (!window.touchPlayer()) stop(); });
+      card.querySelector('.ob-photo').addEventListener('click', () => {
+        if (window.touchPlayer()) return;
+        if (timer) stop(); else start();
+      });
+      // Touch screens (see the autoplay below): one angle per call.
+      card.obStep = () => {
+        if (!warmed) { warmed = true; frames.forEach((src) => { new Image().src = src; }); }
+        i = (i + 1) % frames.length;
+        img.src = frames[i];
+      };
       card.querySelectorAll('.ob-step').forEach((button) => {
         button.appendChild(window.makeClicker(button, +button.dataset.dir));
         button.addEventListener('click', (e) => {
@@ -8468,6 +9027,7 @@
           if (!warmed) { warmed = true; frames.forEach((src) => { new Image().src = src; }); }
           i = (i + +button.dataset.dir + frames.length) % frames.length;
           img.src = frames[i];
+          card.obHeldUntil = performance.now() + OB_HOLD_MS;
         });
       });
     });
@@ -8475,10 +9035,30 @@
     const viewer = document.getElementById('obPasta');
     const views = [...viewer.querySelectorAll('.ob-view img')];
     const angleButtons = [...viewer.querySelectorAll('.kd-tabs button')];
-    angleButtons.forEach((button, i) => button.addEventListener('click', () => {
+    let angle = 0;
+    function showAngle(i) {
+      angle = i;
       views.forEach((v, j) => v.classList.toggle('on', j === i));
       angleButtons.forEach((b, j) => b.classList.toggle('on', j === i));
+    }
+    angleButtons.forEach((button, i) => button.addEventListener('click', () => {
+      showAngle(i);
+      viewer.obHeldUntil = performance.now() + OB_HOLD_MS;
     }));
+    viewer.obStep = () => showAngle((angle + 1) % views.length);
+
+    const autoTurners = [...modal.querySelectorAll('.ob-spin'), viewer];
+    const onScreen = new Set();
+    const turnIo = new IntersectionObserver((entries) => entries.forEach((e) => {
+      if (e.isIntersecting) onScreen.add(e.target); else onScreen.delete(e.target);
+    }), { root: scroll, threshold: 0.5 });
+    autoTurners.forEach((el) => turnIo.observe(el));
+    setInterval(() => {
+      if (!window.touchPlayer() || !modal.classList.contains('open') ||
+          matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const now = performance.now();
+      onScreen.forEach((el) => { if (!(el.obHeldUntil > now)) el.obStep(); });
+    }, OB_AUTO_MS);
 
     function openProducts() {
       modal.classList.add('open');
@@ -9804,5 +10384,367 @@
   })();
 </script>
 
+<script>
+  // WRC logo in motion. One dot on a track down the middle of the red R's
+  // stroke (traced from the PNG, in its pixels). One way only: it drives in
+  // off the R's top end, runs the whole letter in 1s (the R.'s pace) and
+  // out past the tip of the leg, then the R sits whole for a short pause
+  // before the next run. Off the stroke the dot is grey on grey, so it
+  // only shows inside the R. Runs only while it is on screen.
+  (function () {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.querySelectorAll('[data-wrc-run]').forEach((run) => {
+      const track = run.querySelector('.track');
+      const car = run.querySelector('.car');
+      const RUN = 1000, PAUSE = 900, LOOP = RUN + PAUSE;
+      const OFF = 110; // start and finish just past each end of the R
+      let len = 0, a, b, da, db, raf = 0, t0 = 0, visible = false;
+
+      function measure() {
+        len = track.getTotalLength();
+        a = track.getPointAtLength(0); const a2 = track.getPointAtLength(1);
+        b = track.getPointAtLength(len); const b2 = track.getPointAtLength(len - 1);
+        da = [a.x - a2.x, a.y - a2.y]; db = [b.x - b2.x, b.y - b2.y];
+      }
+
+      function frame(now) {
+        if (!len) measure();
+        if (!t0) t0 = now;
+        const t = (now - t0) % LOOP;
+        const on = t < RUN;
+        car.style.visibility = on ? 'visible' : 'hidden';
+        if (on) {
+          const s = (t / RUN) * (len + 2 * OFF) - OFF;
+          let x, y;
+          if (s < 0) { x = a.x - da[0] * s; y = a.y - da[1] * s; }
+          else if (s > len) { x = b.x + db[0] * (s - len); y = b.y + db[1] * (s - len); }
+          else { const p = track.getPointAtLength(s); x = p.x; y = p.y; }
+          car.setAttribute('cx', x.toFixed(1));
+          car.setAttribute('cy', y.toFixed(1));
+        }
+        raf = visible ? requestAnimationFrame(frame) : 0;
+      }
+
+      new IntersectionObserver(([e]) => {
+        visible = e.isIntersecting;
+        if (visible && !raf) raf = requestAnimationFrame(frame);
+      }).observe(run);
+    });
+  })();
+</script>
+<script>
+  // Rally.TV site in motion: one laptop touring the finished pages the way
+  // the recorded walkthrough does. Each page is a world in Figma pixels
+  // (1280 wide; the screen shows 1280 x 832), scaled to fit. The rally clip
+  // is one shared layer under every page, pinned like Figma's sticky
+  // BG-VIDEO-FOLDER (held at the top of the screen, clipped to the folder,
+  // pushed up by its bottom). Every handoff happens with both pages at the
+  // top, so the clip never jumps. Holds and eased moves on one clock.
+  (function () {
+    const tour = document.getElementById('rtvTour');
+    if (!tour) return;
+    const BASE = 'portfolio projects/WRC/web/rtv-site/';
+    // h: page height; bg: BG-VIDEO-FOLDER height (from y 80); white: the
+    // folder's sticky 85% white is on; chart: the sliding chart's height.
+    const PAGES = {
+      rw: { h: 2214, bg: 1290, white: false, imgs: [['rally-winners.png', 0, 2214]] },
+      ch: { h: 1926, bg: 1842, white: true, chart: ['chart-championship.png', 1410], imgs: [['championship.png', 0, 1926]] },
+      ss: { h: 1926, bg: 1842, white: true, chart: ['chart-super-sunday.png', 1410], imgs: [['super-sunday.png', 0, 1926]] },
+      wp: { h: 1926, bg: 1842, white: true, chart: ['chart-wolf-power-stage.png', 581], imgs: [['wolf-power-stage.png', 0, 1926]] },
+      // Drivers: the clip runs behind the whole page (Figma's folder stops at
+      // 1922; extended so every team sits on the feed).
+      dr: { h: 3864, bg: 3864 - 80, white: true, imgs: [['drivers-top.png?v=2', 0, 1922], ['drivers-bottom.png', 1922, 1942]] },
+    };
+    const PAN = 1673 - 972;  // the chart's hidden columns
+    const FADE = 500;
+    const modal = document.getElementById('wrcModal');
+    const scroller = document.getElementById('wrcScroll');
+    const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const ease = (u) => (u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2);
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+    // The walkthrough, after the recording.
+    const segs = [];
+    let cur = { page: 'rw', s: 0, c: 0 };
+    const hold = (d) => segs.push({ d, page: cur.page, a: { ...cur }, b: { ...cur } });
+    const move = (d, s, c = 0) => { const b = { ...cur, s, c }; segs.push({ d, page: cur.page, a: { ...cur }, b, move: true }); cur = b; };
+    // A dissolve: the next page fades in at its top over the last one,
+    // which stays where it was.
+    const go = (page) => { segs.push({ d: FADE, page, from: cur.page, fromS: cur.s, fromC: cur.c, a: { page, s: 0, c: 0 }, b: { page, s: 0, c: 0 }, fade: true }); cur = { page, s: 0, c: 0 }; };
+    // Rally Winners: down to the footer (the one time it's shown), then back
+    // up to the table before handing off. At 520 the clip is still pinned
+    // to the top of the screen, as it is on the next page, so it holds still
+    // through the dissolve.
+    hold(1500); move(1300, 640); hold(900); move(1300, 2214 - 832); hold(2000); move(1300, 520); hold(400);
+    // Championship standings: the race columns slide out and back, briskly.
+    go('ch'); hold(800); move(1500, 0, PAN); hold(700); move(1100, 0, 0); hold(300);
+    // Super Sunday standings.
+    go('ss'); hold(1200);
+    // Wolf Power Stage: slide again.
+    go('wp'); hold(500); move(1400, 0, PAN); hold(600); move(1000, 0, 0); hold(300);
+    // Drivers and teams: Hyundai, M-Sport, Toyota, then back up.
+    go('dr'); hold(1200); move(1200, 560); hold(1000); move(1200, 1100); hold(1000); move(1300, 2150); hold(1000); move(1100, 2560); hold(1300); move(2200, 0); hold(700);
+    go('rw');
+    const CYCLE = segs.reduce((n, x) => n + x.d, 0);
+
+    function state(ms) {
+      let u = ms % CYCLE;
+      for (const x of segs) {
+        if (u < x.d) {
+          const k = x.move ? ease(u / x.d) : 0;
+          return { page: x.page, from: x.fade ? x.from : null, fromS: x.fromS || 0, fromC: x.fromC || 0, k: x.fade ? u / x.d : 1, s: x.a.s + (x.b.s - x.a.s) * k, c: x.a.c + (x.b.c - x.a.c) * k };
+        }
+        u -= x.d;
+      }
+      return { page: 'rw', s: 0, c: 0, k: 1 };
+    }
+
+    // Build: the shared clip layer, then one world per page.
+    const view = tour.querySelector('.rtv-view');
+    const bgWorld = document.createElement('div');
+    bgWorld.className = 'rtv-world';
+    const folder = document.createElement('div');
+    folder.className = 'rtv-folder';
+    const video = document.createElement('video');
+    video.muted = true; video.loop = true; video.playsInline = true; video.preload = 'none';
+    video.setAttribute('muted', ''); video.setAttribute('playsinline', '');
+    folder.appendChild(video);
+    bgWorld.appendChild(folder);
+    view.appendChild(bgWorld);
+    const lazy = [];
+    const worlds = {};
+    Object.entries(PAGES).forEach(([key, p]) => {
+      const w = document.createElement('div');
+      w.className = 'rtv-world';
+      w.style.height = p.h + 'px';
+      if (p.white) {
+        const wf = document.createElement('div');
+        wf.className = 'rtv-folder';
+        wf.style.height = p.bg + 'px';
+        const white = document.createElement('div');
+        white.className = 'rtv-white';
+        wf.appendChild(white);
+        w.appendChild(wf);
+        p.whiteEl = white;
+      }
+      if (p.chart) {
+        const win = document.createElement('div');
+        win.className = 'rtv-chart';
+        win.style.height = p.chart[1] + 'px';
+        const img = document.createElement('img');
+        img.alt = '';
+        img._src = BASE + p.chart[0];  // not data-src: the page hydrator would take it
+        win.appendChild(img);
+        w.appendChild(win);
+        p.chartImg = img;
+        lazy.push(img);
+      }
+      p.imgs.forEach(([f, top, h]) => {
+        const img = document.createElement('img');
+        img.className = 'rtv-page';
+        img.alt = '';
+        img.style.top = top + 'px';
+        img.style.height = h + 'px';
+        img._src = BASE + f;
+        w.appendChild(img);
+        lazy.push(img);
+      });
+      const dot = document.createElement('span');
+      dot.className = 'rtv-pdot';
+      w.appendChild(dot);
+      view.appendChild(w);
+      worlds[key] = w;
+    });
+
+    let k = 0;
+    function place(ms) {
+      const vw = view.clientWidth;
+      if (vw < 20) return;
+      k = vw / 1280;
+      const st = still ? { page: 'rw', s: 0, c: 0, k: 1 } : state(ms);
+      const p = PAGES[st.page];
+      const t = `scale(${k}) translate3d(0, ${-st.s}px, 0)`;
+      // Sticky inside the folder: the 832px frame holding the 938px video
+      // sits at y 2, the 980px white at y 48; both stay at the top of the
+      // screen until the folder's bottom (80 + bg) pushes them up.
+      // During a dissolve the clip keeps the outgoing page's place.
+      const gp = st.from ? PAGES[st.from] : p, gs = st.from ? st.fromS : st.s;
+      bgWorld.style.transform = `scale(${k}) translate3d(0, ${-gs}px, 0)`;
+      folder.style.height = gp.bg + 'px';
+      video.style.top = (clamp(gs, 2, 2 + gp.bg + 78 - 832) - 80) + 'px';
+      Object.entries(worlds).forEach(([key, w]) => {
+        const on = key === st.page, prev = key === st.from;
+        if (!on && !prev) { w.style.visibility = 'hidden'; return; }
+        w.style.visibility = 'visible';
+        w.style.opacity = on ? st.k : 1;
+        w.style.zIndex = on ? 2 : 1;
+        const ps = on ? st.s : st.fromS;
+        w.style.transform = `scale(${k}) translate3d(0, ${-ps}px, 0)`;
+        const q = PAGES[key];
+        if (q.whiteEl) q.whiteEl.style.top = (clamp(ps, 48, 48 + q.bg + 32 - 980) - 80) + 'px';
+        if (q.chartImg) q.chartImg.style.transform = `translate3d(${-(on ? st.c : st.fromC)}px, 0, 0)`;
+      });
+    }
+
+    let visible = false, loaded = false, clock = 0, last = 0, raf = 0, frozen = false;
+    function frame(now) {
+      clock += Math.min(64, now - (last || now));
+      last = now;
+      place(clock);
+      raf = visible && modal.classList.contains('open') && !still && !frozen ? requestAnimationFrame(frame) : 0;
+    }
+    function run() {
+      if (!raf && visible && !still && modal.classList.contains('open')) { last = 0; raf = requestAnimationFrame(frame); }
+      if (visible && modal.classList.contains('open')) { const pl = video.play(); if (pl) pl.catch(() => {}); } else video.pause();
+    }
+    function load() {
+      if (loaded) return;
+      loaded = true;
+      lazy.forEach((img) => { img.src = img._src; });
+      video.src = BASE + 'bg-rally.mp4';
+    }
+    new IntersectionObserver((es) => { if (es[0].isIntersecting) load(); }, { root: scroller, rootMargin: '1200px 0px' }).observe(tour);
+    new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible) { load(); if (!frozen) place(clock); } run(); }, { root: scroller }).observe(tour);
+    new MutationObserver(run).observe(modal, { attributes: true, attributeFilter: ['class'] });
+    addEventListener('resize', () => { if (!frozen) place(clock); });
+    // For exports: load everything, then draw any moment exactly, with the
+    // clip seeked to match.
+    window.rtvTour = {
+      cycle: CYCLE,
+      ready() { load(); return Promise.all(lazy.map((img) => (img.complete && img.naturalWidth) ? 0 : new Promise((r) => { img.addEventListener('load', r, { once: true }); img.addEventListener('error', r, { once: true }); }))); },
+      frame(ms) {
+        frozen = true;
+        place(ms);
+        return new Promise((done) => {
+          const go = () => {
+            const t = (ms / 1000) % (video.duration || 20);
+            if (Math.abs(video.currentTime - t) < 0.01) return done();
+            video.addEventListener('seeked', () => done(), { once: true });
+            video.currentTime = t;
+          };
+          if (video.readyState >= 1) go(); else video.addEventListener('loadedmetadata', go, { once: true });
+        });
+      },
+    };
+  })();
+</script>
+<script>
+  // Router: every page has its own address, with the HTML5 History API, so a
+  // project, About or the Playground can be linked to and shared, and Back /
+  // Forward move between them. The pages themselves still open and close
+  // with their own scripts and transitions (the router only clicks the same
+  // links a visitor would); it watches which page is showing and keeps the
+  // address in step. Locally (file://) it uses #/wrc instead of /wrc.
+  (function () {
+    const PAGES = {
+      wrc: { modal: 'wrcModal', opener: '[data-opens-wrc]', title: 'World Rally Championship' },
+      organicobello: { modal: 'productModal', opener: '[data-opens-products]', title: 'Organico Bello' },
+      kodak: { modal: 'kodakModal', opener: '[data-opens-kodak]', title: 'Kodak' },
+      ourworkisneverdone: { modal: 'bookModal', opener: '[data-opens-book]', title: 'Our Work Is Never Done' },
+      oldnewmensclub: { modal: 'bookModal2', opener: '[data-opens-book-2]', title: 'Old New Mens Club' },
+      stylesmakefights: { modal: 'bookModal3', opener: '[data-opens-book-3]', title: 'Styles Make Fights' },
+      sandiegofc: { modal: 'bookModal4', opener: '[data-opens-book-4]', title: 'San Diego Football Club' },
+      artdivision: { modal: 'adModal', opener: '[data-opens-ad]', title: 'Art Division' },
+      about: { modal: 'aboutModal', opener: '#aboutLink', title: 'About' },
+      playground: { title: 'Playground' },
+    };
+    const byModal = {};
+    Object.entries(PAGES).forEach(([slug, p]) => { if (p.modal) byModal[p.modal] = slug; });
+    const HOME_TITLE = document.title;
+    const local = location.protocol === 'file:';
+
+    // The site's root: the address minus any page name.
+    let base = location.pathname;
+    const last = base.split('/').pop().toLowerCase();
+    if (PAGES[last]) base = base.slice(0, base.length - last.length);
+    if (!base.endsWith('/')) base = base.slice(0, base.lastIndexOf('/') + 1);
+    const urlFor = (slug) => local ? (slug ? '#/' + slug : location.pathname) : base + slug;
+    const routeInUrl = () => {
+      const seg = local ? (location.hash.match(/^#\/([^/?#]+)/) || [])[1] : location.pathname.split('/').pop();
+      const s = (seg || '').toLowerCase();
+      return PAGES[s] ? s : '';
+    };
+
+    // What's showing now.
+    function current() {
+      const open = document.querySelector('.book-modal.open');
+      if (open && byModal[open.id]) return byModal[open.id];
+      if (document.body.classList.contains('playground-open')) return 'playground';
+      return '';
+    }
+
+    function setTitle(slug) {
+      document.title = slug ? PAGES[slug].title + ' — Liam Kengla' : HOME_TITLE;
+    }
+
+    // Show a page by doing what a visitor would: close what's open (through
+    // its own X), then click the page's link.
+    function show(slug) {
+      const now = current();
+      if (now === slug) return;
+      const open = document.querySelector('.book-modal.open');
+      if (open) { const x = open.querySelector('.book-close'); if (x) x.click(); }
+      const p = PAGES[slug];
+      const inPlayground = document.body.classList.contains('playground-open');
+      if (!slug) { if (inPlayground) window.closePlayground(); return; }
+      if (slug === 'playground') { if (!inPlayground) window.openPlayground(); return; }
+      // A project opened from a link lands over the carousel, not the Playground.
+      if (inPlayground && !(now === 'playground' || (now && PAGES[now].modal && document.querySelector('.playground ' + p.opener)))) window.closePlayground();
+      const el = document.querySelector(p.opener);
+      if (el) setTimeout(() => el.click(), open ? 60 : 0);
+    }
+
+    // Following the page: once it settles on a new page, the address moves
+    // with it. Going back to the page it came from steps back in history
+    // (so Back and the X agree); anything else is a new entry.
+    let expected = null, expectedUntil = 0, timer = 0, ownBack = false;
+    function sync() {
+      timer = 0;
+      const now = current();
+      if (expected !== null) {
+        if (now === expected || performance.now() > expectedUntil) expected = null;
+        return;
+      }
+      const st = history.state || {};
+      const inUrl = 'route' in st ? st.route : routeInUrl();
+      if (now === inUrl) return;
+      setTitle(now);
+      try {
+        if (st.from !== undefined && st.from !== null && st.from === now) { ownBack = true; history.back(); }
+        else history.pushState({ route: now, from: inUrl }, '', urlFor(now));
+      } catch (e) {}
+    }
+    const watch = () => { if (!timer) timer = setTimeout(sync, 160); };
+    const mo = new MutationObserver(watch);
+    document.querySelectorAll('.book-modal').forEach((m) => mo.observe(m, { attributes: true, attributeFilter: ['class'] }));
+    mo.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+
+    function go(slug) {
+      if (current() === slug) { setTitle(slug); return; }
+      expected = slug;
+      expectedUntil = performance.now() + 1500;
+      setTitle(slug);
+      show(slug);
+    }
+
+    window.addEventListener('popstate', (e) => {
+      // The router's own step back (a page closed with its X): the page is
+      // already where the address now says.
+      if (ownBack) { ownBack = false; setTitle(current()); return; }
+      const slug = e.state && 'route' in e.state ? e.state.route : routeInUrl();
+      go(slug);
+    });
+    if (local) window.addEventListener('hashchange', () => { if (!history.state) go(routeInUrl()); });
+
+    // Arriving: home is the first entry, so Back from a linked page lands on
+    // the homepage rather than leaving the site.
+    const start = window.__route || routeInUrl();
+    try {
+      history.replaceState({ route: '', from: null }, '', urlFor(''));
+      if (start) history.pushState({ route: start, from: '' }, '', urlFor(start));
+    } catch (e) {}
+    if (start) go(start);
+  })();
+</script>
 </body>
 </html>
