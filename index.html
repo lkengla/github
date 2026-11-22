@@ -6200,7 +6200,7 @@
         <span class="ba-tag is-after" aria-hidden="true">After</span>
       </div>
     </div>
-    <p class="interjection is-long is-near">A companion mark for Rally.TV, the championship's streaming platform, drawn from the same system as the WRC logo and the custom typeface.</p>
+    <p class="interjection is-long is-near">A complementary mark for Rally.TV, the championship's streaming platform, drawn from the same system as the WRC logo and the custom typeface.</p>
     <div class="wrc-section">
       <div class="wrc-logos">
         <div class="wrc-logo"><img data-src="portfolio projects/WRC/logos/full logo WRC copy.png" alt="WRC logo, FIA World Rally Championship" width="4589" height="2058" loading="lazy"></div>
@@ -6518,8 +6518,8 @@
         </div>
       </div>
       <figure class="about-portrait" id="aboutPortrait">
-        <img data-src="about/portrait-0995.jpg" alt="Liam Kengla" width="1400" height="2100">
-        <img class="alt" data-src="about/portrait-0994.jpg" alt="" width="1400" height="2100" aria-hidden="true">
+        <img data-src="about/portrait-1305.jpg" alt="Liam Kengla" width="1400" height="2100">
+        <img class="alt" data-src="about/portrait-1306.jpg" alt="" width="1400" height="2100" aria-hidden="true">
       </figure>
     </div>
     <div class="book-contact">
@@ -7435,15 +7435,23 @@
   // Touch screens can't hover to pause or glide to scrub, so there the
   // books simply play through once opened: no paging, no strip (a plain
   // progress line instead), and the cues say so. See html.touch-player.
-  window.touchPlayer = () => window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  // Phone-width windows count too, so the mobile layout always gets the
+  // simple playthrough (no strip, no hover cues) whatever the device.
+  const TOUCH_PLAYER_QUERY = window.matchMedia('(hover: none) and (pointer: coarse), (max-width: 640px)');
+  window.touchPlayer = () => TOUCH_PLAYER_QUERY.matches;
   (function () {
     const apply = () => {
       const on = window.touchPlayer();
       document.documentElement.classList.toggle('touch-player', on);
+      document.querySelectorAll('.player-hint, .player-hint-playing').forEach((h) => {
+        if (h.dataset.desktop === undefined) h.dataset.desktop = h.innerHTML;
+        if (!on) h.innerHTML = h.dataset.desktop;
+      });
       if (!on) return;
       document.querySelectorAll('.player-hint').forEach((h) => { h.textContent = 'Tap to open the book and start autoplay'; });
-      document.querySelectorAll('.player-hint-playing').forEach((h) => { h.innerHTML = '<span>Full interactive playthrough available on desktop</span>'; });
+      document.querySelectorAll('.player-hint-playing').forEach((h) => { h.innerHTML = ''; });
     };
+    if (TOUCH_PLAYER_QUERY.addEventListener) TOUCH_PLAYER_QUERY.addEventListener('change', apply);
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply);
     else apply();
   })();
@@ -7696,7 +7704,7 @@
     // resets back to the closed cover, ready to be opened again. Hovering
     // pauses on whatever frame is currently showing, resuming when the
     // mouse moves away.
-    const FRAME_MS = 500;
+    const FRAME_MS = window.touchPlayer() ? 320 : 500; // phones page through a little faster
     const FLIP_MS = 900; // matches the .cover-flip transition duration
     const END_HOLD_MS = 500; // pause on the half-final page before closing
     const SHUT_HOLD_MS = 3000; // pause on the shut back cover before resetting
@@ -8193,7 +8201,7 @@
     // half-final are single pages with no gutter to show one.
     const isFullSpread = (index) => index !== 0 && index !== spreads.length - 1;
 
-    const FRAME_MS = 500;
+    const FRAME_MS = window.touchPlayer() ? 320 : 500; // phones page through a little faster
     const FLIP_MS = 900;
     const END_HOLD_MS = 500;
     const SHUT_HOLD_MS = 3000;
@@ -8557,7 +8565,7 @@
     // half-final are single pages with no gutter to show one.
     const isFullSpread = (index) => index !== 0 && index !== spreads.length - 1;
 
-    const FRAME_MS = 500;
+    const FRAME_MS = window.touchPlayer() ? 320 : 500; // phones page through a little faster
     const FLIP_MS = 900;
     const END_HOLD_MS = 500;
     const SHUT_HOLD_MS = 3000;
@@ -9309,7 +9317,7 @@
       onScrubbing: (on) => { scrubbing = on; },
     });
 
-    const FRAME_MS = 500;
+    const FRAME_MS = window.touchPlayer() ? 320 : 500; // phones page through a little faster
     const FLIP_MS = 900;
     const END_HOLD_MS = 500;
     const SHUT_HOLD_MS = 3000;
