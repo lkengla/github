@@ -5271,6 +5271,93 @@
       display: none;
     }
   }
+  /* Kodak on phones. */
+  .kd-note-under { display: none; }
+
+  @media (max-width: 640px) {
+    /* The size note sits under the size buttons instead of above. */
+    .kd-note-top { display: none; }
+    .kd-part:has(.kd-note-top) .interjection { padding-bottom: 32px; }
+    .kd-note.kd-note-under {
+      display: block;
+      margin: 16px 0 0;
+      padding: 0;
+    }
+
+    /* Footer captions wrap inside the screen. */
+    .kd-footers .kd-cell figcaption {
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    /* Every page resizing: one page at a time in a swipeable row, the
+       next one peeking in, instead of five stacked down the screen. */
+    .kd-all .kd-grid {
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .kd-all .kd-grid::-webkit-scrollbar { display: none; }
+
+    .kd-all .kd-grid .kd-cell {
+      flex: 0 0 84%;
+      scroll-snap-align: center;
+    }
+
+    /* The explorer's instruction: small mono, under the page buttons. */
+    .kd-side-text {
+      margin-top: 16px;
+      font-family: inherit;
+      font-size: 13px;
+      line-height: 1.45;
+      letter-spacing: 0;
+    }
+  }
+
+  /* When a phone (or anything) asks for less motion, the before/after
+     can't sweep, so it shows both: before on top, after under it. */
+  @media (prefers-reduced-motion: reduce) {
+    .kd-swipe-box {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: visible;
+    }
+
+    .kd-swipe-old {
+      position: static;
+      order: 0;
+      clip-path: none;
+    }
+
+    .kd-swipe-box::after {
+      content: "After";
+      order: 1;
+      margin-top: 8px;
+    }
+
+    .kd-swipe-old::before {
+      content: "Before";
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .kd-swipe-box::after,
+    .kd-swipe-old::before {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .kd-swipe-box > img { order: 2; }
+    .kd-swipe-old img { display: block; width: 100%; height: auto; }
+    .kd-swipe-line,
+    .kd-swipe-tags { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -6040,7 +6127,7 @@
     </div>
     <div class="kd-part">
       <p class="interjection is-long">Two footers, one for the homepage and one for every other page, at every size.</p>
-      <span class="kd-note">Click a size to change the preview.</span>
+      <span class="kd-note kd-note-top">Click a size to change the preview.</span>
     </div>
     <div class="kd-resize kd-footers">
       <div class="kd-grid">
@@ -6066,10 +6153,11 @@
       </figure>
       </div>
       <div class="kd-sizes" aria-label="Show both footers at one size"><button type="button">Phone</button><button type="button">Tablet</button><button type="button">Laptop</button><button type="button">Desktop</button></div>
+      <span class="kd-note kd-note-under"><span class="for-hover">Click</span><span class="for-touch">Tap</span> a size to change the preview.</span>
     </div>
     <div class="kd-part">
       <p class="interjection is-long">Every page scales from iPhone to large desktop, 360 to 2000px.</p>
-      <span class="kd-note">Click a size to change the preview.</span>
+      <span class="kd-note kd-note-top">Click a size to change the preview.</span>
     </div>
     <div class="kd-resize kd-all" id="kodakResizeAll">
       <div class="kd-grid">
@@ -6125,6 +6213,7 @@
       </figure>
       </div>
       <div class="kd-sizes" aria-label="Show every page at one size"><button type="button">Phone</button><button type="button">Tablet</button><button type="button">Laptop</button><button type="button">Desktop</button></div>
+      <span class="kd-note kd-note-under"><span class="for-touch">Swipe across for each page. Tap</span><span class="for-hover">Scroll across for each page. Click</span> a size to change the preview.</span>
     </div>
     <div class="kd-part">
       <p class="interjection">The full website, one page at a time.</p>
