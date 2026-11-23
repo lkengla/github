@@ -9,7 +9,7 @@
   // page's relative paths still resolve); and the page named in the address
   // is noted so the intro can step aside for it.
   (function () {
-    var ROUTES = ['wrc', 'organicobello', 'kodak', 'ourworkisneverdone', 'oldnewmensclub', 'stylesmakefights', 'sandiegofc', 'artdivision', 'about', 'playground'];
+    var ROUTES = ['wrc', 'organicobello', 'kodak', 'ourworkisneverdone', 'oldnewmensclub', 'stylesmakefights', 'sandiegofc', 'artdivision', 'contact', 'playground'];
     var l = location, q = new URLSearchParams(l.search).get('p');
     try {
       if (q !== null) history.replaceState(null, '', l.pathname + q.replace(/\/+$/, '') + l.hash);
@@ -17,6 +17,14 @@
     } catch (e) {}
     var seg = l.protocol === 'file:' ? (l.hash.match(/^#\/([^/?#]+)/) || [])[1] : l.pathname.split('/').pop();
     seg = (seg || '').toLowerCase();
+    // The Contact page used to live at /about; old links land on /contact.
+    if (seg === 'about') {
+      seg = 'contact';
+      try {
+        if (l.protocol === 'file:') history.replaceState(null, '', l.pathname + l.search + l.hash.replace(/^#\/about/i, '#/contact'));
+        else history.replaceState(null, '', l.pathname.replace(/about$/i, 'contact') + l.search + l.hash);
+      } catch (e) {}
+    }
     window.__route = ROUTES.indexOf(seg) >= 0 ? seg : '';
   })();
 </script>
@@ -2351,7 +2359,7 @@
     height: auto;
   }
 
-  /* Placeholders until the business card renders are in. 3.5 x 2 in. */
+  /* Business card slots (3.5 x 2 in). Markup removed until the cards are scanned; re-add <div class="card-placeholder"> or the card images under each envelope pair. */
   #wrcModal .card-placeholder {
     width: 60%;
     align-self: center;
@@ -5202,7 +5210,7 @@
   // The intro (playIntro, after the header) plays on every load unless the
   // visitor prefers reduced motion. Flagged here, before the header is
   // drawn, so the page never flashes in first.
-  // A link straight to a page (/wrc, /about...) skips it and opens that page.
+  // A link straight to a page (/wrc, /contact...) skips it and opens that page.
   if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && !window.__route) {
     document.documentElement.classList.add('intro');
     document.body.style.overflow = 'hidden';
@@ -5214,7 +5222,7 @@
   <div class="info">
     <span id="navToggle" class="nav-ask"><span>What do</span> <span>you need?</span></span>
     <nav class="pages">
-      <a href="#" id="aboutLink">About</a>
+      <a href="#" id="aboutLink">Contact</a>
       <a href="#" id="playgroundLink">Playground</a>
     </nav>
     <button class="close" id="headerClose" aria-label="Close">&times;</button>
@@ -6265,14 +6273,10 @@
         <div class="st-col">
           <img data-src="portfolio projects/WRC/web/envelope-wrc-front.webp" alt="WRC envelope, front" loading="lazy">
           <img data-src="portfolio projects/WRC/web/envelope-wrc-back.webp" alt="WRC envelope, back" loading="lazy">
-          <div class="card-placeholder" role="img" aria-label="WRC business card, front (coming soon)"></div>
-          <div class="card-placeholder" role="img" aria-label="WRC business card, back (coming soon)"></div>
         </div>
         <div class="st-col">
           <img data-src="portfolio projects/WRC/web/envelope-rtv-back.webp" alt="Rally.TV envelope, back" loading="lazy">
           <img data-src="portfolio projects/WRC/web/envelope-rtv-front.webp" alt="Rally.TV envelope, front" loading="lazy">
-          <div class="card-placeholder" role="img" aria-label="Rally.TV business card, front (coming soon)"></div>
-          <div class="card-placeholder" role="img" aria-label="Rally.TV business card, back (coming soon)"></div>
         </div>
       </div>
     </div>
@@ -10300,7 +10304,7 @@
       const h2 = m.querySelector('h2');
       m.setAttribute('role', 'dialog');
       m.setAttribute('aria-modal', 'true');
-      m.setAttribute('aria-label', h2 ? h2.textContent.trim() : (m.id === 'aboutModal' ? 'About' : 'What do you need?'));
+      m.setAttribute('aria-label', h2 ? h2.textContent.trim() : (m.id === 'aboutModal' ? 'Contact' : 'What do you need?'));
       const scroll = m.querySelector('.gallery-scroll');
       if (scroll) scroll.setAttribute('tabindex', '-1');
       let wasOpen = false;
@@ -10653,7 +10657,7 @@
       stylesmakefights: { modal: 'bookModal3', opener: '[data-opens-book-3]', title: 'Styles Make Fights' },
       sandiegofc: { modal: 'bookModal4', opener: '[data-opens-book-4]', title: 'San Diego Football Club' },
       artdivision: { modal: 'adModal', opener: '[data-opens-ad]', title: 'Art Division' },
-      about: { modal: 'aboutModal', opener: '#aboutLink', title: 'About' },
+      contact: { modal: 'aboutModal', opener: '#aboutLink', title: 'Contact' },
       playground: { title: 'Playground' },
     };
     const byModal = {};
