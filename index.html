@@ -3647,6 +3647,21 @@
     opacity: 1;
   }
 
+  /* In Hand trades the two hand photos every 2.5s with a slow fade: the
+     new one fades in over the old, which stays put underneath. */
+  .ob-view img.is-hand {
+    transition-duration: 0.8s;
+  }
+
+  .ob-view img.on.is-hand {
+    z-index: 1;
+  }
+
+  .ob-view img.under {
+    opacity: 1;
+    transition: none;
+  }
+
   /* Angle buttons spaced well apart, so two-word labels read as one
      button each. */
   #obPasta .kd-tabs {
@@ -3696,6 +3711,7 @@
   }
 
   .ob-backs img,
+  .ob-grid-2 img,
   .ob-grid-3 img,
   .ob-grid-4 img {
     display: block;
@@ -3754,11 +3770,14 @@
     margin-top: 16px;
   }
 
+  .ob-grid-2,
   .ob-grid-3,
   .ob-grid-4 {
     display: grid;
     gap: 16px;
   }
+
+  .ob-grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
   .ob-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .ob-grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -3771,8 +3790,25 @@
     .ob-materials { grid-template-columns: minmax(0, 1fr); }
   }
 
+  /* Two across: the first sketch goes full width over the other two. */
+  @media (max-width: 900px) {
+    .ob-big-first > :first-child { grid-column: 1 / -1; }
+  }
+
   @media (max-width: 640px) {
     .ob-grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    /* Painting on phones: the painted lids full width, then the two
+       portraits side by side. */
+    .pj-row.ob-paint {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .pj-row.ob-paint > img:last-child {
+      grid-column: 1 / -1;
+      order: -1;
+    }
 
     /* The product photos carry ~15% white above and below each jar, so
        on phones they zoom 12% inside their square (nothing of the
@@ -6419,10 +6455,10 @@
           <img data-src="portfolio projects/OrganicoBello/web/OB-penne_rigate-back.webp" alt="Penne Rigate bag, back" width="1600" height="1600">
           <img data-src="portfolio projects/OrganicoBello/web/OB-penne_rigate-left.webp" alt="Penne Rigate bag, left side" width="1600" height="1600">
           <img data-src="portfolio projects/OrganicoBello/web/OB-penne_rigate-top.webp" alt="Penne Rigate bag, top" width="1600" height="1600">
-          <img data-src="portfolio projects/OrganicoBello/web/hand models/OB-penne_rigate-front-hand_model.webp" alt="Penne Rigate bag, in hand" width="2880" height="1800">
-          <img data-src="portfolio projects/OrganicoBello/web/hand models/OB-penne_rigate-right-hand_model.webp" alt="Penne Rigate bag, in hand, side" width="2880" height="1800">
+          <img data-src="portfolio projects/OrganicoBello/web/hand models/OB-penne_rigate-front-hand_model.webp" alt="Penne Rigate bag, in hand" width="2880" height="1800" class="is-hand">
+          <img data-src="portfolio projects/OrganicoBello/web/hand models/OB-penne_rigate-right-hand_model.webp" alt="Penne Rigate bag, in hand, side" width="2880" height="1800" class="is-hand">
       </div>
-      <div class="kd-tabs" aria-label="Viewing angle"><button type="button" class="on">Front</button><button type="button">Right Side</button><button type="button">Back</button><button type="button">Left Side</button><button type="button">Top</button><button type="button">In Hand 1</button><button type="button">In Hand 2</button></div>
+      <div class="kd-tabs" aria-label="Viewing angle"><button type="button" class="on">Front</button><button type="button">Right Side</button><button type="button">Back</button><button type="button">Left Side</button><button type="button">Top</button><button type="button">In Hand</button></div>
       <p class="kd-note ob-pasta-note"><span class="for-hover">Click an angle to turn the bag.</span><span class="for-touch">Tap an angle to hold it.</span></p>
     </div>
     <div class="kd-part">
@@ -6467,7 +6503,7 @@
       <p class="interjection is-long">Hand&#8209;drawn logo ideations, then paper form studies on the jars until the label shape was right.</p>
       <span class="kd-label">Process</span>
     </div>
-    <div class="pj-section ob-grid-3">
+    <div class="pj-section ob-grid-3 ob-big-first">
       <img data-src="portfolio projects/OrganicoBello/web/process/logo-sketchbook-1.jpg" alt="Hand-drawn Bello logo sketches" width="1600" height="1172" loading="lazy">
       <img data-src="portfolio projects/OrganicoBello/web/process/logo-sketchbook-2.jpg" alt="Hand-drawn Bello logo sketches with grape marks" width="1600" height="1132" loading="lazy">
       <img data-src="portfolio projects/OrganicoBello/web/process/logo-sketchbook-3.jpg" alt="Hand-drawn Bello monograms and marks" width="1600" height="1102" loading="lazy">
@@ -6482,16 +6518,14 @@
       <img data-src="portfolio projects/OrganicoBello/web/process/form-7.jpg" alt="Paper label form study #7" width="1400" height="1050" loading="lazy">
       <img data-src="portfolio projects/OrganicoBello/web/process/form-8.jpg" alt="Paper label form study #8" width="1400" height="1050" loading="lazy">
     </div>
-    <div class="pj-section ob-grid-3">
+    <div class="pj-section ob-grid-2">
       <img data-src="portfolio projects/OrganicoBello/web/process/form-final-1202.jpg" alt="Birch paper label with a window cutout" width="1400" height="1050" loading="lazy">
-      <img data-src="portfolio projects/OrganicoBello/web/process/form-final-1204.jpg" alt="Birch paper labels with window cutouts on three jars" width="1400" height="1050" loading="lazy">
       <img data-src="portfolio projects/OrganicoBello/web/process/form-final-1205.jpg" alt="Final birch paper label forms" width="1400" height="1050" loading="lazy">
     </div>
-    <div class="pj-section pj-row">
+    <div class="pj-section pj-row ob-paint">
       <img data-src="portfolio projects/OrganicoBello/web/process/painting-1.jpg" alt="Painting the jar lids" width="1050" height="1400" loading="lazy" style="--ar: 0.750">
       <img data-src="portfolio projects/OrganicoBello/web/process/painting-2.jpg" alt="Painting the jar lids" width="1050" height="1400" loading="lazy" style="--ar: 0.750">
-      <img data-src="portfolio projects/OrganicoBello/web/process/painting-3.jpg" alt="Painting the jar lids" width="1050" height="1400" loading="lazy" style="--ar: 0.750">
-      <img data-src="portfolio projects/OrganicoBello/web/process/painting-4.jpg" alt="Painting the jar lids" width="1400" height="1050" loading="lazy" style="--ar: 1.333">
+      <img data-src="portfolio projects/OrganicoBello/web/process/painting-4.jpg" alt="Painted jar lids" width="1400" height="1050" loading="lazy" style="--ar: 1.333">
     </div>
     <div class="book-contact">
       <span>Copyright 2026 Liam Kengla</span>
@@ -9044,17 +9078,42 @@
     const viewer = document.getElementById('obPasta');
     const views = [...viewer.querySelectorAll('.ob-view img')];
     const angleButtons = [...viewer.querySelectorAll('.kd-tabs button')];
-    let angle = 0;
+    // Buttons 0-4 are the angles; the last, In Hand, trades the two hand
+    // photos (the last two views) every HAND_MS until another is picked.
+    const HAND_MS = 2500;
+    const IN_HAND = angleButtons.length - 1;
+    let angle = 0, hand = 0, handTimer = null, underTimer = null;
+    function render() {
+      const shown = angle === IN_HAND ? IN_HAND + hand : angle;
+      views.forEach((v, j) => v.classList.toggle('on', j === shown));
+      angleButtons.forEach((b, j) => b.classList.toggle('on', j === angle));
+    }
     function showAngle(i) {
       angle = i;
-      views.forEach((v, j) => v.classList.toggle('on', j === i));
-      angleButtons.forEach((b, j) => b.classList.toggle('on', j === i));
+      hand = 0;
+      clearInterval(handTimer);
+      clearTimeout(underTimer);
+      views.forEach((v) => v.classList.remove('under'));
+      render();
+      if (i === IN_HAND) handTimer = setInterval(() => {
+        const out = views[IN_HAND + hand];
+        out.classList.add('under');
+        hand ^= 1;
+        render();
+        clearTimeout(underTimer);
+        underTimer = setTimeout(() => out.classList.remove('under'), 900);
+      }, HAND_MS);
     }
     angleButtons.forEach((button, i) => button.addEventListener('click', () => {
       showAngle(i);
-      viewer.obHeldUntil = performance.now() + OB_HOLD_MS;
+      // In Hand keeps trading until another button is picked.
+      viewer.obHeldUntil = i === IN_HAND ? Infinity : performance.now() + OB_HOLD_MS;
     }));
-    viewer.obStep = () => showAngle((angle + 1) % views.length);
+    viewer.obStep = () => {
+      showAngle(angle === IN_HAND ? 0 : angle + 1);
+      // Turning on its own, In Hand stays long enough to show both photos.
+      if (angle === IN_HAND) viewer.obHeldUntil = performance.now() + 2 * HAND_MS;
+    };
 
     const autoTurners = [...modal.querySelectorAll('.ob-spin'), viewer];
     const onScreen = new Set();
