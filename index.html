@@ -5237,6 +5237,40 @@
     }
   }
 
+  /* Phones: tighter gaps between photos and spreads on every project
+     page, a smaller turning book on Our Work Is Never Done, and only its
+     first description paragraph (desktop keeps both to fill beside the
+     credits column). */
+  @media (max-width: 640px) {
+    #wrcModal { --wrc-gap: 8px; }
+    .pj-page { --pj-gap: 8px; }
+
+    .gallery-row,
+    #bookModal .gallery-row,
+    .binding-row {
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .ob-grid-2,
+    .ob-grid-3,
+    .ob-grid-4 {
+      gap: 8px;
+    }
+
+    .ow-book {
+      min-height: 0;
+      padding-bottom: 48px;
+    }
+
+    .ow-book .book-3d {
+      --book-h: min(calc(52vh - var(--fade-bottom)), 400px);
+    }
+
+    p.desktop-only {
+      display: none;
+    }
+  }
 </style>
 </head>
 <body>
@@ -5693,7 +5727,7 @@
           <div class="pt-description">
             <h3>Project Description</h3>
             <p style="max-width: 50ch">Our Work Is Never Done, an 800&#8209;page book on Mexican&#8209;American immigration, features case studies of non&#8209;violent protests, community injustices, and stories of labor from the 1930s&ndash;1970s, offering a powerful narrative of Mexican resilience and community.</p>
-            <p style="max-width: 54ch">Designed as an intimate read, the book uses a one&#8209;column format, long image sequences, and personal stories. Its small trim size evokes a field journal, while its unusual length creates a bible&#8209;like presence in the hand. Created in reaction to the current administration&rsquo;s views and actions on immigration, the book is a passionate, content&#8209;rich record of Mexican&#8209;American history.</p>
+            <p class="desktop-only" style="max-width: 54ch">Designed as an intimate read, the book uses a one&#8209;column format, long image sequences, and personal stories. Its small trim size evokes a field journal, while its unusual length creates a bible&#8209;like presence in the hand. Created in reaction to the current administration&rsquo;s views and actions on immigration, the book is a passionate, content&#8209;rich record of Mexican&#8209;American history.</p>
           </div>
           <div>
             <h3>Design</h3><p>L.J. Kengla</p>
