@@ -55,3 +55,22 @@ portfolio projects/OrganicoBello/new info /
 
 # Local phone preview server, not part of the site
 serve-phone.py
+
+# Raw source files the site never loads (kept local; Pages upload cap is 1 GB)
+/portfolio projects/OldNewMensClub/OldNewMensClub-Interior-No_shadow
+/portfolio projects/OldNewMensClub/interior spreads
+/portfolio projects/OldNewMensClub/highlight spreads
+/portfolio projects/OldNewMensClub/Final_Poster.jpg
+/portfolio projects/OldNewMensClub/gallery.jpg
+/portfolio projects/StylesMakeFights/interior_spreads
+/portfolio projects/OrganicoBello/hand models
+/portfolio projects/OurWorkIsNeverDone/cover scans
+/portfolio projects/SanDiego-Football-Club/clothing-clear-background
+/portfolio projects/SanDiego-Football-Club/seahorses
+/portfolio projects/SanDiego-Football-Club/SDC-macro-poster-1.jpg.jpg
+/portfolio projects/SanDiego-Football-Club/logo_poster_3 copy.jpg
+/portfolio projects/SanDiego-Football-Club/SDFC-hiving_lozano-poster.jpg
+/portfolio projects/SanDiego-Football-Club/SDFC-bis_card-mock.jpg
+/portfolio projects/SanDiego-Football-Club/SDFC-staff-badge.jpg
+/portfolio projects/SanDiego-Football-Club/jersey_v3 copy.jpg
+/portfolio projects/SanDiego-Football-Club/Jersey_v1 copy.jpg
