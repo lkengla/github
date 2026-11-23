@@ -2869,18 +2869,17 @@
     .wrc-run .car { display: none; }
   }
 
-  /* Phones: one column, each mark followed by its motion. */
+  /* Phones: one column, WRC over Rally.TV. */
   @media (max-width: 640px) {
     #wrcModal .wrc-logos {
       grid-template-columns: minmax(0, 1fr);
     }
 
+    /* Phones show only the animated marks. When a phone won't play the
+       motion they sit still as the standard logos, so nothing repeats. */
+    #wrcModal .wrc-logos > :nth-child(1),
     #wrcModal .wrc-logos > :nth-child(2) {
-      order: 1;
-    }
-
-    #wrcModal .wrc-logos > :nth-child(4) {
-      order: 2;
+      display: none;
     }
   }
 
@@ -6187,9 +6186,7 @@
       <div class="project-texts">
         <div class="pt-description">
           <h3>Project Description</h3>
-          <p style="max-width: 50ch">This proposed rebrand of the World Rally Championship and its streaming service, Rally.TV, is designed to attract new viewers, building on the recent rise in Formula&nbsp;1 viewership under the same governing body, the FIA.</p>
-          <p style="max-width: 48ch">A visual system inspired by important details of rally racing, referencing the physical forms that appear in racing, through the weight reduction concept and a typeface inspired by the shape language of track iconography, as well as the spirited, enthusiast side of motorsport, through posters and layouts inspired by vintage automotive advertisements.</p>
-          <p style="max-width: 51ch">Promotional materials are aimed at building interest in the sport and teaching fans more about it as they enjoy it, alongside user interface design that prioritizes live streaming.</p>
+          <p style="max-width: 50ch">This proposed rebrand of the World Rally Championship and its streaming service, Rally.TV, is designed to attract new viewers, building on the recent rise in Formula&nbsp;1 viewership under the same governing body, the FIA. Promotional materials teach fans more about the sport as they enjoy it.</p>
         </div>
         <div>
           <h3>Design</h3><p>L.J. Kengla</p>
